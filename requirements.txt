@@ -7,3 +7,4 @@ python-decouple>=3.8
 clerk-backend-api>=7.0,<8
 svix>=1.40
 gunicorn>=22.0
+Pillow>=11.0

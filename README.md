@@ -27,9 +27,19 @@ Health check: `GET http://localhost:8000/api/v1/health/`
 | GET | `/api/v1/health/` | anyone |
 | GET / PATCH | `/api/v1/me/` | signed in (`Authorization: Bearer <Clerk session token>`) |
 | POST | `/api/v1/webhooks/clerk/` | Clerk (Svix-signed) |
+| GET | `/api/v1/candidates/` (`?position=&state=&election_year=&q=&page=`) | anyone — published only |
+| GET | `/api/v1/candidates/positions/` | anyone |
+| GET | `/api/v1/candidates/<slug>/` | anyone — 404 unless published |
+| GET / POST | `/api/v1/admin/candidates/` | system admin |
+| GET / PATCH | `/api/v1/admin/candidates/<id>/` | system admin |
+| POST | `/api/v1/admin/candidates/<id>/{verify,unverify,publish,unpublish,archive,restore}/` | system admin |
+| PUT / DELETE | `/api/v1/admin/candidates/<id>/photo/` (multipart `photo`, `rights_confirmed=true`) | system admin |
+| GET / POST | `/api/v1/admin/candidates/<id>/accounts/` · DELETE `…/accounts/<user_id>/` | system admin |
+
+Candidate photos are saved under `media/` (git-ignored) in development and served by Django only when `DEBUG` is on.
 
 Errors always look like `{"error": {"status", "code", "message", "fields"}}`.
-Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429).
+Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429), `invalid_transition` (409), `invalid_photo` (400), `storage_unavailable` (503).
 
 ## Roles (no UI yet)
 

@@ -16,6 +16,15 @@ class AuditLog(models.Model):
         ROLE_REVOKED = "role.revoked"
         USER_DEACTIVATED = "user.deactivated"
         USER_REACTIVATED = "user.reactivated"
+        CANDIDATE_CREATED = "candidate.created"
+        CANDIDATE_UPDATED = "candidate.updated"
+        CANDIDATE_VERIFIED = "candidate.verified"
+        CANDIDATE_UNVERIFIED = "candidate.unverified"
+        CANDIDATE_PUBLISHED = "candidate.published"
+        CANDIDATE_UNPUBLISHED = "candidate.unpublished"
+        CANDIDATE_ARCHIVED = "candidate.archived"
+        CANDIDATE_RESTORED = "candidate.restored"
+        CANDIDATE_PHOTO_UPDATED = "candidate.photo_updated"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

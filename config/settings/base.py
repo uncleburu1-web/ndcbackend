@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "apps.audit",
     "apps.accounts",
     "apps.access",
+    "apps.candidates",
 ]
 
 MIDDLEWARE = [
@@ -78,6 +79,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "profile_write": "20/min",
         "clerk_webhook": "300/min",
+        "candidates_public": "120/min",  # generous per-IP limit against scraping bursts (spec 03 §9)
     },
 }
 
@@ -93,6 +95,13 @@ USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Media (candidate photos, spec 03 §5.3). Local disk in development; the production
+# provider (Cloudinary or S3-compatible, spec 03 §15.1) is a STORAGES setting change.
+MEDIA_URL = config("MEDIA_URL", default="/media/")
+MEDIA_ROOT = BASE_DIR / "media"
+CANDIDATE_PHOTO_MAX_BYTES = 5 * 1024 * 1024
+CANDIDATE_PHOTO_MIN_SIDE = 400
 
 LOGGING = {
     "version": 1,
