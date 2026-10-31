@@ -35,6 +35,11 @@ Health check: `GET http://localhost:8000/api/v1/health/`
 | POST | `/api/v1/admin/candidates/<id>/{verify,unverify,publish,unpublish,archive,restore}/` | system admin |
 | PUT / DELETE | `/api/v1/admin/candidates/<id>/photo/` (multipart `photo`, `rights_confirmed=true`) | system admin |
 | GET / POST | `/api/v1/admin/candidates/<id>/accounts/` · DELETE `…/accounts/<user_id>/` | system admin |
+| PUT / PATCH / DELETE | `/api/v1/me/follows/<slug>/` — follow (201/200) · `{"notify": bool}` · unfollow (always 204) | signed in |
+| GET | `/api/v1/me/follows/` (Following page, + `hidden_count`) · `?slugs=a,b` (≤ 50, follow state) | signed in |
+
+Single-candidate admin responses include `followers: {total, notify_on}` — counts only; no endpoint lists who follows a candidate.
+Follows are political-opinion data (NDPA 2023): private to the user, never audited, deleted when the account is deleted.
 
 Candidate photos are saved under `media/` (git-ignored) in development and served by Django only when `DEBUG` is on.
 

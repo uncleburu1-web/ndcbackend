@@ -101,7 +101,12 @@ def mark_deleted(clerk_user_id: str) -> Optional[User]:
         user.clerk_synced_at = now
         user.save()
         roles_revoked = user.role_assignments.filter(is_active=True).update(is_active=False, revoked_at=now)
-    record(AuditLog.Action.USER_DELETED, target=user, actor_label="clerk:webhook", roles_revoked=roles_revoked)
+        # Who they followed is political-opinion data; it must not outlive the account (spec 04 §6.2).
+        from apps.follows.services import remove_all_for_user
+
+        follows_removed = remove_all_for_user(user)
+    record(AuditLog.Action.USER_DELETED, target=user, actor_label="clerk:webhook", roles_revoked=roles_revoked,
+           follows_removed=follows_removed)
     return user
 
 

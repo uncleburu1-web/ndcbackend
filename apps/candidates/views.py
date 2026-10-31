@@ -134,7 +134,12 @@ class PublicCandidateDetail(generics.RetrieveAPIView):
 
 # ---------------------------------------------------------------------- admin
 def _admin_data(c, request):
-    return AdminCandidateSerializer(c, context={"request": request}).data
+    """Single-record admin responses also carry follower counts — counts only, never who (spec 04 §7.4)."""
+    from apps.follows.services import follower_counts
+
+    data = AdminCandidateSerializer(c, context={"request": request}).data
+    data["followers"] = follower_counts(c)
+    return data
 
 
 class AdminCandidateList(APIView):

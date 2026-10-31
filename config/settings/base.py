@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.access",
     "apps.candidates",
+    "apps.follows",
 ]
 
 MIDDLEWARE = [
@@ -80,6 +81,7 @@ REST_FRAMEWORK = {
         "profile_write": "20/min",
         "clerk_webhook": "300/min",
         "candidates_public": "120/min",  # generous per-IP limit against scraping bursts (spec 03 §9)
+        "follows": "60/min",  # per user, follow/unfollow/notify writes (spec 04 §7.5)
     },
 }
 
