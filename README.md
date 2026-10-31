@@ -1,6 +1,6 @@
 # ndcbackend
 
-NDCConnect API — Django 5.1 + Django REST Framework + PostgreSQL. Authentication is Clerk (`feature-specs/02-authentication.md`).
+NDCConnect API — Django 5.2 LTS + Django REST Framework + PostgreSQL. Authentication is Clerk (`feature-specs/02-authentication.md`).
 
 ## Run
 
