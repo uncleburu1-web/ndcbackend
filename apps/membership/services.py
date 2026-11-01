@@ -22,8 +22,8 @@ from apps.candidates.photos import PhotoError, load_validated_rgb, square_webp
 from apps.core import crypto
 from apps.core.exceptions import ServiceError
 from apps.payments.providers import ProviderError, get_provider
-from apps.pvc.models import PvcStatus, PvcVerification
 from apps.pvc.services import is_verified as pvc_verified
+from apps.pvc.services import status_for as pvc_status_for
 
 from .models import (
     OPEN_PAYMENT_STATES,
@@ -81,8 +81,7 @@ def membership_open() -> bool:
 
 def config_payload() -> dict:
     return {"open": membership_open(), "fee_kobo": settings.MEMBERSHIP_FEE_KOBO,
-            "requires_approval": MembershipSettings.current().requires_approval,
-            "inec_pvc_url": settings.INEC_PVC_URL or None}  # public: "Get your PVC" for guests too
+            "requires_approval": MembershipSettings.current().requires_approval}  # PVC links live at /pvc/config/ (spec 08)
 
 
 # ---------------------------------------------------------------- helpers
@@ -449,16 +448,16 @@ def set_requires_approval(value: bool, *, admin, request=None) -> MembershipSett
 # ----------------------------------------------------------- user status (§6.4)
 def display_status(user) -> str:
     m = membership_for(user)
-    pvc = PvcVerification.objects.filter(user=user).values_list("status", flat=True).first()
+    pvc = pvc_status_for(user)  # PVC is its own unit; membership only reads its status (spec 08 §6.2)
     if m and m.status in (M.PAYMENT_PENDING, M.PENDING_APPROVAL, M.ACTIVE, M.REJECTED, M.CANCELLED, M.REFUNDED):
         return m.status
-    if pvc == PvcStatus.PENDING:
+    if pvc == "pending":
         return "pvc_pending"
-    if pvc == PvcStatus.REJECTED:
+    if pvc == "rejected":
         return "pvc_rejected"
-    if pvc == PvcStatus.SUCCESSFUL:
+    if pvc == "successful":
         return "pvc_verified"
-    if m is None and pvc is None:
+    if m is None and pvc == "unverified":
         return "not_joined"
     return "pvc_required"
 
@@ -482,9 +481,7 @@ def register_row(m: Membership) -> list:
 
 # ------------------------------------------------------- account deletion (§6.7)
 def erase_for_deleted_user(user) -> bool:
-    from apps.pvc.services import erase_for_deleted_user as erase_pvc
-
-    erase_pvc(user)
+    """PVC data is erased by accounts.mark_deleted itself (spec 08 §6.2)."""
     m = Membership.objects.filter(user=user).first()
     if m is None:
         return False

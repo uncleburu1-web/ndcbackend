@@ -1,5 +1,5 @@
 """
-Campaign blackout windows — spec 07 §6.6 (reused by 08). Electoral Act 2026: public campaigning
+Campaign blackout windows — spec 07 §6.6 (reused by 09). Electoral Act 2026: public campaigning
 must end 24 hours before polling day. Windows are scoped by office because polling days differ.
 """
 from datetime import datetime

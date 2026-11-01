@@ -27,7 +27,7 @@ class Page20(PageNumberPagination):
 def item(n):
     a = n.article
     return {"id": n.id, "kind": n.kind, "created_at": n.created_at, "read_at": n.read_at, "decision": n.decision,
-            "article": {"id": a.id, "source": a.source, "title": a.title, "public": a.status == "successful"}}
+            "article": {"id": a.id, "source": a.source, "title": a.title, "public": a.status == "successful"} if a else None}
 
 
 class NotificationList(_Private):

@@ -44,11 +44,13 @@ Health check: `GET http://localhost:8000/api/v1/health/`
 | GET | `/api/v1/me/donations/` | signed in |
 | GET | `/api/v1/finance/donations/` · `/api/v1/finance/summary/` | anyone — successful donations only |
 | POST | `/api/v1/webhooks/payments/<paystack\|fake>/` | provider signature — one URL for donations (`NDC-`) and membership fees (`MEM-`) |
-| GET / PUT / DELETE | `/api/v1/me/pvc/` | signed in — VIN masked; never returned in full |
+| GET | `/api/v1/pvc/config/` | anyone — INEC links + "Get your PVC" guidance |
+| GET / PUT / DELETE | `/api/v1/me/pvc/` · PATCH `badge/` | signed in — VIN masked; never returned in full |
 | GET | `/api/v1/membership/config/` | anyone — `{open, fee_kobo, requires_approval}` |
 | GET / PUT | `/api/v1/me/membership/` · `photo/` · POST `pay/` · `cancel/` · GET `card/` | signed in (applying/paying: completed profile) |
 | GET | `/api/v1/membership/payments/<reference>/` | anyone with the reference (no personal data) |
-| GET / POST | `/api/v1/admin/pvc/…` · `/api/v1/admin/membership/…` (incl. `register.csv`, `register-photos.zip`) | membership officer or system admin (settings: system admin) |
+| GET / POST | `/api/v1/admin/pvc/…` (incl. `settings/`) | PVC officer, membership officer or system admin (settings PATCH: system admin) |
+| GET / POST | `/api/v1/admin/membership/…` (incl. `register.csv`, `register-photos.zip`) | membership officer or system admin (settings: system admin) |
 | GET / POST | `/api/v1/admin/donations/` · `<id>/` · `<id>/recheck/` · `export.csv` | system admin or finance officer |
 | GET | `/api/v1/news/` (`?source=official\|community&state=&page=`) · `/api/v1/news/<id>/` | anyone — published articles only |
 | POST | `/api/v1/news/<id>/report/` | anyone (5/hour) |
@@ -102,10 +104,18 @@ Membership **payments** are closed until `MEMBERSHIP_ENABLED=True` and `MEMBERSH
   - To rotate, put the new key first and keep the old ones after it.
   - Development creates `.dev_pii_key` automatically (git-ignored).
 - **Member photos** live in `PRIVATE_MEDIA_ROOT` (default `private_media/`, git-ignored). They are never served by `/media/`, only through authenticated views.
-- **PVC checks are manual:** officers check the voter on INEC's checker (`cvr.inecnigeria.org/vvs`) and record the result. "Get your PVC" stays hidden until `INEC_PVC_URL` is set.
 - **Officers:** `python manage.py grant_role officer@example.com membership_officer`.
 - **Daily:** `python manage.py prune_pvc` deletes the VINs of submissions rejected more than 90 days ago.
 - **Local try-out:** add `MEMBERSHIP_ENABLED=True`, `MEMBERSHIP_DATA_APPROVED=True` and `PAYMENT_PROVIDER=fake` to `.env`.
+
+## PVC verification (spec 08)
+
+PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
+
+- **Checks are manual:** an officer checks the voter on INEC's checker (`cvr.inecnigeria.org/vvs`) and records the result. Nothing is sent to INEC.
+- **Officers:** `python manage.py grant_role officer@example.com pvc_officer` (membership officers can use the queue too). Nobody can decide their own check.
+- Users get an in-app notification when their check is verified or rejected, and can opt in to a public "Verified voter" badge.
+- System admins edit the "Get your PVC" guidance at `/admin/pvc/settings`. "Register, transfer or replace" stays hidden until `INEC_PVC_URL` is set.
 
 ## News and announcements (spec 07)
 

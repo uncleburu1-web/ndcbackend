@@ -39,12 +39,13 @@ class PublicArticleSerializer(serializers.ModelSerializer):
     excerpt = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
     byline = serializers.SerializerMethodField()
+    byline_verified = serializers.SerializerMethodField()
     pinned = serializers.SerializerMethodField()
 
     class Meta:
         model = Article
         fields = ["id", "source", "category", "category_label", "title", "excerpt", "state", "state_label", "image", "published_at",
-                  "edited_at", "byline", "pinned"]
+                  "edited_at", "byline", "byline_verified", "pinned"]
 
     def get_category_label(self, a):
         return a.get_category_display() if a.category else ""
@@ -60,6 +61,14 @@ class PublicArticleSerializer(serializers.ModelSerializer):
 
     def get_byline(self, a):
         return byline(a)
+
+    def get_byline_verified(self, a):
+        """Only beside a name the author chose to show, and only if they opted in (spec 08 §3.7)."""
+        if byline(a) is None:
+            return False
+        from apps.pvc.services import public_badge
+
+        return public_badge(a.author)
 
     def get_pinned(self, a):
         return bool(a.pinned_at)

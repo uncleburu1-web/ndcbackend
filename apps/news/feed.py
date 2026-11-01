@@ -1,4 +1,4 @@
-"""The public /news feed — spec 07 §4.1. Kept separate so 08 can add candidate posts as another source."""
+"""The public /news feed — spec 07 §4.1. Kept separate so 09 can add candidate posts as another source."""
 from django.conf import settings
 from django.db.models import Q
 

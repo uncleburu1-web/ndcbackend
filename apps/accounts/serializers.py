@@ -20,11 +20,17 @@ class MeSerializer(serializers.ModelSerializer):
     profile_complete = serializers.BooleanField(read_only=True)
     roles = serializers.SerializerMethodField()
     is_system_admin = serializers.SerializerMethodField()
+    pvc_status = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ["id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin"]
+        fields = ["id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status"]
         read_only_fields = fields
+
+    def get_pvc_status(self, obj) -> str:
+        from apps.pvc.services import status_for
+
+        return status_for(obj)  # the caller's own status only; /me is private (spec 08 §6.2)
 
     def get_roles(self, obj) -> list:
         return RoleSummarySerializer(obj.role_assignments.filter(is_active=True), many=True).data

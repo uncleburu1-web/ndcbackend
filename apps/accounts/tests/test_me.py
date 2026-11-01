@@ -24,8 +24,9 @@ class MeTests(APITestCase):
     def test_get_returns_only_own_profile_shape(self):
         res = self.client.get(ME, **self.auth)
         self.assertEqual(
-            set(res.data), {"id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin"}
+            set(res.data), {"id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status"}
         )
+        self.assertEqual(res.data["pvc_status"], "unverified")
 
     def test_just_completed_is_returned_exactly_once(self):
         first = self.patch({"full_name": "Ada Obi", "phone_number": "0803 123 4567"})

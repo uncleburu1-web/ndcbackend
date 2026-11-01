@@ -59,9 +59,11 @@ class SubmitTests(APITestCase):
 
     def test_unverified_and_inec_link(self):
         r = self.client.get(reverse("my-pvc"))
-        self.assertEqual((r.data["status"], r.data["inec_pvc_url"]), ("unverified", None))
+        self.assertEqual((r.data["status"], r.data["show_badge"]), ("unverified", False))
+        self.assertNotIn("inec_pvc_url", r.data)  # moved to /pvc/config/ (spec 08)
+        self.assertIsNone(APIClient().get(reverse("pvc-config")).data["inec_pvc_url"])
         with override_settings(INEC_PVC_URL="https://cvr.inecnigeria.org"):
-            self.assertEqual(self.client.get(reverse("my-pvc")).data["inec_pvc_url"], "https://cvr.inecnigeria.org")
+            self.assertEqual(APIClient().get(reverse("pvc-config")).data["inec_pvc_url"], "https://cvr.inecnigeria.org")
 
     def test_withdraw_deletes_record_keeps_event(self):
         self.client.put(reverse("my-pvc"), BODY, format="json")

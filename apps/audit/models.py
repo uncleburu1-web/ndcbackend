@@ -60,6 +60,7 @@ class AuditLog(models.Model):
         ANNOUNCEMENT_RESTORED = "announcement.restored"
         ANNOUNCEMENT_PINNED = "announcement.pinned"
         ANNOUNCEMENT_DELIVERED = "announcement.delivered"
+        PVC_SETTINGS_CHANGED = "pvc.settings_changed"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

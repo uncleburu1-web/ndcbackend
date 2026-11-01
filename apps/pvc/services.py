@@ -1,4 +1,7 @@
-"""PVC rules — spec 06 §6.1. Officers decide; every decision and VIN reveal is audited."""
+"""
+PVC rules — spec 06 §6.1, made a stand-alone unit in spec 08. Officers check INEC's public voter checker by hand
+and record the result; every decision and VIN reveal is audited. Other apps call only status_for / is_verified.
+"""
 import re
 from datetime import timedelta
 
@@ -23,8 +26,26 @@ def valid_vin(vin: str) -> bool:
     return bool(VIN_RE.fullmatch(vin))
 
 
+UNVERIFIED = "unverified"
+
+
+def status_for(user) -> str:
+    """unverified · pending · successful · rejected — the one function other apps call (spec 08 §6.1)."""
+    if user is None or not getattr(user, "pk", None):
+        return UNVERIFIED
+    st = PvcVerification.objects.filter(user=user).values_list("status", flat=True).first()
+    return st or UNVERIFIED
+
+
 def is_verified(user) -> bool:
-    return PvcVerification.objects.filter(user=user, status=PvcStatus.SUCCESSFUL).exists()
+    return status_for(user) == PvcStatus.SUCCESSFUL
+
+
+def public_badge(user) -> bool:
+    """Public "Verified voter" chip: verified AND the user opted in (spec 08 §3.7)."""
+    if user is None:
+        return False
+    return PvcVerification.objects.filter(user=user, status=PvcStatus.SUCCESSFUL, show_badge=True).exists()
 
 
 def _event(user, kind, actor=None, note=""):
@@ -46,6 +67,7 @@ def submit(user, *, vin: str, surname: str, state: str, lga: str, polling_unit: 
         rec.state, rec.lga, rec.polling_unit = state, " ".join(lga.split())[:120], polling_unit.strip()[:160]
         rec.status = PvcStatus.PENDING  # new details always need a fresh check (clears a past verification)
         rec.reviewed_by, rec.reviewed_at, rec.reason = None, None, ""
+        rec.show_badge = False  # a new check switches the public badge off (spec 08 §5.1)
         rec.consent_at = timezone.now()
         rec.save()
         _event(user, kind)
@@ -66,13 +88,19 @@ def withdraw(user) -> None:
 
 
 def _decide(rec_id, officer, to, reason, request):
+    from apps.notifications.services import notify_pvc_decision
+
     with transaction.atomic():
-        rec = PvcVerification.objects.select_for_update().get(pk=rec_id)
+        rec = PvcVerification.objects.select_for_update(of=("self",)).select_related("user").get(pk=rec_id)
+        if rec.user_id == officer.pk:
+            raise ServiceError("You can't decide your own PVC check.", code="self_review", status_code=403)
         if rec.status != PvcStatus.PENDING:
             raise ServiceError("This check has already been decided.", code="invalid_transition", status_code=409)
         rec.status, rec.reviewed_by, rec.reviewed_at, rec.reason = to, officer, timezone.now(), reason[:300]
         rec.save()
         _event(rec.user, PvcEvent.Kind.VERIFIED if to == PvcStatus.SUCCESSFUL else PvcEvent.Kind.REJECTED, officer, reason)
+        # Same transaction: the decision and the user's notification commit together (spec 08 §11).
+        notify_pvc_decision(rec.user, "verified" if to == PvcStatus.SUCCESSFUL else "rejected")
     action = AuditLog.Action.PVC_VERIFIED if to == PvcStatus.SUCCESSFUL else AuditLog.Action.PVC_REJECTED
     record(action, target=rec, actor=officer, request=request, reason=reason[:300])
     return rec
@@ -86,6 +114,38 @@ def reject(rec, officer, reason, request=None):
     if not (reason or "").strip():
         raise ServiceError("Give a reason the voter will understand.", code="validation_error", status_code=400)
     return _decide(rec.pk, officer, PvcStatus.REJECTED, reason.strip(), request)
+
+
+def set_badge(user, show: bool) -> PvcVerification:
+    with transaction.atomic():
+        rec = PvcVerification.objects.select_for_update().filter(user=user).first()
+        if rec is None or rec.status != PvcStatus.SUCCESSFUL:
+            raise ServiceError("The badge is available once your PVC is verified.", code="invalid_transition", status_code=409)
+        if rec.show_badge != show:
+            rec.show_badge = show
+            rec.save(update_fields=["show_badge", "updated_at"])
+            _event(user, PvcEvent.Kind.BADGE_CHANGED, user, "shown publicly" if show else "hidden")
+    return rec
+
+
+def update_settings(admin, data: dict, request=None):
+    from .models import PvcSettings
+
+    s = PvcSettings.current()
+    changed = []
+    for field, limit in (("guidance_note", 1000), ("collection_note", 500)):
+        if field in data:
+            value = str(data[field] or "").strip()
+            if len(value) > limit:
+                raise ServiceError(f"Keep it under {limit} characters.", code="validation_error", status_code=400)
+            if getattr(s, field) != value:
+                setattr(s, field, value)
+                changed.append(field)
+    if changed:
+        s.updated_by = admin
+        s.save()
+        record(AuditLog.Action.PVC_SETTINGS_CHANGED, target=s, actor=admin, request=request, fields=changed)
+    return s
 
 
 def reveal_vin(rec, officer, request=None) -> str:

@@ -1,6 +1,6 @@
 """
 In-app notifications — spec 07 §6.4. The only place notifications are written (code standards).
-08 adds deliver_post for candidate posts here.
+09 adds deliver_post for candidate posts here.
 """
 import logging
 from datetime import timedelta
@@ -59,10 +59,17 @@ def notify_decision(article, decision: str):
     return Notification.objects.create(recipient=author, kind=Kind.NEWS_DECISION, article=article, decision=decision)
 
 
+def notify_pvc_decision(user, decision: str):
+    """Spec 08 §4.3 — always sent (the user's own request); no PVC data in the row. Written in the decision's transaction."""
+    if user is None or not user.is_active or user.clerk_deleted_at:
+        return None
+    return Notification.objects.create(recipient=user, kind=Kind.PVC_DECISION, article=None, decision=decision)
+
+
 def visible(user):
-    """Announcements only while their article is public; decisions about your own submissions always."""
+    """Announcements only while their article is public; decisions about your own requests always."""
     return (Notification.objects.filter(recipient=user)
-            .filter(Q(kind=Kind.NEWS_DECISION) | Q(kind=Kind.ANNOUNCEMENT, article__status="successful"))
+            .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION]) | Q(kind=Kind.ANNOUNCEMENT, article__status="successful"))
             .select_related("article"))
 
 

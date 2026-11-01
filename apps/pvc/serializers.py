@@ -28,7 +28,7 @@ class MyPvcSerializer(serializers.ModelSerializer):
     class Meta:
         model = PvcVerification
         fields = ["status", "vin_masked", "surname", "state", "state_label", "lga", "polling_unit", "reason", "reviewed_at", "created_at",
-                  "updated_at"]
+                  "updated_at", "show_badge"]
 
     def get_vin_masked(self, obj):
         return f"•••• {obj.vin_last4}" if obj.vin_last4 else ""
@@ -39,6 +39,18 @@ class AdminPvcSerializer(MyPvcSerializer):
     user_name = serializers.CharField(source="user.full_name")
     user_email = serializers.EmailField(source="user.email")
     reviewed_by_email = serializers.EmailField(source="reviewed_by.email", default=None)
+    is_own = serializers.SerializerMethodField()
+    events = serializers.SerializerMethodField()
 
     class Meta(MyPvcSerializer.Meta):
-        fields = ["id", "user_name", "user_email", "reviewed_by_email"] + MyPvcSerializer.Meta.fields
+        fields = ["id", "user_name", "user_email", "reviewed_by_email", "is_own", "events"] + MyPvcSerializer.Meta.fields
+
+    def get_is_own(self, obj):
+        request = self.context.get("request")
+        return bool(request and obj.user_id == request.user.pk)
+
+    def get_events(self, obj):
+        from .models import PvcEvent
+
+        return [{"kind": e.kind, "note": e.note, "created_at": e.created_at, "actor_email": e.actor.email if e.actor else None}
+                for e in PvcEvent.objects.filter(user_id=obj.user_id).select_related("actor").order_by("created_at")]

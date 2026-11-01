@@ -29,11 +29,13 @@ class PvcVerification(models.Model):
     reviewed_at = models.DateTimeField(null=True, blank=True)
     reason = models.CharField(max_length=300, blank=True)
     consent_at = models.DateTimeField()
+    show_badge = models.BooleanField(default=False)  # public "Verified voter" badge, opt-in (spec 08 §3.7)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["created_at"]
+        indexes = [models.Index(fields=["status", "state", "created_at"], name="pvc_queue_idx")]
 
     def __str__(self):
         return f"pvc {self.pk}"
@@ -50,6 +52,7 @@ class PvcEvent(models.Model):
         REJECTED = "rejected"
         VIN_REVEALED = "vin_revealed"
         VIN_PRUNED = "vin_pruned"
+        BADGE_CHANGED = "badge_changed"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="pvc_events")
@@ -68,3 +71,19 @@ class PvcEvent(models.Model):
 
     def delete(self, *args, **kwargs):
         raise RuntimeError("PvcEvent is append-only.")
+
+
+class PvcSettings(models.Model):
+    """Singleton: "Get your PVC" guidance that system admins can update without a release (spec 08 §5.4)."""
+
+    guidance_note = models.CharField(max_length=1000, blank=True)
+    collection_note = models.CharField(max_length=500, blank=True,
+                                       default="Collection for the 2027 elections began on 9 October 2026 at INEC local government offices. "
+                                               "Take your registration slip or details.")
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @classmethod
+    def current(cls) -> "PvcSettings":
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj

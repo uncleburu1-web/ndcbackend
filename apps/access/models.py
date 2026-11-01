@@ -20,6 +20,7 @@ class Role(models.TextChoices):
     CANDIDATE = "candidate", "Candidate"
     MEMBERSHIP_OFFICER = "membership_officer", "Membership officer"
     FINANCE_OFFICER = "finance_officer", "Finance officer"  # spec 05: donation records + exports only
+    PVC_OFFICER = "pvc_officer", "PVC officer"  # spec 08: the PVC check queue only
 
 
 class ScopeType(models.TextChoices):
@@ -35,11 +36,12 @@ ALLOWED_SCOPES: dict[str, set[str]] = {
     Role.CANDIDATE: {ScopeType.CANDIDATE},
     Role.MEMBERSHIP_OFFICER: {ScopeType.GLOBAL},
     Role.FINANCE_OFFICER: {ScopeType.GLOBAL},
+    Role.PVC_OFFICER: {ScopeType.GLOBAL},
 }
 
 # system_admin passes these checks too. It does NOT imply `candidate`:
 # an admin doesn't publish as a candidate.
-IMPLIED_BY_SYSTEM_ADMIN = {Role.MODERATOR, Role.NEWS_REVIEWER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER}
+IMPLIED_BY_SYSTEM_ADMIN = {Role.MODERATOR, Role.NEWS_REVIEWER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.PVC_OFFICER}
 
 
 class RoleAssignment(TimeStampedModel):
