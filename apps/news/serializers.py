@@ -1,0 +1,163 @@
+from rest_framework import serializers
+
+from apps.candidates.reference import State
+
+from . import images
+from .models import Article, Category
+
+
+def excerpt(body: str, limit: int = 200) -> str:
+    text = " ".join((body or "").split())
+    if len(text) <= limit:
+        return text
+    cut = text[:limit].rsplit(" ", 1)[0]
+    return cut.rstrip(",.;:") + "…"
+
+
+def byline(a: Article):
+    """The public byline: the author's name only if they chose it (spec 07 §3.6)."""
+    if a.source != "community" or not a.show_author_name:
+        return None
+    u = a.author
+    if u is None or not u.is_active or u.clerk_deleted_at or not u.full_name:
+        return None
+    return u.full_name
+
+
+def image_payload(a: Article, request, full=False):
+    if not a.image:
+        return None
+    out = {"url_thumb": images.url(a.image_thumb, request), "width": a.image_width, "height": a.image_height}
+    if full:
+        out["url"] = images.url(a.image, request)
+    return out
+
+
+class PublicArticleSerializer(serializers.ModelSerializer):
+    category_label = serializers.SerializerMethodField()
+    state_label = serializers.SerializerMethodField()
+    excerpt = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    byline = serializers.SerializerMethodField()
+    pinned = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Article
+        fields = ["id", "source", "category", "category_label", "title", "excerpt", "state", "state_label", "image", "published_at",
+                  "edited_at", "byline", "pinned"]
+
+    def get_category_label(self, a):
+        return a.get_category_display() if a.category else ""
+
+    def get_state_label(self, a):
+        return a.get_state_display() if a.state else ""
+
+    def get_excerpt(self, a):
+        return excerpt(a.body)
+
+    def get_image(self, a):
+        return image_payload(a, self.context.get("request"))
+
+    def get_byline(self, a):
+        return byline(a)
+
+    def get_pinned(self, a):
+        return bool(a.pinned_at)
+
+
+class PublicArticleDetailSerializer(PublicArticleSerializer):
+    class Meta(PublicArticleSerializer.Meta):
+        fields = PublicArticleSerializer.Meta.fields + ["body", "source_name", "source_url"]
+
+    def get_image(self, a):
+        return image_payload(a, self.context.get("request"), full=True)
+
+
+class MyArticleSerializer(PublicArticleDetailSerializer):
+    status_label = serializers.CharField(source="get_status_display")
+
+    class Meta(PublicArticleDetailSerializer.Meta):
+        fields = PublicArticleDetailSerializer.Meta.fields + ["status", "status_label", "show_author_name", "decision_reason",
+                                                             "removed_reason", "submitted_at", "created_at"]
+
+
+class AdminArticleSerializer(MyArticleSerializer):
+    author_name = serializers.SerializerMethodField()
+    author_email = serializers.SerializerMethodField()
+    is_own = serializers.SerializerMethodField()
+    open_reports = serializers.IntegerField(read_only=True, default=0)
+    important = serializers.BooleanField(read_only=True)
+    removed_at = serializers.DateTimeField(read_only=True)
+    decided_at = serializers.DateTimeField(read_only=True)
+
+    class Meta(MyArticleSerializer.Meta):
+        fields = MyArticleSerializer.Meta.fields + ["author_name", "author_email", "is_own", "open_reports", "important", "removed_at",
+                                                   "decided_at"]
+
+    def get_author_name(self, a):
+        return a.author.full_name if a.author else ""
+
+    def get_author_email(self, a):
+        return a.author.email if a.author else ""
+
+    def get_is_own(self, a):
+        request = self.context.get("request")
+        return bool(request and a.author_id and a.author_id == request.user.pk)
+
+
+class AdminArticleDetailSerializer(AdminArticleSerializer):
+    events = serializers.SerializerMethodField()
+    reports = serializers.SerializerMethodField()
+
+    class Meta(AdminArticleSerializer.Meta):
+        fields = AdminArticleSerializer.Meta.fields + ["events", "reports", "declarations"]
+
+    def get_events(self, a):
+        return [{"event": e.event, "note": e.note, "created_at": e.created_at, "actor_email": e.actor.email if e.actor else None}
+                for e in a.events.select_related("actor")]
+
+    def get_reports(self, a):
+        return [{"id": r.id, "reason": r.reason, "reason_label": r.get_reason_display(), "details": r.details, "status": r.status,
+                 "contact_email": r.contact_email, "reporter_email": r.reporter.email if r.reporter else None,
+                 "created_at": r.created_at, "resolved_at": r.resolved_at, "resolution_note": r.resolution_note}
+                for r in a.reports.select_related("reporter")]
+
+
+class SubmitSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=150, allow_blank=True)
+    body = serializers.CharField(allow_blank=True, trim_whitespace=False, max_length=20_000)
+    state = serializers.ChoiceField(choices=State.choices, required=False, allow_blank=True)
+    source_url = serializers.CharField(max_length=500, required=False, allow_blank=True)
+    show_author_name = serializers.BooleanField(required=False, default=False)
+    declarations = serializers.DictField(child=serializers.BooleanField(), required=False)
+
+    def validate_source_url(self, v):
+        if v and not v.lower().startswith("https://"):
+            raise serializers.ValidationError("Use a link that starts with https://")
+        if v:
+            serializers.URLField().run_validation(v)
+        return v
+
+
+class EditSerializer(SubmitSerializer):
+    title = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    body = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False, max_length=20_000)
+    show_author_name = serializers.BooleanField(required=False)
+
+
+class AnnouncementSerializer(serializers.Serializer):
+    category = serializers.ChoiceField(choices=Category.choices)
+    title = serializers.CharField(max_length=150)
+    body = serializers.CharField(trim_whitespace=False, max_length=25_000)
+    state = serializers.ChoiceField(choices=State.choices, required=False, allow_blank=True)
+    source_name = serializers.CharField(max_length=120, required=False, allow_blank=True)
+    source_url = serializers.CharField(max_length=500, required=False, allow_blank=True)
+    notify = serializers.BooleanField(required=False, default=False)
+
+    validate_source_url = SubmitSerializer.validate_source_url
+
+
+class ReportSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=12)
+    details = serializers.CharField(max_length=1000, required=False, allow_blank=True)
+    contact_email = serializers.EmailField(required=False, allow_blank=True)

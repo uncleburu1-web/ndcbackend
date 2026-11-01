@@ -113,8 +113,13 @@ def mark_deleted(clerk_user_id: str) -> Optional[User]:
         from apps.membership.services import erase_for_deleted_user
 
         membership_erased = erase_for_deleted_user(user)
+        # Unpublished news cleared, bylines hidden, notifications deleted (spec 07 §6.5).
+        from apps.news.services import erase_for_deleted_user as erase_news
+
+        news_erased = erase_news(user)
     record(AuditLog.Action.USER_DELETED, target=user, actor_label="clerk:webhook", roles_revoked=roles_revoked,
-           follows_removed=follows_removed, donations_anonymised=donations_anonymised, membership_erased=membership_erased)
+           follows_removed=follows_removed, donations_anonymised=donations_anonymised, membership_erased=membership_erased,
+           news_erased=news_erased)
     return user
 
 

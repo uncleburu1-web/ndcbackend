@@ -11,6 +11,8 @@ api_v1 = [
     path("", include("apps.payments.urls")),
     path("", include("apps.pvc.urls")),
     path("", include("apps.membership.urls")),
+    path("", include("apps.news.urls")),
+    path("", include("apps.notifications.urls")),
 ]
 
 urlpatterns = [path("api/v1/", include(api_v1))]

@@ -2,6 +2,7 @@
 NDCConnect backend — shared settings (feature-specs/02-authentication.md §10).
 All secrets come from environment variables; see .env.example.
 """
+import json
 from pathlib import Path
 
 import dj_database_url
@@ -31,6 +32,8 @@ INSTALLED_APPS = [
     "apps.donations",
     "apps.pvc",
     "apps.membership",
+    "apps.news",
+    "apps.notifications",
 ]
 
 MIDDLEWARE = [
@@ -93,6 +96,10 @@ REST_FRAMEWORK = {
         "pvc_submit": "5/hour",  # spec 06 §9
         "membership_pay": "10/hour",
         "pii_reveal": "30/hour",  # per officer — an abuse signal as much as a limit
+        "news_public": "120/min",  # per IP (spec 07 §9)
+        "news_submit": "5/day",  # per user
+        "news_write": "30/hour",  # per user: edits, images, withdrawals, bylines
+        "news_report": "5/hour",  # per user, or per IP for guests
     },
 }
 
@@ -163,3 +170,19 @@ INEC_VOTER_CHECK_URL = "https://cvr.inecnigeria.org/vvs"  # officers' manual che
 PII_ENCRYPTION_KEYS = config("PII_ENCRYPTION_KEYS", default="", cast=Csv())
 # Member photos live OUTSIDE the public media folder and are served only through authenticated views.
 PRIVATE_MEDIA_ROOT = config("PRIVATE_MEDIA_ROOT", default=str(BASE_DIR / "private_media"))
+
+# --------------------------------------------------------------------------
+# News and announcements (spec 07)
+# --------------------------------------------------------------------------
+# Electoral Act 2026: public campaigning ends 24 hours before polling day. Windows are scoped by office
+# (INEC 2027 timetable; 08:00 poll opening assumed — confirm with INEC). Override with JSON in .env.
+_DEFAULT_BLACKOUTS = [
+    {"positions": ["president", "senator", "house_of_reps"], "start": "2027-01-15T08:00+01:00", "end": "2027-01-16T23:59+01:00"},
+    {"positions": ["governor", "state_assembly"], "start": "2027-02-05T08:00+01:00", "end": "2027-02-06T23:59+01:00"},
+]
+CAMPAIGN_BLACKOUTS = json.loads(config("CAMPAIGN_BLACKOUTS", default=json.dumps(_DEFAULT_BLACKOUTS)))
+NEWS_MAX_PENDING = 3
+NEWS_MAX_PINNED = 3
+NEWS_COMMUNITY_MIN_BODY = 100
+NEWS_COMMUNITY_MAX_BODY = 5_000
+NEWS_OFFICIAL_MAX_BODY = 20_000

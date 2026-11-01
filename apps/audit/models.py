@@ -45,6 +45,21 @@ class AuditLog(models.Model):
         MEMBERSHIP_SETTINGS_CHANGED = "membership.settings_changed"
         MEMBERSHIP_ERASED = "membership.erased_on_account_deletion"
         MEMBERSHIP_PAYMENT_RECHECKED = "membership.payment_rechecked"
+        NEWS_SUBMITTED = "news.submitted"
+        NEWS_EDITED = "news.edited"
+        NEWS_WITHDRAWN = "news.withdrawn"
+        NEWS_APPROVED = "news.approved"
+        NEWS_REJECTED = "news.rejected"
+        NEWS_REMOVED = "news.removed"
+        NEWS_RESTORED = "news.restored"
+        NEWS_REPORT_RESOLVED = "news.report_resolved"
+        NEWS_ERASED = "news.erased_on_account_deletion"
+        ANNOUNCEMENT_PUBLISHED = "announcement.published"
+        ANNOUNCEMENT_UPDATED = "announcement.updated"
+        ANNOUNCEMENT_UNPUBLISHED = "announcement.unpublished"
+        ANNOUNCEMENT_RESTORED = "announcement.restored"
+        ANNOUNCEMENT_PINNED = "announcement.pinned"
+        ANNOUNCEMENT_DELIVERED = "announcement.delivered"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

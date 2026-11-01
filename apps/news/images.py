@@ -1,0 +1,44 @@
+"""Article images — spec 07 §5.1: 03 rules (type check, size limit, metadata dropped), aspect ratio kept, not cropped."""
+import io
+import uuid
+
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+from PIL import Image
+
+from apps.candidates.photos import PhotoError, load_validated_rgb  # noqa: F401  (PhotoError re-exported)
+
+SIZES = {"full": 1600, "thumb": 400}
+
+
+def _fit(rgb, longest: int) -> bytes:
+    img = rgb.copy()
+    img.thumbnail((longest, longest), Image.Resampling.LANCZOS)  # never upscales; keeps aspect ratio
+    out = io.BytesIO()
+    img.save(out, format="WEBP", quality=82, method=6)  # no exif= → none written
+    return out.getvalue()
+
+
+def store(upload) -> dict:
+    rgb = load_validated_rgb(upload)
+    stem = uuid.uuid4().hex
+    full = default_storage.save(f"news/{stem}_1600.webp", ContentFile(_fit(rgb, SIZES["full"])))
+    thumb = default_storage.save(f"news/{stem}_400.webp", ContentFile(_fit(rgb, SIZES["thumb"])))
+    w, h = rgb.size
+    scale = min(1.0, SIZES["full"] / max(w, h))
+    return {"image": full, "image_thumb": thumb, "image_width": round(w * scale), "image_height": round(h * scale)}
+
+
+def delete(*names):
+    for name in names:
+        if name:
+            try:
+                default_storage.delete(name)
+            except OSError:  # pragma: no cover
+                pass
+
+
+def url(name: str, request=None) -> str | None:
+    from apps.candidates.photos import public_url
+
+    return public_url(request, name)

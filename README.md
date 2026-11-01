@@ -50,6 +50,12 @@ Health check: `GET http://localhost:8000/api/v1/health/`
 | GET | `/api/v1/membership/payments/<reference>/` | anyone with the reference (no personal data) |
 | GET / POST | `/api/v1/admin/pvc/…` · `/api/v1/admin/membership/…` (incl. `register.csv`, `register-photos.zip`) | membership officer or system admin (settings: system admin) |
 | GET / POST | `/api/v1/admin/donations/` · `<id>/` · `<id>/recheck/` · `export.csv` | system admin or finance officer |
+| GET | `/api/v1/news/` (`?source=official\|community&state=&page=`) · `/api/v1/news/<id>/` | anyone — published articles only |
+| POST | `/api/v1/news/<id>/report/` | anyone (5/hour) |
+| GET / POST | `/api/v1/me/news/` · GET / PATCH `<id>/` · PUT / DELETE `<id>/image/` · POST `<id>/withdraw/` | signed in (writes: completed profile) |
+| GET / POST | `/api/v1/admin/news/` · `<id>/` · `<id>/{approve,reject,remove,restore}/` · `reports/<id>/dismiss/` | news reviewer or system admin |
+| GET / POST | `/api/v1/admin/announcements/` · `notify-count/` · `<id>/` · `<id>/image/` · `<id>/{pin,unpin,unpublish,restore}/` | system admin |
+| GET | `/api/v1/me/notifications/` · `unread-count/` · POST `<id>/read/` · `read-all/` · GET / PATCH `preferences/` | signed in |
 
 Single-candidate admin responses include `followers: {total, notify_on}` — counts only; no endpoint lists who follows a candidate.
 Follows are political-opinion data (NDPA 2023): private to the user, never audited, deleted when the account is deleted.
@@ -57,7 +63,7 @@ Follows are political-opinion data (NDPA 2023): private to the user, never audit
 Candidate photos are saved under `media/` (git-ignored) in development and served by Django only when `DEBUG` is on.
 
 Errors always look like `{"error": {"status", "code", "message", "fields"}}`.
-Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429), `invalid_transition` (409), `invalid_photo` (400), `storage_unavailable` (503).
+Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429), `invalid_transition` (409), `invalid_photo` (400), `storage_unavailable` (503), `too_many_pending` (409), `self_review` (403), `publishing_paused` (409, with `until`), `too_many_pinned` (409), `source_required` (400).
 
 ## Roles (no UI yet)
 
@@ -100,6 +106,14 @@ Membership **payments** are closed until `MEMBERSHIP_ENABLED=True` and `MEMBERSH
 - **Officers:** `python manage.py grant_role officer@example.com membership_officer`.
 - **Daily:** `python manage.py prune_pvc` deletes the VINs of submissions rejected more than 90 days ago.
 - **Local try-out:** add `MEMBERSHIP_ENABLED=True`, `MEMBERSHIP_DATA_APPROVED=True` and `PAYMENT_PROVIDER=fake` to `.env`.
+
+## News and announcements (spec 07)
+
+- **News reviewers:** `python manage.py grant_role reviewer@example.com news_reviewer`. Reviewers can't review their own submissions.
+- **Official announcements** are published by system admins. "Notify everyone" sends one in-app notification per user after the save commits; if it failed, re-run `python manage.py deliver_announcement <article-id>` (safe to repeat).
+- **Blackouts:** `CAMPAIGN_BLACKOUTS` (JSON in `.env`, defaults to the 2027 windows) pauses campaign announcements and community approvals in the 24 hours before polls.
+- **Daily:** `python manage.py prune_news` (rejected/withdrawn after 180 days; removed and dismissed reports after 1 year) and `python manage.py prune_notifications` (read after 180 days, unread after 365).
+- Article images are saved under `media/news/` (metadata stripped, WebP, aspect ratio kept).
 
 ## Tests
 

@@ -1,0 +1,171 @@
+"""
+News and official announcements — spec 07 §5. One table for both sources so the feed, article pages and
+reports share one model. Nothing a member submits is public until a reviewer approves it.
+"""
+import uuid
+
+from django.conf import settings
+from django.db import models
+from django.db.models import Q
+
+from apps.candidates.reference import State
+
+
+class Source(models.TextChoices):
+    OFFICIAL = "official", "Official"
+    COMMUNITY = "community", "Community"
+
+
+class ArticleStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    SUCCESSFUL = "successful", "Successful"
+    REJECTED = "rejected", "Rejected"
+    WITHDRAWN = "withdrawn", "Withdrawn"
+    REMOVED = "removed", "Removed"
+
+
+class Category(models.TextChoices):
+    """FR-024 — official announcements only."""
+
+    ELECTION_UPDATES = "election_updates", "Official Election Updates"
+    PARTY = "party", "Party Announcements"
+    CAMPAIGN = "campaign", "Campaign Announcements"
+    COMMUNITY = "community", "Community Announcements"
+    ELECTION_NEWS = "election_news", "General Election News"
+
+
+class ArticleQuerySet(models.QuerySet):
+    def public(self):
+        return self.filter(status=ArticleStatus.SUCCESSFUL)
+
+
+class Article(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    source = models.CharField(max_length=10, choices=Source.choices)
+    status = models.CharField(max_length=12, choices=ArticleStatus.choices, default=ArticleStatus.PENDING)
+    category = models.CharField(max_length=20, choices=Category.choices, blank=True)
+    title = models.CharField(max_length=150)
+    body = models.TextField()
+    state = models.CharField(max_length=20, choices=State.choices, blank=True)
+    source_name = models.CharField(max_length=120, blank=True)
+    source_url = models.URLField(max_length=500, blank=True)
+    image = models.CharField(max_length=255, blank=True)
+    image_thumb = models.CharField(max_length=255, blank=True)
+    image_width = models.PositiveIntegerField(null=True, blank=True)
+    image_height = models.PositiveIntegerField(null=True, blank=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="news_articles")
+    show_author_name = models.BooleanField(default=False)
+    declarations = models.JSONField(default=dict, blank=True)
+    pinned_at = models.DateTimeField(null=True, blank=True)
+    important = models.BooleanField(default=False)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+    edited_at = models.DateTimeField(null=True, blank=True)
+    decided_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    decided_at = models.DateTimeField(null=True, blank=True)
+    decision_reason = models.CharField(max_length=500, blank=True)
+    removed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    removed_at = models.DateTimeField(null=True, blank=True)
+    removed_reason = models.CharField(max_length=500, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ArticleQuerySet.as_manager()
+
+    class Meta:
+        ordering = ["-published_at", "-created_at"]
+        constraints = [
+            models.CheckConstraint(
+                name="news_official_shape",
+                condition=Q(source="community") | (~Q(category="") & ~Q(status="pending")),
+            ),
+            models.CheckConstraint(
+                name="news_community_shape",
+                condition=Q(source="official") | (Q(category="") & Q(pinned_at__isnull=True)),
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["status", "-published_at"], name="news_feed_idx"),
+            models.Index(fields=["source", "status", "-published_at"], name="news_source_idx"),
+            models.Index(fields=["state", "status", "-published_at"], name="news_state_idx"),
+            models.Index(fields=["author", "-created_at"], name="news_author_idx"),
+            models.Index(fields=["submitted_at"], name="news_queue_idx", condition=Q(status="pending")),
+        ]
+
+    def __str__(self):
+        return f"{self.source}:{self.title[:40]}"
+
+
+class ArticleEvent(models.Model):
+    """Append-only history. Old text isn't kept (spec 07 §10)."""
+
+    class Kind(models.TextChoices):
+        SUBMITTED = "submitted"
+        EDITED = "edited"
+        RESUBMITTED = "resubmitted"
+        APPROVED = "approved"
+        REJECTED = "rejected"
+        WITHDRAWN = "withdrawn"
+        REMOVED = "removed"
+        RESTORED = "restored"
+        PUBLISHED = "published"
+        UNPUBLISHED = "unpublished"
+        PINNED = "pinned"
+        UNPINNED = "unpinned"
+        BYLINE_CHANGED = "byline_changed"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="events")
+    event = models.CharField(max_length=20, choices=Kind.choices)
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    note = models.CharField(max_length=300, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise RuntimeError("ArticleEvent is append-only.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise RuntimeError("ArticleEvent is append-only.")
+
+
+class ReportReason(models.TextChoices):
+    FALSE = "false", "False or misleading"
+    ABUSE = "abuse", "Abusive, hateful or inciting"
+    PRIVACY = "privacy", "Private information about someone"
+    COPYRIGHT = "copyright", "Copyright (my content was used)"
+    SPAM = "spam", "Spam or advertising"
+    OTHER = "other", "Other"
+
+
+class ReportStatus(models.TextChoices):
+    OPEN = "open", "Open"
+    DISMISSED = "dismissed", "Dismissed"
+    ACTIONED = "actioned", "Actioned"
+
+
+class ArticleReport(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="reports")
+    reason = models.CharField(max_length=12, choices=ReportReason.choices)
+    details = models.CharField(max_length=1000, blank=True)
+    reporter = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    contact_email = models.EmailField(blank=True)
+    ip_hash = models.CharField(max_length=64, blank=True)
+    status = models.CharField(max_length=10, choices=ReportStatus.choices, default=ReportStatus.OPEN)
+    resolved_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    resolution_note = models.CharField(max_length=300, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["article", "reporter"], name="news_one_open_report_per_user",
+                                    condition=Q(status="open", reporter__isnull=False)),
+        ]
+        indexes = [models.Index(fields=["status", "created_at"], name="news_report_open_idx")]

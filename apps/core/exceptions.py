@@ -67,4 +67,7 @@ def api_exception_handler(exc, context):
             code, message = "not_authenticated", "Sign in to continue."
 
     response.data = {"error": {"status": response.status_code, "code": code, "message": message, "fields": fields}}
+    extra = getattr(exc, "extra", None)  # e.g. {"until": …} for publishing_paused (spec 07 §7.6)
+    if isinstance(extra, dict):
+        response.data["error"].update({k: v for k, v in extra.items() if k not in response.data["error"]})
     return response
