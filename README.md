@@ -38,6 +38,14 @@ Health check: `GET http://localhost:8000/api/v1/health/`
 | PUT / PATCH / DELETE | `/api/v1/me/follows/<slug>/` — follow (201/200) · `{"notify": bool}` · unfollow (always 204) | signed in |
 | GET | `/api/v1/me/follows/` (Following page, + `hidden_count`) · `?slugs=a,b` (≤ 50, follow state) | signed in |
 
+| GET | `/api/v1/donations/config/` | anyone — `{open, min_kobo, …}` (compliance gate) |
+| POST | `/api/v1/donations/` | anyone (token optional) → `{reference, checkout_url}` |
+| GET | `/api/v1/donations/<reference>/` | anyone with the reference (receipt) |
+| GET | `/api/v1/me/donations/` | signed in |
+| GET | `/api/v1/finance/donations/` · `/api/v1/finance/summary/` | anyone — successful donations only |
+| POST | `/api/v1/webhooks/payments/<paystack\|fake>/` | provider signature |
+| GET / POST | `/api/v1/admin/donations/` · `<id>/` · `<id>/recheck/` · `export.csv` | system admin or finance officer |
+
 Single-candidate admin responses include `followers: {total, notify_on}` — counts only; no endpoint lists who follows a candidate.
 Follows are political-opinion data (NDPA 2023): private to the user, never audited, deleted when the account is deleted.
 
@@ -58,6 +66,21 @@ python manage.py reactivate_user spam@example.com
 
 The user must have signed in or signed up at least once (so the local record exists). Every command is audited as `system:cli`.
 There is no password superuser and no Django admin site: platform users never have passwords.
+
+## Donations (spec 05)
+
+Donations are **closed by default** and stay closed until every gate condition passes:
+`DONATIONS_ENABLED`, a configured provider, limits, and `DONATIONS_COMPLIANCE_APPROVED` (set only after legal sign-off).
+Check with `python manage.py check_donations` (never prints keys).
+
+- **Local development needs no keys:** set `PAYMENT_PROVIDER=fake`, `DONATIONS_ENABLED=True` and `DONATIONS_COMPLIANCE_APPROVED=True` in `.env`.
+  - "Donate" takes you to a dev checkout page with Pay / Fail / Pay (webhook lost) / Leave, which sends a correctly signed webhook.
+  - The fake provider refuses to run without `DEBUG`, and production settings refuse it outright.
+- **Paystack:** put a **test** key in `.env` as `PAYSTACK_SECRET_KEY=sk_test_…`. Never paste keys in chat or commit them.
+  - In the Paystack dashboard, set the webhook URL to `https://<your-api>/api/v1/webhooks/payments/paystack/`.
+  - Live keys belong only on the production server.
+- **Run every 15 minutes once deployed:** `python manage.py sweep_donations`. It re-verifies pending payments, abandons 24-hour-old ones, and clears 90-day-old IP hashes.
+- **Finance staff:** `python manage.py grant_role finance@example.com finance_officer`.
 
 ## Tests
 

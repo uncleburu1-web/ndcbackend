@@ -15,6 +15,11 @@ for name, value in {
     if not value:
         raise ImproperlyConfigured(f"Set {name} in production.")
 
+from .base import PAYMENT_PROVIDER  # noqa: E402
+
+if PAYMENT_PROVIDER == "fake":
+    raise ImproperlyConfigured("The fake payment provider can't run in production. Set PAYMENT_PROVIDER=paystack.")
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=True, cast=bool)
 SECURE_HSTS_SECONDS = 60 * 60 * 24 * 365

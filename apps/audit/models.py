@@ -25,6 +25,10 @@ class AuditLog(models.Model):
         CANDIDATE_ARCHIVED = "candidate.archived"
         CANDIDATE_RESTORED = "candidate.restored"
         CANDIDATE_PHOTO_UPDATED = "candidate.photo_updated"
+        DONATION_VIEWED = "donation.viewed"
+        DONATION_EXPORTED = "donation.exported"
+        DONATION_RECHECKED = "donation.rechecked"
+        DONATION_LABEL_ANONYMISED = "donation.label_anonymised"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

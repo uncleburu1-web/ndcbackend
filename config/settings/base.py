@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "apps.access",
     "apps.candidates",
     "apps.follows",
+    "apps.donations",
 ]
 
 MIDDLEWARE = [
@@ -82,6 +83,10 @@ REST_FRAMEWORK = {
         "clerk_webhook": "300/min",
         "candidates_public": "120/min",  # generous per-IP limit against scraping bursts (spec 03 §9)
         "follows": "60/min",  # per user, follow/unfollow/notify writes (spec 04 §7.5)
+        "donations_start": "10/hour",  # per IP and per user (spec 05 §7.1)
+        "donations_receipt": "60/min",  # per IP — references are the key to a receipt
+        "finance_public": "120/min",  # per IP
+        "payment_webhook": "600/min",
     },
 }
 
@@ -117,3 +122,23 @@ LOGGING = {
 # deliberately ignores Clerk's __session cookie (apps/accounts/clerk.py), so there
 # is no ambient browser credential for a cross-site request to ride on.
 SILENCED_SYSTEM_CHECKS = ["security.W003"]
+
+# --------------------------------------------------------------------------
+# Donations (spec 05). Closed by default: see donations.services.donations_open().
+# Secret keys live in .env only — never in code, never logged.
+# --------------------------------------------------------------------------
+FRONTEND_BASE_URL = config("FRONTEND_BASE_URL", default="http://localhost:5173")
+DONATIONS_ENABLED = config("DONATIONS_ENABLED", default=False, cast=bool)
+# Set only after legal sign-off on spec 05 §15 (FR-046).
+DONATIONS_COMPLIANCE_APPROVED = config("DONATIONS_COMPLIANCE_APPROVED", default=False, cast=bool)
+PAYMENT_PROVIDER = config("PAYMENT_PROVIDER", default="paystack")  # paystack | fake (fake: DEBUG/tests only)
+PAYSTACK_SECRET_KEY = config("PAYSTACK_SECRET_KEY", default="")
+PAYSTACK_API_BASE = "https://api.paystack.co"
+PAYSTACK_CHANNELS = config("PAYSTACK_CHANNELS", default="card,bank,ussd,bank_transfer", cast=Csv())
+FAKE_PAYMENTS_SECRET = config("FAKE_PAYMENTS_SECRET", default="fake-payments-dev-secret")
+DONATION_MIN_KOBO = config("DONATION_MIN_KOBO", default=500_00, cast=int)  # ₦500
+DONATION_MAX_PER_PAYMENT_KOBO = config("DONATION_MAX_PER_PAYMENT_KOBO", default=5_000_000_00, cast=int)  # ₦5m
+# Electoral Act 2026 s. 92: ₦500m per individual/entity per candidate. Lower it if INEC sets a lower limit (s. 91).
+DONATION_CANDIDATE_DONOR_CAP_KOBO = config("DONATION_CANDIDATE_DONOR_CAP_KOBO", default=500_000_000_00, cast=int)
+DONATION_PARTY_DONOR_CAP_KOBO = config("DONATION_PARTY_DONOR_CAP_KOBO", default=500_000_000_00, cast=int)
+DONATION_PRESETS_KOBO = [1_000_00, 5_000_00, 10_000_00, 50_000_00]

@@ -35,6 +35,17 @@ class IsSystemAdmin(IsSignedIn):
         return super().has_permission(request, view) and is_system_admin(request.user)
 
 
+class IsFinanceViewer(IsSignedIn):
+    """Donation records and exports (spec 05 §7.2): system_admin or finance_officer. Nothing else."""
+
+    message = "Finance access is required."
+
+    def has_permission(self, request, view):
+        from .models import Role
+
+        return super().has_permission(request, view) and has_role(request.user, Role.FINANCE_OFFICER)
+
+
 def HasRole(role, scope_type=ScopeType.GLOBAL, scope_kwarg=None):
     """
     Scoped check for later specs, e.g.
