@@ -4,11 +4,9 @@ import logging
 from datetime import date
 
 from django.db.models import Count, Q, Sum
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, StreamingHttpResponse
+from django.http import StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.cache import add_never_cache_headers, patch_cache_control
-from django.utils.html import escape
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
@@ -22,8 +20,6 @@ from apps.audit.services import record
 
 from . import services
 from .models import Designation, Donation, DonationStatus as S
-from .providers import InvalidSignature
-from .providers.fake import SIGNATURE_HEADER, FakeProvider, bank_get, fake_allowed, sign
 from .serializers import (
     AdminDonationEventSerializer,
     AdminDonationSerializer,
@@ -61,10 +57,6 @@ class ReceiptThrottle(_PerIP):
 
 class FinanceThrottle(_PerIP):
     scope = "finance_public"
-
-
-class WebhookThrottle(_PerIP):
-    scope = "payment_webhook"
 
 
 class Page20(PageNumberPagination):
@@ -173,74 +165,6 @@ class FinanceSummaryView(APIView):
             "candidates": [{"slug": r["candidate__slug"], "full_name": r["candidate__full_name"],
                             "total_kobo": (r["a"] or 0) - (r["r"] or 0), "count": r["n"]} for r in rows],
         }))
-
-
-# ---------------------------------------------------------------- webhooks
-@csrf_exempt
-def payment_webhook(request, provider):
-    """POST /webhooks/payments/<provider>/ — signature first; verify with the provider before any success (§6.4)."""
-    if request.method != "POST":
-        return HttpResponse(status=405)
-    if provider not in ("paystack", "fake") or (provider == "fake" and not fake_allowed()):
-        return HttpResponseNotFound()
-    throttle = WebhookThrottle()
-    if not throttle.allow_request(_DRFLike(request), None):
-        return HttpResponse(status=429)
-    try:
-        services.handle_webhook(provider, request.body, request.headers)
-    except InvalidSignature:
-        return _json_error(400, "invalid_signature", "Webhook signature could not be verified.")
-    except Exception:
-        logger.exception("Payment webhook processing failed")
-        return _json_error(500, "server_error", "Webhook could not be processed.")  # provider retries
-    return HttpResponse(status=200)
-
-
-class _DRFLike:
-    """Just enough of a DRF request for the throttle's IP lookup."""
-
-    def __init__(self, request):
-        self._request = request
-        self.META = request.META
-        self.user = None
-
-
-def _json_error(code, err, message):
-    import json
-
-    return HttpResponse(json.dumps({"error": {"status": code, "code": err, "message": message, "fields": {}}}),
-                        status=code, content_type="application/json")
-
-
-# --------------------------------------------------------- dev fake checkout
-@csrf_exempt
-def fake_checkout(request, reference):
-    """DEBUG/tests only: a stand-in for the provider's hosted page (§6.4)."""
-    if not fake_allowed():
-        return HttpResponseNotFound()
-    d = Donation.objects.filter(reference=reference, provider="fake").first()
-    state = bank_get(reference)
-    if d is None or state is None:
-        return HttpResponseNotFound()
-    if request.method == "POST":
-        outcome = request.POST.get("outcome")
-        if outcome in ("success", "failed"):
-            FakeProvider.settle(reference, outcome)
-            body = FakeProvider.webhook_body("charge.success" if outcome == "success" else "charge.failed", reference)
-            services.handle_webhook("fake", body, {SIGNATURE_HEADER: sign(body)})
-        elif outcome == "success_no_webhook":
-            FakeProvider.settle(reference, "success")  # bank says paid; webhook "lost"
-        return HttpResponseRedirect(state["callback_url"])
-    naira = f"₦{d.amount_kobo // 100:,}"
-    return HttpResponse(f"""<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>Fake checkout</title>
-<body style="font-family:system-ui;max-width:28rem;margin:3rem auto;padding:0 1rem">
-<p style="background:#fff3cd;padding:.5rem 1rem">Development only: no real money moves.</p>
-<h1>Pay {escape(naira)}</h1><p>Reference {escape(reference)}</p>
-<form method="post"><button name="outcome" value="success">Pay</button>
-<button name="outcome" value="failed">Fail</button>
-<button name="outcome" value="success_no_webhook">Pay (webhook lost)</button>
-<button name="outcome" value="leave">Leave (stays pending)</button></form></body>""")
 
 
 # ------------------------------------------------------------- admin/finance

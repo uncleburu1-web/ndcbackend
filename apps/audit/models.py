@@ -29,12 +29,28 @@ class AuditLog(models.Model):
         DONATION_EXPORTED = "donation.exported"
         DONATION_RECHECKED = "donation.rechecked"
         DONATION_LABEL_ANONYMISED = "donation.label_anonymised"
+        PVC_SUBMITTED = "pvc.submitted"
+        PVC_VERIFIED = "pvc.verified"
+        PVC_REJECTED = "pvc.rejected"
+        PVC_VIN_REVEALED = "pvc.vin_revealed"
+        MEMBERSHIP_SUBMITTED = "membership.submitted"
+        MEMBERSHIP_PAYMENT_STARTED = "membership.payment_started"
+        MEMBERSHIP_ACTIVATED = "membership.activated"
+        MEMBERSHIP_APPROVED = "membership.approved"
+        MEMBERSHIP_REJECTED = "membership.rejected"
+        MEMBERSHIP_CANCELLED = "membership.cancelled"
+        MEMBERSHIP_NIN_REVEALED = "membership.nin_revealed"
+        MEMBERSHIP_PHOTO_VIEWED = "membership.photo_viewed"
+        MEMBERSHIP_REGISTER_EXPORTED = "membership.register_exported"
+        MEMBERSHIP_SETTINGS_CHANGED = "membership.settings_changed"
+        MEMBERSHIP_ERASED = "membership.erased_on_account_deletion"
+        MEMBERSHIP_PAYMENT_RECHECKED = "membership.payment_rechecked"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     # For non-user actors: "system:cli", "clerk:webhook", "system:jit".
     actor_label = models.CharField(max_length=32, blank=True)
-    action = models.CharField(max_length=40, choices=Action.choices, db_index=True)
+    action = models.CharField(max_length=48, choices=Action.choices, db_index=True)
     target_type = models.CharField(max_length=64, blank=True)
     target_id = models.CharField(max_length=64, blank=True, db_index=True)
     metadata = models.JSONField(default=dict, blank=True)

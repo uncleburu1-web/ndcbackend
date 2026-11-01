@@ -17,7 +17,7 @@ class CandidateFollow(models.Model):
     # Candidates are never hard-deleted (spec 03 §6.2); PROTECT makes that explicit.
     candidate = models.ForeignKey("candidates.Candidate", on_delete=models.PROTECT, related_name="follows")
     notify = models.BooleanField(default=False)  # opt-in (§3 rule 6)
-    notify_changed_at = models.DateTimeField(null=True, blank=True)  # unit 06 skips posts published before this (§6.3)
+    notify_changed_at = models.DateTimeField(null=True, blank=True)  # unit 07 skips posts published before this (§6.3)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

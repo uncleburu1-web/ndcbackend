@@ -15,7 +15,10 @@ for name, value in {
     if not value:
         raise ImproperlyConfigured(f"Set {name} in production.")
 
-from .base import PAYMENT_PROVIDER  # noqa: E402
+from .base import PAYMENT_PROVIDER, PII_ENCRYPTION_KEYS  # noqa: E402
+
+if not [k for k in PII_ENCRYPTION_KEYS if k.strip()]:
+    raise ImproperlyConfigured("Set PII_ENCRYPTION_KEYS in production (VIN/NIN encryption, spec 06 §9).")
 
 if PAYMENT_PROVIDER == "fake":
     raise ImproperlyConfigured("The fake payment provider can't run in production. Set PAYMENT_PROVIDER=paystack.")

@@ -43,7 +43,12 @@ Health check: `GET http://localhost:8000/api/v1/health/`
 | GET | `/api/v1/donations/<reference>/` | anyone with the reference (receipt) |
 | GET | `/api/v1/me/donations/` | signed in |
 | GET | `/api/v1/finance/donations/` · `/api/v1/finance/summary/` | anyone — successful donations only |
-| POST | `/api/v1/webhooks/payments/<paystack\|fake>/` | provider signature |
+| POST | `/api/v1/webhooks/payments/<paystack\|fake>/` | provider signature — one URL for donations (`NDC-`) and membership fees (`MEM-`) |
+| GET / PUT / DELETE | `/api/v1/me/pvc/` | signed in — VIN masked; never returned in full |
+| GET | `/api/v1/membership/config/` | anyone — `{open, fee_kobo, requires_approval}` |
+| GET / PUT | `/api/v1/me/membership/` · `photo/` · POST `pay/` · `cancel/` · GET `card/` | signed in (applying/paying: completed profile) |
+| GET | `/api/v1/membership/payments/<reference>/` | anyone with the reference (no personal data) |
+| GET / POST | `/api/v1/admin/pvc/…` · `/api/v1/admin/membership/…` (incl. `register.csv`, `register-photos.zip`) | membership officer or system admin (settings: system admin) |
 | GET / POST | `/api/v1/admin/donations/` · `<id>/` · `<id>/recheck/` · `export.csv` | system admin or finance officer |
 
 Single-candidate admin responses include `followers: {total, notify_on}` — counts only; no endpoint lists who follows a candidate.
@@ -79,8 +84,22 @@ Check with `python manage.py check_donations` (never prints keys).
 - **Paystack:** put a **test** key in `.env` as `PAYSTACK_SECRET_KEY=sk_test_…`. Never paste keys in chat or commit them.
   - In the Paystack dashboard, set the webhook URL to `https://<your-api>/api/v1/webhooks/payments/paystack/`.
   - Live keys belong only on the production server.
-- **Run every 15 minutes once deployed:** `python manage.py sweep_donations`. It re-verifies pending payments, abandons 24-hour-old ones, and clears 90-day-old IP hashes.
+- **Run every 15 minutes once deployed:** `python manage.py sweep_payments` (`sweep_donations` still works as an alias). It re-verifies pending donations and membership payments, abandons 24-hour-old ones, and clears 90-day-old IP hashes.
 - **Finance staff:** `python manage.py grant_role finance@example.com finance_officer`.
+
+## Membership and PVC (spec 06)
+
+Membership **payments** are closed until `MEMBERSHIP_ENABLED=True` and `MEMBERSHIP_DATA_APPROVED=True` (after party/legal sign-off). PVC verification and saving details work regardless.
+
+- **VIN and NIN are encrypted** with `PII_ENCRYPTION_KEYS`.
+  - Production refuses to start without it. Generate a key with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
+  - To rotate, put the new key first and keep the old ones after it.
+  - Development creates `.dev_pii_key` automatically (git-ignored).
+- **Member photos** live in `PRIVATE_MEDIA_ROOT` (default `private_media/`, git-ignored). They are never served by `/media/`, only through authenticated views.
+- **PVC checks are manual:** officers check the voter on INEC's checker (`cvr.inecnigeria.org/vvs`) and record the result. "Get your PVC" stays hidden until `INEC_PVC_URL` is set.
+- **Officers:** `python manage.py grant_role officer@example.com membership_officer`.
+- **Daily:** `python manage.py prune_pvc` deletes the VINs of submissions rejected more than 90 days ago.
+- **Local try-out:** add `MEMBERSHIP_ENABLED=True`, `MEMBERSHIP_DATA_APPROVED=True` and `PAYMENT_PROVIDER=fake` to `.env`.
 
 ## Tests
 

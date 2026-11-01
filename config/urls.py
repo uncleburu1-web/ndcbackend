@@ -8,6 +8,9 @@ api_v1 = [
     path("", include("apps.candidates.urls")),
     path("", include("apps.follows.urls")),
     path("", include("apps.donations.urls")),
+    path("", include("apps.payments.urls")),
+    path("", include("apps.pvc.urls")),
+    path("", include("apps.membership.urls")),
 ]
 
 urlpatterns = [path("api/v1/", include(api_v1))]

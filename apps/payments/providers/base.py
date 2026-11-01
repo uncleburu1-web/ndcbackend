@@ -1,4 +1,9 @@
-"""Payment provider adapter interface — spec 05 §6.4."""
+"""
+Payment provider adapter interface — spec 05 §6.4, generalised in spec 06 §6.3.
+
+Providers work on a *payable*: any object with `reference`, `amount_kobo`, `payer_email`
+and `metadata` (dict). Donation and MembershipPayment both provide these.
+"""
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
@@ -43,10 +48,10 @@ class PaymentProvider:
     def configured(self) -> bool:  # pragma: no cover - interface
         raise NotImplementedError
 
-    def initialize(self, donation, *, callback_url: str, base_url: str) -> InitResult:  # pragma: no cover
+    def initialize(self, payable, *, callback_url: str, base_url: str) -> InitResult:  # pragma: no cover
         raise NotImplementedError
 
-    def verify(self, donation, *, check_refunds: bool = False) -> VerifyResult:  # pragma: no cover
+    def verify(self, payable, *, check_refunds: bool = False) -> VerifyResult:  # pragma: no cover
         raise NotImplementedError
 
     def parse_webhook(self, raw_body: bytes, headers) -> WebhookEvent:  # pragma: no cover

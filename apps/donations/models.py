@@ -91,6 +91,15 @@ class Donation(models.Model):
     def net_kobo(self) -> int:
         return self.amount_kobo - self.refunded_kobo
 
+    # payable interface for the shared payment providers (spec 06 §6.3)
+    @property
+    def payer_email(self) -> str:
+        return self.donor_email
+
+    @property
+    def metadata(self) -> dict:
+        return {"kind": "donation", "donation_id": str(self.id)}
+
 
 class DonationEvent(models.Model):
     """Append-only history of status changes (spec 05 §5.2). Never the full provider payload."""

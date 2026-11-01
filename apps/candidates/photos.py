@@ -31,7 +31,8 @@ class StoredPhoto:
     name_200: str
 
 
-def process_and_store(upload) -> StoredPhoto:
+def load_validated_rgb(upload):
+    """Type-check, size-limit, honour rotation and drop all metadata. Shared with membership photos (spec 06 §9)."""
     if upload.size > settings.CANDIDATE_PHOTO_MAX_BYTES:
         raise PhotoError("That photo is larger than 5 MB. Choose a smaller file.")
 
@@ -54,14 +55,22 @@ def process_and_store(upload) -> StoredPhoto:
         raise
     except (UnidentifiedImageError, Image.DecompressionBombError, OSError, SyntaxError, ValueError):
         raise PhotoError("We couldn't read that file as a photo. Use a JPEG, PNG or WebP image.") from None
+    return rgb
 
+
+def square_webp(rgb, size: int) -> bytes:
+    square = ImageOps.fit(rgb, (size, size), method=Image.Resampling.LANCZOS, centering=(0.5, 0.4))
+    out = io.BytesIO()
+    square.save(out, format="WEBP", quality=82, method=6)  # no exif= argument → none written
+    return out.getvalue()
+
+
+def process_and_store(upload) -> StoredPhoto:
+    rgb = load_validated_rgb(upload)
     stem = uuid.uuid4().hex
     names = []
     for size in SIZES:
-        square = ImageOps.fit(rgb, (size, size), method=Image.Resampling.LANCZOS, centering=(0.5, 0.4))
-        out = io.BytesIO()
-        square.save(out, format="WEBP", quality=82, method=6)  # no exif= argument → none written
-        names.append(default_storage.save(f"candidates/{stem}_{size}.webp", ContentFile(out.getvalue())))
+        names.append(default_storage.save(f"candidates/{stem}_{size}.webp", ContentFile(square_webp(rgb, size))))
     return StoredPhoto(name_800=names[0], name_200=names[1])
 
 

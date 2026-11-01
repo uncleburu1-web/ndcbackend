@@ -22,14 +22,12 @@ from apps.candidates.models import Candidate, CandidateStatus
 from apps.core.exceptions import ServiceError
 
 from .models import Designation, DisplayChoice, Donation, DonationEvent, DonationStatus as S
-from .providers import ProviderError, get_provider
-from .providers.paystack import HANDLED_EVENTS as PAYSTACK_EVENTS
+from apps.payments.providers import ProviderError, get_provider
 
 logger = logging.getLogger(__name__)
 
 ANON_LABEL = "Anonymous Donor"
 GUEST_LABEL = "Guest"
-FAKE_EVENTS = {"charge.success", "charge.failed", "refund.processed"}
 OPEN_STATES = (S.INITIATED, S.PENDING)
 
 
@@ -284,18 +282,21 @@ def maybe_reverify(d: Donation, *, min_age_seconds=5) -> Donation:
 
 
 # ------------------------------------------------------------- webhooks (§6.4)
-def handle_webhook(provider_name: str, raw_body: bytes, headers) -> None:
-    provider = get_provider(provider_name)
-    event = provider.parse_webhook(raw_body, headers)  # raises InvalidSignature
-    handled = PAYSTACK_EVENTS if provider_name == "paystack" else FAKE_EVENTS
-    if event.name not in handled:
-        return
-    d = Donation.objects.filter(reference=event.reference, provider=provider_name).first()
+def on_provider_event(provider_name: str, reference: str, event_name: str, payload_sha256: str) -> None:
+    """Called by apps.payments.dispatch for NDC- references. Never trusts the payload: always verifies."""
+    d = Donation.objects.filter(reference=reference, provider=provider_name).first()
     if d is None:
-        logger.warning("Payment webhook %s for unknown reference %s", event.name, event.reference[:40])
+        logger.warning("Payment webhook %s for unknown donation %s", event_name, reference[:40])
         return
-    verify_now(d, source=DonationEvent.Source.WEBHOOK, event=event.name, check_refunds=event.name.startswith("refund."),
-               payload_sha256=event.payload_sha256)
+    verify_now(d, source=DonationEvent.Source.WEBHOOK, event=event_name, check_refunds=event_name.startswith("refund."),
+               payload_sha256=payload_sha256)
+
+
+def handle_webhook(provider_name: str, raw_body: bytes, headers) -> None:
+    """Kept for callers from unit 05; routing now lives in apps.payments.dispatch."""
+    from apps.payments.dispatch import handle_webhook as dispatch
+
+    dispatch(provider_name, raw_body, headers)
 
 
 # --------------------------------------------------------------- admin (§4.6)

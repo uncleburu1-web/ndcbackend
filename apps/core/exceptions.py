@@ -51,6 +51,9 @@ def api_exception_handler(exc, context):
         non_field = data.get("non_field_errors")
         message = _first(non_field) if non_field else "Please correct the highlighted fields."
         code = "validation_error"
+        # A validation error may carry its own stable code/message (e.g. application_incomplete, spec 06 §7.3).
+        code = getattr(exc, "envelope_code", code)
+        message = getattr(exc, "envelope_message", message)
     elif isinstance(exc, exceptions.Throttled):
         wait = int(exc.wait or 60)
         message, code = f"Too many requests. Please wait {wait} seconds and try again.", "throttled"

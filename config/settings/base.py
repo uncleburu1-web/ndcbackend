@@ -27,7 +27,10 @@ INSTALLED_APPS = [
     "apps.access",
     "apps.candidates",
     "apps.follows",
+    "apps.payments",
     "apps.donations",
+    "apps.pvc",
+    "apps.membership",
 ]
 
 MIDDLEWARE = [
@@ -87,6 +90,9 @@ REST_FRAMEWORK = {
         "donations_receipt": "60/min",  # per IP — references are the key to a receipt
         "finance_public": "120/min",  # per IP
         "payment_webhook": "600/min",
+        "pvc_submit": "5/hour",  # spec 06 §9
+        "membership_pay": "10/hour",
+        "pii_reveal": "30/hour",  # per officer — an abuse signal as much as a limit
     },
 }
 
@@ -114,7 +120,8 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {"simple": {"format": "%(asctime)s %(levelname)s %(name)s: %(message)s"}},
-    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "simple"}},
+    "filters": {"redact_pii": {"()": "apps.core.logging.RedactPII"}},  # VIN/NIN never reach logs (spec 06 §9)
+    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "simple", "filters": ["redact_pii"]}},
     "root": {"handlers": ["console"], "level": "INFO"},
 }
 
@@ -142,3 +149,17 @@ DONATION_MAX_PER_PAYMENT_KOBO = config("DONATION_MAX_PER_PAYMENT_KOBO", default=
 DONATION_CANDIDATE_DONOR_CAP_KOBO = config("DONATION_CANDIDATE_DONOR_CAP_KOBO", default=500_000_000_00, cast=int)
 DONATION_PARTY_DONOR_CAP_KOBO = config("DONATION_PARTY_DONOR_CAP_KOBO", default=500_000_000_00, cast=int)
 DONATION_PRESETS_KOBO = [1_000_00, 5_000_00, 10_000_00, 50_000_00]
+
+# --------------------------------------------------------------------------
+# Membership + PVC verification (spec 06). Payments closed until the party/legal sign-off.
+# --------------------------------------------------------------------------
+MEMBERSHIP_ENABLED = config("MEMBERSHIP_ENABLED", default=False, cast=bool)
+MEMBERSHIP_DATA_APPROVED = config("MEMBERSHIP_DATA_APPROVED", default=False, cast=bool)
+MEMBERSHIP_FEE_KOBO = config("MEMBERSHIP_FEE_KOBO", default=2_000_000, cast=int)  # ₦20,000
+# Official INEC portal for "Get your PVC" — empty hides the button until confirmed (spec 06 §15.2).
+INEC_PVC_URL = config("INEC_PVC_URL", default="")
+INEC_VOTER_CHECK_URL = "https://cvr.inecnigeria.org/vvs"  # officers' manual check (spec 06 §6.2)
+# Fernet keys (comma-separated; first encrypts, all decrypt). Required in production.
+PII_ENCRYPTION_KEYS = config("PII_ENCRYPTION_KEYS", default="", cast=Csv())
+# Member photos live OUTSIDE the public media folder and are served only through authenticated views.
+PRIVATE_MEDIA_ROOT = config("PRIVATE_MEDIA_ROOT", default=str(BASE_DIR / "private_media"))

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from apps.donations.providers import ProviderError, get_provider
+from apps.payments.providers import ProviderError, get_provider
 from apps.donations.services import gate_status
 
 

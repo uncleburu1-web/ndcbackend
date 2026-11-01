@@ -109,8 +109,12 @@ def mark_deleted(clerk_user_id: str) -> Optional[User]:
         from apps.donations.services import anonymise_for_deleted_user
 
         donations_anonymised = anonymise_for_deleted_user(user)
+        # NIN, VIN, date of birth and photo are erased; membership cancelled; payments kept (spec 06 §6.7).
+        from apps.membership.services import erase_for_deleted_user
+
+        membership_erased = erase_for_deleted_user(user)
     record(AuditLog.Action.USER_DELETED, target=user, actor_label="clerk:webhook", roles_revoked=roles_revoked,
-           follows_removed=follows_removed, donations_anonymised=donations_anonymised)
+           follows_removed=follows_removed, donations_anonymised=donations_anonymised, membership_erased=membership_erased)
     return user
 
 
