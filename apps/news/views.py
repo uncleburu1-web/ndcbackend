@@ -1,5 +1,5 @@
 """News API — spec 07 §7."""
-from django.db.models import Count, Min, Q
+from django.db.models import Min, Q
 from django.shortcuts import get_object_or_404
 from django.utils.cache import add_never_cache_headers, patch_cache_control
 from rest_framework import status
@@ -19,7 +19,10 @@ from apps.core.exceptions import ServiceError
 from . import announcements, reports, services
 from .feed import feed_page
 from .images import PhotoError
-from .models import Article, ArticleReport, ArticleStatus, ReportStatus, Source
+from apps.moderation import services as moderation
+from apps.moderation.models import Report, ReportStatus
+
+from .models import Article, ArticleStatus, Source
 from .serializers import (
     AdminArticleDetailSerializer,
     AdminArticleSerializer,
@@ -130,7 +133,10 @@ class NewsDetail(APIView):
     throttle_classes = [PublicThrottle]
 
     def get(self, request, pk):
-        a = get_object_or_404(Article.objects.public().select_related("author"), pk=pk)
+        a = Article.objects.public().select_related("author").filter(pk=pk).first()
+        if a is None:
+            moderation.raise_if_removed("article", Article.objects.filter(pk=pk, status=ArticleStatus.REMOVED).first())
+            raise ServiceError("Not found.", code="not_found", status_code=404)
         response = Response(PublicArticleDetailSerializer(a, context={"request": request}).data)
         patch_cache_control(response, public=True, max_age=60)
         return response
@@ -145,9 +151,9 @@ class NewsReport(_Private):
         ser = ReportSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         user = request.user if request.user and request.user.is_authenticated else None
-        reports.report(a, ser.validated_data["reason"], ser.validated_data.get("details", ""), user=user,
-                       contact_email="" if user else ser.validated_data.get("contact_email", ""), ip=client_ip(request) or "")
-        return Response({"ok": True}, status=status.HTTP_201_CREATED)
+        out = reports.report(a, ser.validated_data["reason"], ser.validated_data.get("details", ""), user=user,
+                             contact_email="" if user else ser.validated_data.get("contact_email", ""), ip=client_ip(request) or "")
+        return Response(out, status=status.HTTP_200_OK if "route" in out else status.HTTP_201_CREATED)
 
 
 # ------------------------------------------------------------------ member
@@ -219,7 +225,7 @@ class MyNewsWithdraw(_Private):
 
 # ---------------------------------------------------------------- reviewer
 def _admin_qs():
-    return Article.objects.select_related("author").annotate(open_reports=Count("reports", filter=Q(reports__status=ReportStatus.OPEN)))
+    return Article.objects.select_related("author").annotate(open_reports=moderation.open_reports_subquery("article"))
 
 
 class AdminNewsList(_Private):
@@ -243,10 +249,10 @@ class AdminNewsList(_Private):
         paginator = Page20()
         page = paginator.paginate_queryset(qs, request, view=self)
         response = paginator.get_paginated_response(AdminArticleSerializer(page, many=True, context={"request": request}).data)
-        open_reports = ArticleReport.objects.filter(status=ReportStatus.OPEN)
+        open_reports = Report.objects.filter(target_kind="article", status=ReportStatus.OPEN)
         response.data["counts"] = {
             "pending": Article.objects.filter(status=ArticleStatus.PENDING).count(),
-            "reported": open_reports.values("article").distinct().count(),
+            "reported": open_reports.values("target_id").distinct().count(),
             "oldest_open_report": open_reports.aggregate(t=Min("created_at"))["t"],
             "paused_until": services.paused_until(),
         }
@@ -272,9 +278,10 @@ class AdminNewsAction(_Private):
         elif self.action_name == "reject":
             services.reject(a, request.user, reason, request=request)
         elif self.action_name == "remove":
-            services.remove(a, request.user, reason, request=request)
+            services.remove(a, request.user, reason, request=request, rule=str(request.data.get("rule", "")),
+                            note_to_author=str(request.data.get("note_to_author", ""))[:500])
         elif self.action_name == "restore":
-            services.restore(a, request.user, request=request)
+            services.restore(a, request.user, request=request, note=str(request.data.get("note", ""))[:1000])
         return Response(AdminArticleDetailSerializer(_admin_qs().get(pk=pk), context={"request": request}).data)
 
 
@@ -282,8 +289,9 @@ class AdminReportDismiss(_Private):
     permission_classes = [Reviewer]
 
     def post(self, request, pk):
-        r = reports.dismiss(get_object_or_404(ArticleReport, pk=pk), request.user, str(request.data.get("note", "")), request=request)
-        return Response(AdminArticleDetailSerializer(_admin_qs().get(pk=r.article_id), context={"request": request}).data)
+        r = get_object_or_404(Report, pk=pk, target_kind="article")
+        reports.dismiss(r, request.user, str(request.data.get("note", "")), request=request)
+        return Response(AdminArticleDetailSerializer(_admin_qs().get(pk=r.target_id), context={"request": request}).data)
 
 
 # ----------------------------------------------------------- announcements
@@ -362,7 +370,8 @@ class AnnouncementAction(_Private):
         elif self.action_name == "unpin":
             announcements.unpin(a, request.user, request=request)
         elif self.action_name == "unpublish":
-            services.remove(a, request.user, str(request.data.get("reason", "")), request=request)
+            services.remove(a, request.user, str(request.data.get("reason", "")), request=request, rule=str(request.data.get("rule", "")),
+                            note_to_author=str(request.data.get("note_to_author", ""))[:500])
         elif self.action_name == "restore":
-            services.restore(a, request.user, request=request)
+            services.restore(a, request.user, request=request, note=str(request.data.get("note", ""))[:1000])
         return Response(AdminArticleDetailSerializer(_official(pk), context={"request": request}).data)

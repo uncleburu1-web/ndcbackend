@@ -15,7 +15,7 @@ from apps.core.models import TimeStampedModel
 
 class Role(models.TextChoices):
     SYSTEM_ADMIN = "system_admin", "System administrator"
-    MODERATOR = "moderator", "Community moderator"
+    MODERATOR = "moderator", "Moderator"
     NEWS_REVIEWER = "news_reviewer", "News reviewer"
     CANDIDATE = "candidate", "Candidate"
     MEMBERSHIP_OFFICER = "membership_officer", "Membership officer"

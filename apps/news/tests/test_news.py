@@ -16,7 +16,8 @@ from apps.accounts.models import User
 from apps.accounts.tests.helpers import signed_webhook
 from apps.audit.models import AuditLog
 from apps.news import services
-from apps.news.models import Article, ArticleEvent, ArticleReport, ArticleStatus as S
+from apps.moderation.models import Report
+from apps.news.models import Article, ArticleEvent, ArticleStatus as S
 from apps.notifications.models import Notification, NotificationPreference
 
 TMP_MEDIA = tempfile.mkdtemp(prefix="ndc-news-test-")
@@ -190,8 +191,12 @@ class ReviewTests(Base):
         rc = self.as_(self.reviewer)
         rc.post(reverse("admin-news-approve", kwargs={"pk": a.pk}))
         self.assertEqual(rc.post(reverse("admin-news-remove", kwargs={"pk": a.pk}), {}, format="json").status_code, 400)
-        rc.post(reverse("admin-news-remove", kwargs={"pk": a.pk}), {"reason": "Shares private information"}, format="json")
-        self.assertEqual(APIClient().get(reverse("news-detail", kwargs={"pk": a.pk})).status_code, 404)
+        r = rc.post(reverse("admin-news-remove", kwargs={"pk": a.pk}), {"reason": "Shares private information"}, format="json")
+        self.assertEqual((r.status_code, r.data["error"]["code"]), (400, "rule_required"))  # spec 13: every removal cites a rule
+        rc.post(reverse("admin-news-remove", kwargs={"pk": a.pk}), {"reason": "Shares private information", "rule": "R5"}, format="json")
+        gone = APIClient().get(reverse("news-detail", kwargs={"pk": a.pk}))
+        self.assertEqual((gone.status_code, gone.data["error"]["rule"]), (410, "R5"))
+        self.assertNotIn("title", gone.data["error"])
         self.assertEqual(self.client.get(reverse("my-news-detail", kwargs={"pk": a.pk})).data["removed_reason"], "Shares private information")
         self.assertEqual(self.client.post(reverse("my-news-withdraw", kwargs={"pk": a.pk})).status_code, 409)
         rc.post(reverse("admin-news-restore", kwargs={"pk": a.pk}))
@@ -331,13 +336,14 @@ class ReportTests(Base):
         r = APIClient().post(url, {"reason": "false", "details": "Not true", "contact_email": "me@example.com"}, format="json",
                              REMOTE_ADDR="10.0.0.9")
         self.assertEqual(r.status_code, 201)
-        rep = ArticleReport.objects.get()
+        self.assertTrue(r.data["reference"].startswith("RPT-"))
+        rep = Report.objects.get()
         self.assertNotIn("10.0.0.9", rep.ip_hash)
         self.assertEqual(len(rep.ip_hash), 64)
         u = self.as_(mk_user("user_rep"))
         u.post(url, {"reason": "spam"}, format="json")
         u.post(url, {"reason": "abuse"}, format="json")
-        self.assertEqual(ArticleReport.objects.filter(reporter__clerk_user_id="user_rep").count(), 1)
+        self.assertEqual(Report.objects.filter(reporter__clerk_user_id="user_rep").count(), 1)
         self.assertEqual(APIClient().post(url, {"reason": "nope"}, format="json").status_code, 400)
         counts = self.as_(self.reviewer).get(reverse("admin-news"), {"reported": 1}).data
         self.assertEqual((counts["count"], counts["counts"]["reported"]), (1, 1))
@@ -346,13 +352,14 @@ class ReportTests(Base):
     def test_remove_resolves_and_dismiss(self):
         url = reverse("news-report", kwargs={"pk": self.a.pk})
         APIClient().post(url, {"reason": "privacy"}, format="json")
-        rep = ArticleReport.objects.get()
+        rep = Report.objects.get()
         rc = self.as_(self.reviewer)
         r = rc.post(reverse("admin-news-report-dismiss", kwargs={"pk": rep.pk}), {"note": "Fine"}, format="json")
-        self.assertEqual(r.data["reports"][0]["status"], "dismissed")
+        self.assertEqual((r.data["case"]["status"], r.data["case"]["decision"]), ("closed", "kept"))  # last report dismissed → Keep
+        self.assertEqual(Report.objects.get().status, "dismissed")
         APIClient().post(url, {"reason": "privacy"}, format="json")
-        rc.post(reverse("admin-news-remove", kwargs={"pk": self.a.pk}), {"reason": "Private information"}, format="json")
-        self.assertEqual(ArticleReport.objects.filter(status="actioned").count(), 1)
+        rc.post(reverse("admin-news-remove", kwargs={"pk": self.a.pk}), {"reason": "Private information", "rule": "R5"}, format="json")
+        self.assertEqual(Report.objects.filter(status="actioned").count(), 1)
         self.assertEqual(APIClient().post(url, {"reason": "spam"}, format="json").status_code, 404)
 
     def test_reports_private(self):
@@ -407,7 +414,7 @@ class DeletionTests(Base):
         self.assertIsNone(APIClient().get(reverse("news-detail", kwargs={"pk": pub.pk})).data["byline"])
         self.assertFalse(Notification.objects.filter(recipient=u).exists())
         self.assertFalse(NotificationPreference.objects.filter(user=u).exists())
-        self.assertFalse(ArticleReport.objects.filter(reporter=u).exists())
+        self.assertFalse(Report.objects.filter(reporter=u).exists())
         log = AuditLog.objects.filter(action="user.deleted").latest("created_at")
         self.assertEqual(log.metadata["news_erased"]["drafts_cleared"], 1)
 

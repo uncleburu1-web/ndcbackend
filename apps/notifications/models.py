@@ -11,6 +11,15 @@ class Kind(models.TextChoices):
     NEWS_DECISION = "news_decision", "News decision"
     PVC_DECISION = "pvc_decision", "PVC decision"  # spec 08: no FK and no PVC data in the row
     CANDIDATE_POST = "candidate_post", "Candidate post"  # spec 09: follow data — never audited
+    # spec 13 §4.6: moderation outcomes. Linked to the case (and appeal), never to the moderator.
+    REPORT_OUTCOME = "report_outcome", "Report outcome"
+    CONTENT_REMOVED = "content_removed", "Content removed"
+    ACCOUNT_WARNING = "account_warning", "Account warning"
+    SUBMISSIONS_PAUSED = "submissions_paused", "Submissions paused"
+    APPEAL_DECISION = "appeal_decision", "Appeal decision"
+
+
+MODERATION_KINDS = ["report_outcome", "content_removed", "account_warning", "submissions_paused", "appeal_decision"]
 
 
 class Notification(models.Model):
@@ -19,6 +28,8 @@ class Notification(models.Model):
     kind = models.CharField(max_length=20, choices=Kind.choices)
     article = models.ForeignKey("news.Article", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
     candidate_post = models.ForeignKey("posts.CandidatePost", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
+    case = models.ForeignKey("moderation.Case", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
+    appeal = models.ForeignKey("moderation.Appeal", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
     decision = models.CharField(max_length=10, blank=True)  # approved | rejected (news) · verified | rejected (pvc)
     created_at = models.DateTimeField(auto_now_add=True)
     read_at = models.DateTimeField(null=True, blank=True)
@@ -33,7 +44,8 @@ class Notification(models.Model):
             models.CheckConstraint(name="notif_target_by_kind",
                                    condition=(Q(kind__in=["announcement", "news_decision"], article__isnull=False, candidate_post__isnull=True)
                                               | Q(kind="pvc_decision", article__isnull=True, candidate_post__isnull=True)
-                                              | Q(kind="candidate_post", candidate_post__isnull=False, article__isnull=True))),
+                                              | Q(kind="candidate_post", candidate_post__isnull=False, article__isnull=True)
+                                              | Q(kind__in=MODERATION_KINDS, article__isnull=True, candidate_post__isnull=True))),
         ]
         indexes = [
             models.Index(fields=["recipient", "-created_at"], name="notif_recipient_idx"),

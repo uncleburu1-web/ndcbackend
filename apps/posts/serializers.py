@@ -81,7 +81,7 @@ class CampaignPostSerializer(PublicPostDetailSerializer):
     status_label = serializers.CharField(source="get_status_display")
 
     class Meta(PublicPostDetailSerializer.Meta):
-        fields = PublicPostDetailSerializer.Meta.fields + ["status", "status_label", "removed_reason", "removed_at", "created_at"]
+        fields = PublicPostDetailSerializer.Meta.fields + ["status", "status_label", "removed_reason", "removed_rule", "removed_at", "created_at"]
 
 
 class AdminPostSerializer(CampaignPostSerializer):
@@ -101,19 +101,19 @@ class AdminPostSerializer(CampaignPostSerializer):
 
 class AdminPostDetailSerializer(AdminPostSerializer):
     events = serializers.SerializerMethodField()
-    reports = serializers.SerializerMethodField()
+    case = serializers.SerializerMethodField()
 
     class Meta(AdminPostSerializer.Meta):
-        fields = AdminPostSerializer.Meta.fields + ["events", "reports"]
+        fields = AdminPostSerializer.Meta.fields + ["events", "case"]
 
     def get_events(self, p):
         return [{"event": e.event, "note": e.note, "created_at": e.created_at, "actor_email": e.actor.email if e.actor else None}
                 for e in p.events.select_related("actor")]
 
-    def get_reports(self, p):
-        return [{"id": r.id, "reason": r.reason, "reason_label": r.get_reason_display(), "details": r.details, "status": r.status,
-                 "contact_email": r.contact_email, "reporter_email": r.reporter.email if r.reporter else None, "created_at": r.created_at,
-                 "resolved_at": r.resolved_at, "resolution_note": r.resolution_note} for r in p.reports.select_related("reporter")]
+    def get_case(self, p):  # spec 13 §8.2
+        from apps.moderation.services import case_summary
+
+        return case_summary("post", p.pk)
 
 
 class PostWriteSerializer(serializers.Serializer):

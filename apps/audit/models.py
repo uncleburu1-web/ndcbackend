@@ -72,6 +72,22 @@ class AuditLog(models.Model):
         USER_VIEWED = "user.viewed"  # spec 11: account page opened by a system admin
         USER_PHONE_REVEALED = "user.phone_revealed"
         AUDIT_VIEWED = "audit.viewed"  # spec 11: the audit log itself was searched
+        # spec 13: reporting and moderation
+        MODERATION_CASE_CLAIMED = "moderation.case_claimed"
+        MODERATION_KEPT = "moderation.kept"
+        MODERATION_REMOVED = "moderation.removed"
+        MODERATION_RESTORED = "moderation.restored"
+        MODERATION_ESCALATED = "moderation.escalated"
+        MODERATION_WARNED = "moderation.warned"
+        MODERATION_PAUSED = "moderation.paused"
+        MODERATION_PAUSE_LIFTED = "moderation.pause_lifted"
+        MODERATION_APPEAL_DECIDED = "moderation.appeal_decided"
+        MODERATION_REPORTER_VIEWED = "moderation.reporter_viewed"
+        MODERATION_LEGAL_NOTICE_LOGGED = "moderation.legal_notice_logged"
+        MODERATION_LEGAL_NOTICE_UPDATED = "moderation.legal_notice_updated"
+        MODERATION_LEGAL_HOLD_CHANGED = "moderation.legal_hold_changed"
+        MODERATION_ATTACHMENT_VIEWED = "moderation.attachment_viewed"
+        MODERATION_COMPLIANCE_EXPORTED = "moderation.compliance_exported"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

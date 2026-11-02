@@ -105,14 +105,24 @@ def notify_pvc_decision(user, decision: str):
     return Notification.objects.create(recipient=user, kind=Kind.PVC_DECISION, article=None, decision=decision)
 
 
+def notify_moderation(user, kind: str, *, case=None, appeal=None, decision=""):
+    """Spec 13 §4.6. Written inside the decision's transaction, so a decision and its notices commit together.
+    Never names the moderator or the reporter."""
+    if user is None or not user.is_active or user.clerk_deleted_at:
+        return None
+    return Notification.objects.create(recipient=user, kind=kind, case=case, appeal=appeal, decision=(decision or "")[:10])
+
+
 def visible(user):
     """Announcements only while their article is public; decisions about your own requests always."""
+    from .models import MODERATION_KINDS
+
     return (Notification.objects.filter(recipient=user)
-            .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION])
+            .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION, *MODERATION_KINDS])
                     | Q(kind=Kind.ANNOUNCEMENT, article__status="successful")
                     | Q(kind=Kind.CANDIDATE_POST, candidate_post__status="published", candidate_post__candidate__status="published",
                         candidate_post__candidate__verified_at__isnull=False))
-            .select_related("article", "candidate_post__candidate"))
+            .select_related("article", "candidate_post__candidate", "case", "appeal__case"))
 
 
 def unread_count(user) -> int:

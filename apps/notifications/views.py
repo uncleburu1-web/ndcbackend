@@ -36,6 +36,15 @@ def item(n, request=None):
         out["post"] = {"id": p.id, "kind": p.kind, "kind_label": p.get_kind_display(), "title": p.title}
         out["candidate"] = {"slug": c.slug, "full_name": c.full_name,
                             "photo": {"url_200": public_url(request, c.photo_200)} if c.photo_200 else None}
+    case = n.case or (n.appeal.case if n.appeal_id else None)
+    if case is not None:  # spec 13 §4.6: what, which rule, and where to go next; never who decided
+        from apps.moderation.rules import rule_title
+
+        removed_for_reporter = n.kind == "report_outcome" and n.decision == "removed"
+        out["case"] = {"id": case.id, "target_kind": case.target_kind, "title": "" if removed_for_reporter else case.title,
+                       "rule": case.rule, "rule_title": rule_title(case.rule) if case.rule else ""}
+    if n.appeal_id:
+        out["appeal"] = {"id": n.appeal.id, "status": n.appeal.status, "reason": n.appeal.decision_reason}
     return out
 
 

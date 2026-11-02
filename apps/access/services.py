@@ -147,15 +147,15 @@ ROLE_ORDER = [Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMB
               Role.MODERATOR, Role.CANDIDATE]
 ROLE_DESCRIPTIONS = {
     Role.SYSTEM_ADMIN: "manage every admin area, people, roles and settings",
-    Role.NEWS_REVIEWER: "approve or reject community news and act on news reports",
+    Role.NEWS_REVIEWER: "approve or reject community news and act on reports about community news",
     Role.PVC_OFFICER: "check PVC details against INEC's voter checker",
     Role.MEMBERSHIP_OFFICER: "check PVCs, approve memberships and export the register",
     Role.FINANCE_OFFICER: "see donation records and export them",
-    Role.MODERATOR: "moderate communities (when communities exist)",
+    Role.MODERATOR: "review reports on community news and candidate posts, remove or restore content, warn or pause authors",
     Role.CANDIDATE: "post for one candidate (linked on the candidate page)",
 }
-# Granted from the browser. `candidate` needs the candidate record (03); `moderator` waits for communities (spec 11 §15.7).
-GRANTABLE = [Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER]
+# Granted from the browser. `candidate` needs the candidate record (03). `moderator` became grantable with spec 13.
+GRANTABLE = [Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.MODERATOR]
 
 
 def grantable_roles() -> list[dict]:

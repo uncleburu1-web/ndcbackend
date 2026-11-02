@@ -53,13 +53,19 @@ Health check: `GET http://localhost:8000/api/v1/health/`
 | GET / POST | `/api/v1/admin/membership/…` (incl. `register.csv`, `register-photos.zip`) | membership officer or system admin (settings: system admin) |
 | GET / POST | `/api/v1/admin/donations/` · `<id>/` · `<id>/recheck/` · `export.csv` | system admin or finance officer |
 | GET | `/api/v1/news/` (`?source=official\|community&state=&page=`) · `/api/v1/news/<id>/` | anyone — published articles only |
-| POST | `/api/v1/news/<id>/report/` | anyone (5/hour) |
+| POST | `/api/v1/news/<id>/report/` · `/api/v1/candidates/<slug>/report/` (profile) | anyone (5/hour) → `{reference}`, or `{route}` for copyright |
 | GET / POST | `/api/v1/me/news/` · GET / PATCH `<id>/` · PUT / DELETE `<id>/image/` · POST `<id>/withdraw/` | signed in (writes: completed profile) |
-| GET / POST | `/api/v1/admin/news/` · `<id>/` · `<id>/{approve,reject,remove,restore}/` · `reports/<id>/dismiss/` | news reviewer or system admin |
+| GET / POST | `/api/v1/admin/news/` · `<id>/` · `<id>/{approve,reject,remove,restore}/` (remove needs `rule`) · `reports/<id>/dismiss/` | news reviewer or system admin |
 | GET / POST | `/api/v1/admin/announcements/` · `notify-count/` · `<id>/` · `<id>/image/` · `<id>/{pin,unpin,unpublish,restore}/` | system admin |
 | GET | `/api/v1/candidates/<slug>/posts/` · `<id>/` · POST `<id>/report/` | anyone — visible candidate posts only |
 | GET / POST | `/api/v1/campaign/candidates/` · `<candidate_id>/posts/` · GET / PATCH / DELETE `<post_id>/` · PUT / DELETE `<post_id>/image/` | accounts linked to that candidate (`candidate` role) |
-| GET / POST | `/api/v1/admin/posts/` · `<id>/` · `<id>/{remove,restore}/` · `reports/<id>/dismiss/` · `/api/v1/admin/candidates/<id>/posts/` | system admin |
+| GET / POST | `/api/v1/admin/posts/` · `<id>/` · `<id>/{remove,restore}/` (remove needs `rule`) · `reports/<id>/dismiss/` · `/api/v1/admin/candidates/<id>/posts/` | system admin |
+| GET | `/api/v1/rules/` · `/api/v1/reports/status/?reference=` | anyone (spec 13) |
+| POST | `/api/v1/report/copyright/` | anyone — Copyright Act s. 54(2) fields → `{reference}` |
+| GET / POST | `/api/v1/me/reports/` · `/api/v1/me/moderation/` · POST `/api/v1/me/appeals/` · `/api/v1/me/counter-notices/` | signed in |
+| GET / POST | `/api/v1/admin/moderation/cases/` · `<id>/` · `<id>/{claim,release,keep,remove,restore,escalate,warn,pause,lift-pause,hold}/` · `<id>/reports/<report_id>/reporter/` (system admin, audited) | moderator, news reviewer, system admin (as the role table) |
+| GET / POST | `/api/v1/admin/moderation/appeals/` · `<id>/decide/` | as above; never the original decider |
+| GET / POST / PATCH | `/api/v1/admin/moderation/legal/` · `<id>/` · `<id>/{acknowledge,hold,owner-notified}/` · `<id>/attachment/` · `<id>/items/<item>/` · `/api/v1/admin/moderation/compliance/?year=` (`&format=csv`, audited) | system admin |
 | GET | `/api/v1/me/notifications/` · `unread-count/` · POST `<id>/read/` · `read-all/` · GET / PATCH `preferences/` | signed in |
 | GET | `/api/v1/search/?q=` (`type`, `state`, `position`, `year`, `source`, `since`, `page`) · `/api/v1/search/suggest/?q=` · `/api/v1/states/` · `/api/v1/states/<state>/` | anyone — anonymous, cacheable 60 s, public items only (spec 12) |
 | GET | `/api/v1/admin/overview/` | any admin role — only that role's cards and numbers (spec 11) |
@@ -73,7 +79,7 @@ Follows are political-opinion data (NDPA 2023): private to the user, never audit
 Candidate photos are saved under `media/` (git-ignored) in development and served by Django only when `DEBUG` is on.
 
 Errors always look like `{"error": {"status", "code", "message", "fields"}}`.
-Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429), `invalid_transition` (409), `invalid_photo` (400), `storage_unavailable` (503), `too_many_pending` (409), `self_review` (403), `publishing_paused` (409, with `until`), `too_many_pinned` (409), `source_required` (400), `candidate_not_published` (409), `posting_paused` (409), `self_moderation` (403), `self_change` (403), `last_system_admin` (409), `user_not_found` (404), `role_exists` (409), `user_inactive` (409), `query_too_short` (400), `invalid_role` (400), `query_too_long` (400), `invalid_filter` (400), `search_unavailable` (503).
+Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429), `invalid_transition` (409), `invalid_photo` (400), `storage_unavailable` (503), `too_many_pending` (409), `self_review` (403), `publishing_paused` (409, with `until`), `too_many_pinned` (409), `source_required` (400), `candidate_not_published` (409), `posting_paused` (409), `self_moderation` (403), `self_change` (403), `last_system_admin` (409), `user_not_found` (404), `role_exists` (409), `user_inactive` (409), `query_too_short` (400), `invalid_role` (400), `query_too_long` (400), `invalid_filter` (400), `search_unavailable` (503), `removed` (410, with `rule`, `rule_title`, `kind`, `source`), `rule_required` (400), `legal_basis_required` (400), `not_your_case` (403), `same_decider` (403), `submissions_paused` (403, with `until`), `appeal_window_closed` (409), `appeal_exists` (409).
 
 ## Roles
 
@@ -134,23 +140,23 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - Accounts linked to a candidate (admin → candidate → linked accounts, or `grant_role <email> candidate --scope-type candidate --scope-id <candidate-uuid>`) publish straight away at `/campaign`. There is no Pending.
 - Followers with the bell on get an in-app notification after the post commits. If delivery failed, re-run `python manage.py deliver_post <post-id>` (safe to repeat). Edits and restores never notify again.
 - Posting pauses for the candidate's office inside `CAMPAIGN_BLACKOUTS`; deleting still works.
-- System admins moderate at `/admin/posts` (an admin linked to the candidate can't moderate its posts).
-- **Daily:** `python manage.py prune_posts` (deleted/removed posts and dismissed reports after 1 year).
+- Moderators and system admins moderate reported posts at `/admin/moderation`; `/admin/posts` stays for system admins (nobody linked to the candidate can moderate its posts).
+- **Daily:** `python manage.py prune_posts` (deleted/removed posts after 1 year, except legal holds).
 
 ## News and announcements (spec 07)
 
 - **News reviewers:** `python manage.py grant_role reviewer@example.com news_reviewer`. Reviewers can't review their own submissions.
 - **Official announcements** are published by system admins. "Notify everyone" sends one in-app notification per user after the save commits; if it failed, re-run `python manage.py deliver_announcement <article-id>` (safe to repeat).
 - **Blackouts:** `CAMPAIGN_BLACKOUTS` (JSON in `.env`, defaults to the 2027 windows) pauses campaign announcements and community approvals in the 24 hours before polls.
-- **Daily:** `python manage.py prune_news` (rejected/withdrawn after 180 days; removed and dismissed reports after 1 year) and `python manage.py prune_notifications` (read after 180 days, unread after 365).
+- **Daily:** `python manage.py prune_news` (rejected/withdrawn after 180 days; removed after 1 year, except legal holds) and `python manage.py prune_notifications` (read after 180 days, unread after 365).
 - Article images are saved under `media/news/` (metadata stripped, WebP, aspect ratio kept).
 
 ## Admin dashboard and background jobs (spec 11)
 
 - `/admin` shows each admin role its own queues, weekly counts, readiness (gates and settings as set/not set, never values), background jobs and recent activity. Numbers are cached 30 seconds per role set.
 - Every scheduled command records a `JobRun` (shown under Background jobs; "Overdue" when it hasn't run in time). Suggested schedule:
-  - every 15 minutes: `sweep_payments` (or the alias `sweep_donations`);
-  - daily: `check_donations`, `prune_pvc`, `prune_news`, `prune_notifications`, `prune_posts`;
+  - every 15 minutes: `sweep_payments` (or the alias `sweep_donations`) and `moderation_tick`;
+  - daily: `check_donations`, `prune_pvc`, `prune_news`, `prune_notifications`, `prune_posts`, `prune_moderation`;
   - weekly: `prune_jobruns` (job records older than 90 days).
 
 ## Search (spec 12)
@@ -159,6 +165,18 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - The index (`search.SearchEntry`) holds public items only and updates in the same transaction as every candidate, article and post save. `python manage.py rebuild_search` rebuilds it (weekly, and after deploys); the admin Readiness shows "Search index" and the job shows under Background jobs.
 - Searches are anonymous and never stored. Django logs show `q=[redacted]`. **Reverse proxy:** strip the query string for `/api/v1/search/` and `/api/v1/candidates/` from access logs too (for nginx, log `$uri` instead of `$request_uri` for those paths).
 - `PATCH /me` accepts `home_state` (optional, private; only pre-fills state filters in the browser).
+
+## Reporting and moderation (spec 13)
+
+- **Rules** live in code (`apps/moderation/rules.py`: R1–R10, version, date, change history) and are served at `/api/v1/rules/`. They ship marked "Draft — under legal review" (`RULES_DRAFT`) until the party's legal team signs them off. Bump `RULES_VERSION`/`RULES_UPDATED` and add a `CHANGES` line when they change: signed-in users then see a one-time banner.
+- **One process for everything public:** reports on news, announcements, candidate posts and candidate profiles become cases in `/admin/moderation`. People decide; report counts never remove anything (a burst of reports only raises a flag).
+- **Every removal cites a rule.** The public URL then answers 410 with the rule and nothing else. Content changes always go through the owning app (`news.services.remove/restore`, `posts.services.remove_post/restore_post`), which call back into moderation so the case, notifications and compliance figures stay consistent.
+- **Roles:** `moderator` (grantable at `/admin/team`) handles community news and candidate posts; news reviewers handle community news; system admins also handle official announcements, candidate profiles (corrected in the candidate editor, then closed with Keep), escalations and legal notices. Nobody acts on their own content, a candidate they're linked to, a report they filed, or an appeal of their own decision. Claims lapse after 4 hours.
+- **Authors** are notified of removals, warnings and pauses (7, 30 or 90 days of no community news), and can appeal once within 14 days; someone other than the original decider decides.
+- **Legal notices** (system admins, `/admin/moderation/legal`): agency notices need a legal basis and get a 48-hour deadline; court orders; copyright notices (also from the public form `/report/copyright`) with counter-notices. Attachments go to `PRIVATE_MEDIA_ROOT` (PDF, JPEG, PNG; 10 MB) and every download is audited. A legal hold stops `prune_news`, `prune_posts` and `prune_moderation` for that item.
+- **Settings:** `MODERATION_LEGAL_EMAIL` (shown on `/rules` for agencies; NDCConnect records acknowledgements, it doesn't send them), `COPYRIGHT_COUNTER_NOTICE_DAYS` (default 10, pending a lawyer's confirmation), `COMPLIANCE_SAFETY_STATEMENT`.
+- **NITDA annual report:** `/admin/moderation/compliance` shows every figure for a year (Lagos time) with its definition; "Download CSV" is audited and holds no personal data. `prune_moderation` freezes a year's figures before it deletes old cases.
+- **Schedule:** `moderation_tick` every 15 minutes (releases stale claims, burst flags, copyright windows); `prune_moderation` daily (closed cases, their reports and appeals 1 year after closing).
 
 ## Tests
 

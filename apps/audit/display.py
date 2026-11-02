@@ -58,13 +58,13 @@ ACTIONS: dict[str, tuple[str, tuple[str, ...]]] = {
     A.NEWS_WITHDRAWN: ("withdrew community news", ()),
     A.NEWS_APPROVED: ("approved community news", ()),
     A.NEWS_REJECTED: ("rejected community news", ()),
-    A.NEWS_REMOVED: ("removed news", ()),
+    A.NEWS_REMOVED: ("removed news", ("rule",)),
     A.NEWS_RESTORED: ("restored news", ()),
     A.NEWS_REPORT_RESOLVED: ("resolved a news report", ("outcome",)),
     A.NEWS_ERASED: ("erased news on account deletion", ()),
     A.ANNOUNCEMENT_PUBLISHED: ("published an announcement", ("category", "notify")),
     A.ANNOUNCEMENT_UPDATED: ("edited an announcement", ("fields",)),
-    A.ANNOUNCEMENT_UNPUBLISHED: ("unpublished an announcement", ("reports_resolved",)),
+    A.ANNOUNCEMENT_UNPUBLISHED: ("unpublished an announcement", ("reports_resolved", "rule")),
     A.ANNOUNCEMENT_RESTORED: ("restored an announcement", ()),
     A.ANNOUNCEMENT_PINNED: ("pinned or unpinned an announcement", ("pinned",)),
     A.ANNOUNCEMENT_DELIVERED: ("delivered announcement notifications", ("delivered",)),
@@ -72,11 +72,26 @@ ACTIONS: dict[str, tuple[str, tuple[str, ...]]] = {
     A.POST_UPDATED: ("edited a candidate post", ("fields",)),
     A.POST_IMAGE_UPDATED: ("changed a candidate post image", ("change",)),
     A.POST_DELETED: ("deleted a candidate post", ()),
-    A.POST_REMOVED: ("removed a candidate post", ("reports_resolved",)),
+    A.POST_REMOVED: ("removed a candidate post", ("reports_resolved", "rule")),
     A.POST_RESTORED: ("restored a candidate post", ()),
     A.POST_REPORT_RESOLVED: ("resolved a candidate post report", ("outcome",)),
     A.POST_DELIVERED: ("delivered candidate post notifications", ("delivered",)),
     A.AUDIT_VIEWED: ("searched the audit log", ("filters",)),
+    A.MODERATION_CASE_CLAIMED: ("took a moderation case", ()),
+    A.MODERATION_KEPT: ("closed a case with no action", ()),
+    A.MODERATION_REMOVED: ("removed content under a rule", ("rule", "kind")),
+    A.MODERATION_RESTORED: ("restored removed content", ("kind",)),
+    A.MODERATION_ESCALATED: ("escalated a case to system administrators", ()),
+    A.MODERATION_WARNED: ("warned an author", ("rule",)),
+    A.MODERATION_PAUSED: ("paused an author's community news", ("days", "rule")),
+    A.MODERATION_PAUSE_LIFTED: ("lifted a community news pause", ()),
+    A.MODERATION_APPEAL_DECIDED: ("decided an appeal", ("upheld",)),
+    A.MODERATION_REPORTER_VIEWED: ("revealed who filed a report", ()),
+    A.MODERATION_LEGAL_NOTICE_LOGGED: ("logged a legal notice", ("kind", "items")),
+    A.MODERATION_LEGAL_NOTICE_UPDATED: ("updated a legal notice", ("change",)),
+    A.MODERATION_LEGAL_HOLD_CHANGED: ("changed a legal hold", ("on",)),
+    A.MODERATION_ATTACHMENT_VIEWED: ("opened a legal notice attachment", ()),
+    A.MODERATION_COMPLIANCE_EXPORTED: ("downloaded the compliance report", ("year",)),
 }
 
 # area → (words, action prefixes)
@@ -89,6 +104,7 @@ AREAS: dict[str, tuple[str, tuple[str, ...]]] = {
     "news": ("News", ("news.",)),
     "announcements": ("Announcements", ("announcement.",)),
     "posts": ("Candidate posts", ("post.",)),
+    "moderation": ("Moderation", ("moderation.",)),
     "audit": ("Audit views", ("audit.",)),
 }
 
@@ -103,6 +119,11 @@ TARGET_WORDS = {
     "membership.membershipsettings": "Membership settings",
     "news.article": "Article",
     "posts.candidatepost": "Candidate post",
+    "moderation.case": "Moderation case",
+    "moderation.restriction": "Author restriction",
+    "moderation.appeal": "Appeal",
+    "moderation.legalnotice": "Legal notice",
+    "moderation.report": "Report",
 }
 
 TARGET_LINKS = {
@@ -113,9 +134,12 @@ TARGET_LINKS = {
     "donations.donation": "/admin/donations/{id}",
     "accounts.user": "/admin/users/{id}",
     "access.roleassignment": "/admin/team",
+    "moderation.case": "/admin/moderation/{id}",
+    "moderation.legalnotice": "/admin/moderation/legal/{id}",
 }
 
-ACTOR_LABELS = {"system:cli": "System (CLI)", "clerk:webhook": "Clerk", "system:jit": "System", "system:notifications": "System"}
+ACTOR_LABELS = {"system:cli": "System (CLI)", "clerk:webhook": "Clerk", "system:jit": "System", "system:notifications": "System",
+                "public:copyright_form": "Copyright form"}
 
 
 def action_label(action: str) -> str:

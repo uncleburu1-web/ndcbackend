@@ -30,6 +30,8 @@ KNOWN_JOBS = {
     "deliver_post": ("Resend candidate post notifications", None),
     "prune_jobruns": ("Clear old job records", 8 * 24 * H),
     "rebuild_search": ("Rebuild search index", 8 * 24 * H),
+    "moderation_tick": ("Moderation upkeep (claims, burst flags, copyright windows)", 1 * H),
+    "prune_moderation": ("Clear old moderation records", 26 * H),
 }
 MANUAL_STALE = 24 * H  # a by-hand run that hasn't finished after this "didn't finish"
 KEEP = timedelta(days=90)

@@ -21,7 +21,8 @@ from apps.follows.models import CandidateFollow
 from apps.news.models import Article
 from apps.notifications.models import Notification
 from apps.notifications.services import deliver_post
-from apps.posts.models import CandidatePost, PostEvent, PostReport
+from apps.moderation.models import Report
+from apps.posts.models import CandidatePost, PostEvent
 
 TMP_MEDIA = tempfile.mkdtemp(prefix="ndc-posts-test-")
 NOW = timezone.now()
@@ -221,8 +222,11 @@ class VisibilityTests(Base):
         follow(fan, self.cand)
         p = self.publish()
         self.assertEqual(client(self.admin).post(reverse("admin-post-remove", kwargs={"pk": p.pk}), {}, format="json").status_code, 400)
-        client(self.admin).post(reverse("admin-post-remove", kwargs={"pk": p.pk}), {"reason": "Inciting language"}, format="json")
-        self.assertEqual(client().get(reverse("candidate-post", kwargs={"slug": self.cand.slug, "pk": p.pk})).status_code, 404)
+        r = client(self.admin).post(reverse("admin-post-remove", kwargs={"pk": p.pk}), {"reason": "Inciting language"}, format="json")
+        self.assertEqual(r.data["error"]["code"], "rule_required")
+        client(self.admin).post(reverse("admin-post-remove", kwargs={"pk": p.pk}), {"reason": "Inciting language", "rule": "R1"}, format="json")
+        gone = client().get(reverse("candidate-post", kwargs={"slug": self.cand.slug, "pk": p.pk}))
+        self.assertEqual((gone.status_code, gone.data["error"]["rule"]), (410, "R1"))  # spec 13 §4.5
         self.assertEqual(client(fan).get(reverse("my-notifications")).data["count"], 0)
         mine = self.cc.get(self.url()).data["results"]
         self.assertEqual((mine[0]["status"], mine[0]["removed_reason"]), ("removed", "Inciting language"))
@@ -293,19 +297,19 @@ class ReportTests(Base):
         p = self.publish()
         url = reverse("candidate-post-report", kwargs={"slug": self.cand.slug, "pk": p.pk})
         self.assertEqual(client().post(url, {"reason": "abuse", "details": "Inciting"}, format="json", REMOTE_ADDR="10.1.1.1").status_code, 201)
-        r = PostReport.objects.get()
+        r = Report.objects.get()
         self.assertEqual(len(r.ip_hash), 64)
         u = client(mk_user("user_rep"))
         u.post(url, {"reason": "spam"}, format="json")
         u.post(url, {"reason": "false"}, format="json")
-        self.assertEqual(PostReport.objects.filter(reporter__clerk_user_id="user_rep").count(), 1)
+        self.assertEqual(Report.objects.filter(reporter__clerk_user_id="user_rep").count(), 1)
         ac = client(self.admin)
         lst = ac.get(reverse("admin-posts"), {"reported": 1}).data
         self.assertEqual((lst["count"], lst["counts"]["reported"]), (1, 1))
         d = ac.post(reverse("admin-post-report-dismiss", kwargs={"pk": r.pk}), {"note": "Fine"}, format="json").data
-        self.assertEqual([x["status"] for x in d["reports"]].count("dismissed"), 1)
-        ac.post(reverse("admin-post-remove", kwargs={"pk": p.pk}), {"reason": "Abuse"}, format="json")
-        self.assertEqual(PostReport.objects.filter(status="actioned").count(), 1)
+        self.assertEqual(d["case"]["open_reports"], 1)  # the member's report is still open, so the case stays open
+        ac.post(reverse("admin-post-remove", kwargs={"pk": p.pk}), {"reason": "Abuse", "rule": "R2"}, format="json")
+        self.assertEqual(Report.objects.filter(status="actioned").count(), 1)
         self.assertEqual(client().post(url, {"reason": "spam"}, format="json").status_code, 404)
 
 

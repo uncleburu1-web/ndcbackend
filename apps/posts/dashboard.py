@@ -1,21 +1,14 @@
 """Candidate post figures for the admin home (spec 11 §6.1)."""
-from django.db.models import Min
-
 from apps.access.models import Role
 from apps.access.services import has_role, is_system_admin
-from apps.dashboard.cards import Card, Stat, weeks
-from apps.news.models import ReportStatus
+from apps.dashboard.cards import Stat, weeks
 
-from .models import CandidatePost, PostReport, PostStatus
+from .models import CandidatePost, PostStatus
 
 
 def admin_summary(user, *, now):
     out = []
     admin = is_system_admin(user)
-    if admin:
-        reports = PostReport.objects.filter(status=ReportStatus.OPEN)
-        out.append(Card("post_reports", "Candidate post reports", reports.values("post").distinct().count(), "/admin/posts?tab=reported",
-                        oldest_at=reports.aggregate(t=Min("created_at"))["t"], target_hours=24))
     if admin or has_role(user, Role.NEWS_REVIEWER):
         this, last = weeks(now)
         live = CandidatePost.objects.filter(status=PostStatus.PUBLISHED)

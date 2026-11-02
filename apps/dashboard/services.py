@@ -21,14 +21,14 @@ from .cards import Card, Stat, to_dict
 logger = logging.getLogger(__name__)
 
 # Order matters: cards appear in this order (spec 11 §4.2).
-SUMMARY_APPS = ["news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts"]
-CARD_ORDER = ["news_pending", "news_reports", "post_reports", "pvc_pending", "membership_approvals", "membership_payments_review",
+SUMMARY_APPS = ["moderation", "news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts"]
+CARD_ORDER = ["reports_review", "reports_urgent", "appeals_waiting", "legal_due", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
               "donations_review", "candidates_unpublished", "ban_failed"]
 GROUPS = [("people", "People"), ("candidates", "Candidates and following"), ("content", "Content"), ("pvc", "PVC"),
           ("membership", "Membership"), ("donations", "Donations")]
 ADMIN_ROLES = {Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.MODERATOR}
 CACHE_SECONDS = 30
-APP_LABELS = {"news": "News", "posts": "Candidate posts", "pvc": "PVC checks", "membership": "Membership", "donations": "Donations",
+APP_LABELS = {"moderation": "Moderation", "news": "News", "posts": "Candidate posts", "pvc": "PVC checks", "membership": "Membership", "donations": "Donations",
               "candidates": "Candidates", "follows": "Following", "accounts": "Accounts"}
 
 
@@ -54,6 +54,8 @@ def admin_areas(user) -> list[str]:
         areas.append("pvc")
     if has_role(user, Role.MEMBERSHIP_OFFICER):
         areas.append("membership")
+    if sysadmin or has_role(user, Role.MODERATOR) or has_role(user, Role.NEWS_REVIEWER):
+        areas.append("moderation")  # spec 13 §4.9
     if has_role(user, Role.NEWS_REVIEWER):
         areas.append("news")
     if sysadmin:

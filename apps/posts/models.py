@@ -6,9 +6,6 @@ import uuid
 
 from django.conf import settings
 from django.db import models
-from django.db.models import Q
-
-from apps.news.models import ReportReason, ReportStatus
 
 
 class PostKind(models.TextChoices):
@@ -47,6 +44,7 @@ class CandidatePost(models.Model):
     removed_at = models.DateTimeField(null=True, blank=True)
     removed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     removed_reason = models.CharField(max_length=500, blank=True)
+    removed_rule = models.CharField(max_length=8, blank=True)  # spec 13 §5.4
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -92,28 +90,3 @@ class PostEvent(models.Model):
 
     def delete(self, *args, **kwargs):
         raise RuntimeError("PostEvent is append-only.")
-
-
-class PostReport(models.Model):
-    """Same shape as news.ArticleReport (spec 09 §5.3); reasons shared with 07."""
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    post = models.ForeignKey(CandidatePost, on_delete=models.CASCADE, related_name="reports")
-    reason = models.CharField(max_length=12, choices=ReportReason.choices)
-    details = models.CharField(max_length=1000, blank=True)
-    reporter = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
-    contact_email = models.EmailField(blank=True)
-    ip_hash = models.CharField(max_length=64, blank=True)
-    status = models.CharField(max_length=10, choices=ReportStatus.choices, default=ReportStatus.OPEN)
-    resolved_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
-    resolved_at = models.DateTimeField(null=True, blank=True)
-    resolution_note = models.CharField(max_length=300, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["created_at"]
-        constraints = [
-            models.UniqueConstraint(fields=["post", "reporter"], name="posts_one_open_report_per_user",
-                                    condition=Q(status="open", reporter__isnull=False)),
-        ]
-        indexes = [models.Index(fields=["status", "created_at"], name="posts_report_open_idx")]

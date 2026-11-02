@@ -197,50 +197,59 @@ def delete_post(post, author, *, request=None) -> CandidatePost:
         p.save()
         _event(p, PostEvent.Kind.DELETED, author)
         n, _ = p.notifications.all().delete()
+        from apps.moderation.services import author_removed
+
+        author_removed("post", p)  # spec 13 §11: an open case closes as "Removed by author"
     record(A.POST_DELETED, target=p, actor=author, request=request, notifications_deleted=n)
     return p
 
 
 # ---------------------------------------------------------------- moderation
 def _require_admin(actor, candidate):
-    if not is_system_admin(actor):
-        raise ServiceError("System administrator access is required.", code="permission_denied", status_code=403)
+    """Spec 13 §4.3: moderators and system admins act on posts; nobody linked to the candidate."""
+    if not (is_system_admin(actor) or has_role(actor, Role.MODERATOR)):
+        raise ServiceError("Moderator access is required.", code="permission_denied", status_code=403)
     if can_post(actor, candidate):
-        raise ServiceError("You're linked to this candidate, so another admin has to moderate its posts.", code="self_moderation",
+        raise ServiceError("You're linked to this candidate, so someone else has to moderate its posts.", code="self_moderation",
                            status_code=403)
 
 
-def remove_post(post, admin, reason: str, *, request=None) -> CandidatePost:
-    from .models import PostReport
-    from apps.news.models import ReportStatus
+def remove_post(post, admin, reason: str, *, request=None, rule="", note_to_author="", internal_note="", source=None) -> CandidatePost:
+    from apps.moderation import services as moderation
+    from apps.moderation.rules import RULE_IDS
 
     reason = (reason or "").strip()
     if not reason:
         raise ServiceError("Give a reason the campaign team will understand.", code="validation_error", status_code=400)
     _require_admin(admin, post.candidate)
+    if rule not in RULE_IDS:
+        raise ServiceError("Choose the rule it broke.", code="rule_required", status_code=400)
     with transaction.atomic():
         p = _locked(post)
         if p.status != S.PUBLISHED:
             raise ServiceError("Only published posts can be removed.", code="invalid_transition", status_code=409)
         now = timezone.now()
-        p.status, p.removed_at, p.removed_by, p.removed_reason = S.REMOVED, now, admin, reason[:500]
+        p.status, p.removed_at, p.removed_by, p.removed_reason, p.removed_rule = S.REMOVED, now, admin, reason[:500], rule
         p.save()
         _event(p, PostEvent.Kind.REMOVED, admin, reason)
-        n = PostReport.objects.filter(post=p, status=ReportStatus.OPEN).update(
-            status=ReportStatus.ACTIONED, resolved_by=admin, resolved_at=now, resolution_note=f"Removed: {reason}"[:300])
-    record(A.POST_REMOVED, target=p, actor=admin, request=request, reports_resolved=n)
+        case = moderation.content_removed("post", p, admin, rule_id=rule, note_to_author=note_to_author, internal_note=internal_note,
+                                          source=source)
+    record(A.POST_REMOVED, target=p, actor=admin, request=request, rule=rule, case=str(case.pk) if case else "")
     return p
 
 
-def restore_post(post, admin, *, request=None) -> CandidatePost:
+def restore_post(post, admin, *, request=None, note="") -> CandidatePost:
+    from apps.moderation import services as moderation
+
     _require_admin(admin, post.candidate)
     with transaction.atomic():
         p = _locked(post)
         if p.status != S.REMOVED:
             raise ServiceError("Only removed posts can be restored.", code="invalid_transition", status_code=409)
-        p.status, p.removed_at, p.removed_by, p.removed_reason = S.PUBLISHED, None, None, ""
+        p.status, p.removed_at, p.removed_by, p.removed_reason, p.removed_rule = S.PUBLISHED, None, None, "", ""
         p.save()
-        _event(p, PostEvent.Kind.RESTORED, admin)
+        _event(p, PostEvent.Kind.RESTORED, admin, note)
+        moderation.content_restored("post", p, admin, note)
     record(A.POST_RESTORED, target=p, actor=admin, request=request)  # no delivery on restore
     return p
 

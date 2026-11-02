@@ -87,7 +87,7 @@ class MyArticleSerializer(PublicArticleDetailSerializer):
 
     class Meta(PublicArticleDetailSerializer.Meta):
         fields = PublicArticleDetailSerializer.Meta.fields + ["status", "status_label", "show_author_name", "decision_reason",
-                                                             "removed_reason", "submitted_at", "created_at"]
+                                                             "removed_reason", "removed_rule", "submitted_at", "created_at"]
 
 
 class AdminArticleSerializer(MyArticleSerializer):
@@ -116,20 +116,19 @@ class AdminArticleSerializer(MyArticleSerializer):
 
 class AdminArticleDetailSerializer(AdminArticleSerializer):
     events = serializers.SerializerMethodField()
-    reports = serializers.SerializerMethodField()
+    case = serializers.SerializerMethodField()
 
     class Meta(AdminArticleSerializer.Meta):
-        fields = AdminArticleSerializer.Meta.fields + ["events", "reports", "declarations"]
+        fields = AdminArticleSerializer.Meta.fields + ["events", "case", "declarations"]
 
     def get_events(self, a):
         return [{"event": e.event, "note": e.note, "created_at": e.created_at, "actor_email": e.actor.email if e.actor else None}
                 for e in a.events.select_related("actor")]
 
-    def get_reports(self, a):
-        return [{"id": r.id, "reason": r.reason, "reason_label": r.get_reason_display(), "details": r.details, "status": r.status,
-                 "contact_email": r.contact_email, "reporter_email": r.reporter.email if r.reporter else None,
-                 "created_at": r.created_at, "resolved_at": r.resolved_at, "resolution_note": r.resolution_note}
-                for r in a.reports.select_related("reporter")]
+    def get_case(self, a):  # spec 13 §8.2: reports live in the moderation case
+        from apps.moderation.services import case_summary
+
+        return case_summary("article", a.pk)
 
 
 class SubmitSerializer(serializers.Serializer):
@@ -167,6 +166,6 @@ class AnnouncementSerializer(serializers.Serializer):
 
 
 class ReportSerializer(serializers.Serializer):
-    reason = serializers.CharField(max_length=12)
+    reason = serializers.CharField(max_length=16)
     details = serializers.CharField(max_length=1000, required=False, allow_blank=True)
     contact_email = serializers.EmailField(required=False, allow_blank=True)

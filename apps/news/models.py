@@ -67,6 +67,7 @@ class Article(models.Model):
     removed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     removed_at = models.DateTimeField(null=True, blank=True)
     removed_reason = models.CharField(max_length=500, blank=True)
+    removed_rule = models.CharField(max_length=8, blank=True)  # spec 13 §5.4: "R3", or "LEGAL" for legal-notice removals
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -131,41 +132,3 @@ class ArticleEvent(models.Model):
 
     def delete(self, *args, **kwargs):
         raise RuntimeError("ArticleEvent is append-only.")
-
-
-class ReportReason(models.TextChoices):
-    FALSE = "false", "False or misleading"
-    ABUSE = "abuse", "Abusive, hateful or inciting"
-    PRIVACY = "privacy", "Private information about someone"
-    COPYRIGHT = "copyright", "Copyright (my content was used)"
-    SPAM = "spam", "Spam or advertising"
-    OTHER = "other", "Other"
-
-
-class ReportStatus(models.TextChoices):
-    OPEN = "open", "Open"
-    DISMISSED = "dismissed", "Dismissed"
-    ACTIONED = "actioned", "Actioned"
-
-
-class ArticleReport(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="reports")
-    reason = models.CharField(max_length=12, choices=ReportReason.choices)
-    details = models.CharField(max_length=1000, blank=True)
-    reporter = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
-    contact_email = models.EmailField(blank=True)
-    ip_hash = models.CharField(max_length=64, blank=True)
-    status = models.CharField(max_length=10, choices=ReportStatus.choices, default=ReportStatus.OPEN)
-    resolved_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
-    resolved_at = models.DateTimeField(null=True, blank=True)
-    resolution_note = models.CharField(max_length=300, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["created_at"]
-        constraints = [
-            models.UniqueConstraint(fields=["article", "reporter"], name="news_one_open_report_per_user",
-                                    condition=Q(status="open", reporter__isnull=False)),
-        ]
-        indexes = [models.Index(fields=["status", "created_at"], name="news_report_open_idx")]

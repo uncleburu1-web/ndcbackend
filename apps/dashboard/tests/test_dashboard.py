@@ -27,8 +27,9 @@ from apps.dashboard.services import admin_areas
 from apps.donations.models import Donation
 from apps.follows.models import CandidateFollow
 from apps.membership.models import Membership, MembershipPayment
-from apps.news.models import Article, ArticleReport
-from apps.posts.models import CandidatePost, PostReport
+from apps.moderation import services as moderation
+from apps.news.models import Article
+from apps.posts.models import CandidatePost
 from apps.pvc import services as pvc
 
 PHONE = "+2348031234567"
@@ -112,14 +113,14 @@ class OverviewAccessTests(Base):
 
     def test_each_role_gets_exactly_its_sections(self):
         expect = {
-            "sa": (["news_pending", "news_reports", "post_reports", "pvc_pending", "membership_approvals", "membership_payments_review",
+            "sa": (["reports_review", "reports_urgent", "appeals_waiting", "legal_due", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
                     "donations_review", "candidates_unpublished", "ban_failed"],
                    ["people", "candidates", "content", "pvc", "membership", "donations"], True),
-            "news": (["news_pending", "news_reports"], ["content"], False),
+            "news": (["reports_review", "reports_urgent", "appeals_waiting", "news_pending"], ["content"], False),
             "pvc": (["pvc_pending"], ["pvc"], False),
             "mem": (["pvc_pending", "membership_approvals", "membership_payments_review"], ["pvc", "membership"], False),
             "fin": (["donations_review"], ["donations"], False),
-            "mod": ([], [], False),
+            "mod": (["reports_review", "reports_urgent", "appeals_waiting"], [], False),  # spec 13 §4.9
         }
         for who, (cards, groups, sys_sections) in expect.items():
             data = overview(getattr(self, who)).data
@@ -131,7 +132,7 @@ class OverviewAccessTests(Base):
     def test_combined_roles(self):
         u = role_user("u_combo", Role.NEWS_REVIEWER, Role.FINANCE_OFFICER)
         data = overview(u).data
-        self.assertEqual(card_keys(data), ["news_pending", "news_reports", "donations_review"])
+        self.assertEqual(card_keys(data), ["reports_review", "reports_urgent", "appeals_waiting", "news_pending", "donations_review"])
         self.assertEqual([r["role"] for r in data["roles"]], ["finance_officer", "news_reviewer"])
 
     def test_private_and_no_people(self):
@@ -162,15 +163,18 @@ class CountTests(Base):
 
     def test_reports_cards(self):
         a = mk_article(self.plain, status="successful", published_at=timezone.now())
-        ArticleReport.objects.create(article=a, reason="false", status="open")
-        ArticleReport.objects.create(article=a, reason="abuse", status="open")
+        moderation.report("article", a, "false")
+        moderation.report("article", a, "abuse")
         c = mk_candidate()
         p = CandidatePost.objects.create(candidate=c, kind="news", title="t", body="b", published_at=timezone.now())
-        PostReport.objects.create(post=p, reason="abuse", status="open")
+        moderation.report("post", p, "spam")
         cards = {c["key"]: c for c in overview(self.sa).data["attention"]}
-        self.assertEqual(cards["news_reports"]["count"], 1)  # articles with open reports, not reports
-        self.assertEqual(cards["post_reports"]["count"], 1)
-        self.assertEqual(cards["post_reports"]["href"], "/admin/posts?tab=reported")
+        self.assertEqual(cards["reports_review"]["count"], 2)  # cases (one per item), not reports
+        self.assertEqual(cards["reports_review"]["href"], "/admin/moderation")
+        self.assertEqual(cards["reports_urgent"]["count"], 1)  # abuse raised the article's case to urgent
+        news = {c["key"]: c for c in overview(self.news).data["attention"]}
+        self.assertEqual(news["reports_review"]["count"], 1)  # news reviewers see community news only
+        self.assertNotIn("legal_due", news)
 
     def test_pvc_excludes_own_check(self):
         pvc.submit(self.plain, vin="90F5B0F8E0295612345", surname="X", state="kano", lga="Fagge")
@@ -321,7 +325,7 @@ class TeamTests(Base):
         r = client(self.sa).get(reverse("admin-team"))
         self.assertEqual(r.status_code, 200)
         self.assertEqual([g["role"] for g in r.data["grantable"]],
-                         ["system_admin", "news_reviewer", "pvc_officer", "membership_officer", "finance_officer"])
+                         ["system_admin", "news_reviewer", "pvc_officer", "membership_officer", "finance_officer", "moderator"])
         own = [a for a in r.data["results"] if a["is_own"]]
         self.assertEqual([a["role"] for a in own], ["system_admin"])
         r = client(self.sa).post(reverse("admin-team"), {"email": "U_PLAIN@example.com", "role": "news_reviewer", "note": "Lagos desk"},
@@ -337,7 +341,6 @@ class TeamTests(Base):
         cases = [
             ({"email": "nobody@example.com", "role": "news_reviewer"}, 404, "user_not_found"),
             ({"email": "u_plain@example.com", "role": "candidate"}, 400, "invalid_role"),
-            ({"email": "u_plain@example.com", "role": "moderator"}, 400, "invalid_role"),
             ({"email": "u_news@example.com", "role": "news_reviewer"}, 409, "role_exists"),
             ({"email": "u_sa@example.com", "role": "finance_officer"}, 403, "self_change"),
         ]
@@ -508,12 +511,12 @@ class AuditViewerTests(Base):
 class MeAreasTests(Base):
     def test_admin_areas(self):
         self.assertEqual(admin_areas(self.plain), [])
-        self.assertEqual(admin_areas(self.mod), ["overview"])
-        self.assertEqual(admin_areas(self.news), ["overview", "news"])
+        self.assertEqual(admin_areas(self.mod), ["overview", "moderation"])
+        self.assertEqual(admin_areas(self.news), ["overview", "moderation", "news"])
         self.assertEqual(admin_areas(self.pvc), ["overview", "pvc"])
         self.assertEqual(admin_areas(self.mem), ["overview", "pvc", "membership"])
         self.assertEqual(admin_areas(self.fin), ["overview", "donations"])
-        self.assertEqual(admin_areas(self.sa), ["overview", "candidates", "donations", "pvc", "membership", "news", "announcements",
+        self.assertEqual(admin_areas(self.sa), ["overview", "candidates", "donations", "pvc", "membership", "moderation", "news", "announcements",
                                                 "posts", "team", "audit"])
         r = client(self.news).get(reverse("me"))
-        self.assertEqual(r.data["admin_areas"], ["overview", "news"])
+        self.assertEqual(r.data["admin_areas"], ["overview", "moderation", "news"])

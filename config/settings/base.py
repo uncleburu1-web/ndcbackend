@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "apps.posts",
     "apps.dashboard",
     "apps.search",
+    "apps.moderation",
 ]
 
 MIDDLEWARE = [
@@ -106,8 +107,9 @@ REST_FRAMEWORK = {
         "news_report": "5/hour",  # per user, or per IP for guests (also used for candidate-post reports, spec 09)
         "posts_write": "30/hour",  # per user: candidate post writes (spec 09 §7.2)
         "admin_write": "60/hour",  # per admin: grants, revokes, deactivations, reveals (spec 11 §7)
-        "admin_read": "300/hour",
-        "search_public": "60/min",  # per IP (spec 12 §7)  # per admin: overview, user search, audit search (spec 11 §9)
+        "admin_read": "300/hour",  # per admin: overview, user search, audit search (spec 11 §9)
+        "search_public": "60/min",  # per IP (spec 12 §7)
+        "moderation_public": "5/hour",  # per user or IP: copyright notices, appeals and counter-notices (spec 13 §9)
     },
 }
 
@@ -203,3 +205,14 @@ NEWS_COMMUNITY_MIN_BODY = 100
 NEWS_COMMUNITY_MAX_BODY = 5_000
 NEWS_OFFICIAL_MAX_BODY = 20_000
 CANDIDATE_POST_MAX_BODY = 10_000
+
+# --------------------------------------------------------------------------
+# Reporting and moderation (spec 13). Contact address shown on /rules for government agencies;
+# blank hides the line. NDCConnect records acknowledgements; it doesn't send them (§15.3).
+# --------------------------------------------------------------------------
+MODERATION_LEGAL_EMAIL = config("MODERATION_LEGAL_EMAIL", default="")
+# Copyright Act 2022: restore after a counter-notice the owner doesn't answer within this many days (§15.4).
+COPYRIGHT_COUNTER_NOTICE_DAYS = config("COPYRIGHT_COUNTER_NOTICE_DAYS", default=10, cast=int)
+COMPLIANCE_SAFETY_STATEMENT = config("COMPLIANCE_SAFETY_STATEMENT", default=(
+    "Community rules R1, R2, R5 and R6 protect adults and children from harmful content. Reports on these rules are urgent; "
+    "every decision is made by a person; removed content is labelled with the rule and can be appealed."))

@@ -1,5 +1,5 @@
 """Candidate posts API — spec 09 §7."""
-from django.db.models import Count, Min, Q
+from django.db.models import Min
 from django.shortcuts import get_object_or_404
 from django.utils.cache import add_never_cache_headers, patch_cache_control
 from rest_framework import status
@@ -15,12 +15,13 @@ from apps.audit.services import client_ip
 from apps.candidates.models import Candidate
 from apps.core.exceptions import ServiceError
 from apps.news.images import PhotoError
-from apps.news.models import ReportStatus
+from apps.moderation import services as moderation
+from apps.moderation.models import Report, ReportStatus
 from apps.news.serializers import ReportSerializer
 from apps.news.views import PublicThrottle, ReportThrottle
 
 from . import reports, services
-from .models import CandidatePost, PostReport, PostStatus
+from .models import CandidatePost, PostStatus
 from .serializers import (AdminPostDetailSerializer, AdminPostSerializer, CampaignPostSerializer, PostWriteSerializer,
                           PublicPostDetailSerializer, PublicPostSerializer, candidate_summary)
 
@@ -71,7 +72,12 @@ class PublicPostDetail(APIView):
     throttle_classes = [PublicThrottle]
 
     def get(self, request, slug, pk):
-        p = get_object_or_404(CandidatePost.objects.visible().select_related("candidate"), pk=pk, candidate__slug=slug)
+        p = CandidatePost.objects.visible().select_related("candidate").filter(pk=pk, candidate__slug=slug).first()
+        if p is None:
+            gone = CandidatePost.objects.filter(pk=pk, candidate__slug=slug, status=PostStatus.REMOVED).select_related("candidate").first()
+            if gone is not None and services.candidate_published(gone.candidate):
+                moderation.raise_if_removed("post", gone)
+            raise ServiceError("Not found.", code="not_found", status_code=404)
         response = Response(PublicPostDetailSerializer(p, context={"request": request}).data)
         patch_cache_control(response, public=True, max_age=60)
         return response
@@ -86,9 +92,9 @@ class PostReportView(_Private):
         ser = ReportSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         user = request.user if request.user and request.user.is_authenticated else None
-        reports.report(p, ser.validated_data["reason"], ser.validated_data.get("details", ""), user=user,
-                       contact_email="" if user else ser.validated_data.get("contact_email", ""), ip=client_ip(request) or "")
-        return Response({"ok": True}, status=status.HTTP_201_CREATED)
+        out = reports.report(p, ser.validated_data["reason"], ser.validated_data.get("details", ""), user=user,
+                             contact_email="" if user else ser.validated_data.get("contact_email", ""), ip=client_ip(request) or "")
+        return Response(out, status=status.HTTP_200_OK if "route" in out else status.HTTP_201_CREATED)
 
 
 # ---------------------------------------------------------------- campaign
@@ -191,7 +197,7 @@ class CampaignPostImage(_Private):
 # ------------------------------------------------------------------- admin
 def _admin_qs():
     return (CandidatePost.objects.select_related("candidate", "created_by", "updated_by")
-            .annotate(open_reports=Count("reports", filter=Q(reports__status=ReportStatus.OPEN))))
+            .annotate(open_reports=moderation.open_reports_subquery("post")))
 
 
 class AdminPosts(_Private):
@@ -214,8 +220,8 @@ class AdminPosts(_Private):
         paginator = Page20()
         page = paginator.paginate_queryset(qs, request, view=self)
         response = paginator.get_paginated_response(AdminPostSerializer(page, many=True, context={"request": request}).data)
-        open_reports = PostReport.objects.filter(status=ReportStatus.OPEN)
-        response.data["counts"] = {"reported": open_reports.values("post").distinct().count(),
+        open_reports = Report.objects.filter(target_kind="post", status=ReportStatus.OPEN)
+        response.data["counts"] = {"reported": open_reports.values("target_id").distinct().count(),
                                    "oldest_open_report": open_reports.aggregate(t=Min("created_at"))["t"]}
         return response
 
@@ -234,9 +240,10 @@ class AdminPostAction(_Private):
     def post(self, request, pk):
         p = get_object_or_404(CandidatePost.objects.select_related("candidate"), pk=pk)
         if self.action_name == "remove":
-            services.remove_post(p, request.user, str(request.data.get("reason", "")), request=request)
+            services.remove_post(p, request.user, str(request.data.get("reason", "")), request=request, rule=str(request.data.get("rule", "")),
+                                 note_to_author=str(request.data.get("note_to_author", ""))[:500])
         else:
-            services.restore_post(p, request.user, request=request)
+            services.restore_post(p, request.user, request=request, note=str(request.data.get("note", ""))[:1000])
         return Response(AdminPostDetailSerializer(_admin_qs().get(pk=pk), context={"request": request}).data)
 
 
@@ -244,8 +251,9 @@ class AdminReportDismiss(_Private):
     permission_classes = [IsSystemAdmin]
 
     def post(self, request, pk):
-        r = reports.dismiss(get_object_or_404(PostReport, pk=pk), request.user, str(request.data.get("note", "")), request=request)
-        return Response(AdminPostDetailSerializer(_admin_qs().get(pk=r.post_id), context={"request": request}).data)
+        r = get_object_or_404(Report, pk=pk, target_kind="post")
+        reports.dismiss(r, request.user, str(request.data.get("note", "")), request=request)
+        return Response(AdminPostDetailSerializer(_admin_qs().get(pk=r.target_id), context={"request": request}).data)
 
 
 class AdminCandidatePosts(_Private):
