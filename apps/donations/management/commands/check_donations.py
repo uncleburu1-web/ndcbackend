@@ -1,14 +1,15 @@
 from django.conf import settings
-from django.core.management.base import BaseCommand
 
 from apps.payments.providers import ProviderError, get_provider
 from apps.donations.services import gate_status
+from apps.core.jobs import TrackedCommand
 
 
-class Command(BaseCommand):
+class Command(TrackedCommand):
+    job = "check_donations"
     help = "Show whether the donations compliance gate is open (spec 05 §6.6), and test the provider key. Never prints keys."
 
-    def handle(self, *args, **opts):
+    def run(self, *args, **opts):
         for name, ok in gate_status().items():
             self.stdout.write(f"{'OK  ' if ok else 'FAIL'} {name}")
         if settings.PAYMENT_PROVIDER == "paystack" and settings.PAYSTACK_SECRET_KEY:
@@ -20,3 +21,4 @@ class Command(BaseCommand):
                 self.stdout.write(f"FAIL Paystack {mode} key: {exc}")
         open_ = all(gate_status().values())
         self.stdout.write(self.style.SUCCESS("Donations are OPEN") if open_ else self.style.WARNING("Donations are CLOSED"))
+        return "Donations are open" if open_ else "Donations are closed"

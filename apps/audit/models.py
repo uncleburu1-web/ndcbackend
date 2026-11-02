@@ -69,6 +69,9 @@ class AuditLog(models.Model):
         POST_RESTORED = "post.restored"
         POST_REPORT_RESOLVED = "post.report_resolved"
         POST_DELIVERED = "post.delivered"
+        USER_VIEWED = "user.viewed"  # spec 11: account page opened by a system admin
+        USER_PHONE_REVEALED = "user.phone_revealed"
+        AUDIT_VIEWED = "audit.viewed"  # spec 11: the audit log itself was searched
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

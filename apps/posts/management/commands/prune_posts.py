@@ -1,16 +1,17 @@
 from datetime import timedelta
 
-from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from apps.news import images
 from apps.posts.models import CandidatePost, PostReport
+from apps.core.jobs import TrackedCommand
 
 
-class Command(BaseCommand):
+class Command(TrackedCommand):
+    job = "prune_posts"
     help = "Retention (spec 09 §10): purge deleted and removed posts after 1 year, and dismissed reports after 1 year. Run daily."
 
-    def handle(self, *args, **opts):
+    def run(self, *args, **opts):
         cutoff = timezone.now() - timedelta(days=365)
         old = CandidatePost.objects.filter(status="deleted", deleted_at__lt=cutoff) | CandidatePost.objects.filter(status="removed",
                                                                                                                   removed_at__lt=cutoff)
@@ -19,4 +20,6 @@ class Command(BaseCommand):
         for pair in files:
             images.delete(*pair)
         r, _ = PostReport.objects.filter(status="dismissed", resolved_at__lt=cutoff).delete()
-        self.stdout.write(f"Deleted {n} rows with old posts and {r} dismissed reports.")
+        text = f"Deleted {n} rows with old posts and {r} dismissed reports"
+        self.stdout.write(text + ".")
+        return text

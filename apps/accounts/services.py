@@ -157,3 +157,56 @@ def update_profile(user: User, *, full_name=None, phone_number=None, request=Non
     elif changed:
         record(AuditLog.Action.PROFILE_UPDATED, target=user, actor=user, request=request, fields=changed)
     return just_completed
+
+
+# --------------------------------------------------------------------------
+# Admin users page (spec 11 §4.4, §6.5). Account facts only — never follows, donations,
+# membership or PVC (spec 11 §3.2, §10).
+# --------------------------------------------------------------------------
+VIEW_DEDUPE_MINUTES = 10
+
+
+def admin_search(q: str = "", status: str = "", flt: str = ""):
+    from django.db.models import Q
+
+    qs = User.objects.all()
+    if flt == "ban_failed":
+        qs = qs.filter(pk__in=ban_failed_ids())
+    if q:
+        qs = qs.filter(Q(email__icontains=q) | Q(full_name__icontains=q))
+    if status == "active":
+        qs = qs.filter(is_active=True)
+    elif status == "deactivated":
+        qs = qs.filter(is_active=False)
+    return qs.order_by("-created_at")
+
+
+def ban_failed_ids() -> list:
+    """Inactive users whose latest deactivation audit entry says the Clerk ban failed."""
+    from apps.audit.models import AuditLog
+
+    latest = {}
+    for target_id, ban, at in (AuditLog.objects.filter(action=AuditLog.Action.USER_DEACTIVATED)
+                               .order_by("target_id", "-created_at").values_list("target_id", "metadata__clerk_ban", "created_at")):
+        latest.setdefault(target_id, ban)
+    failed = [t for t, ban in latest.items() if ban == "failed"]
+    return list(User.objects.filter(pk__in=failed, is_active=False, clerk_deleted_at__isnull=True).values_list("pk", flat=True))
+
+
+def record_view_once(action, *, target, viewer, request, **meta):
+    """Audit a view, but at most once per viewer, target and metadata per 10 minutes (spec 11 §6.5–6.6)."""
+    from datetime import timedelta
+
+    from apps.audit.models import AuditLog
+    from apps.audit.services import record
+
+    recent = AuditLog.objects.filter(action=action, actor=viewer, target_id=str(target.pk) if target is not None else "",
+                                     created_at__gte=timezone.now() - timedelta(minutes=VIEW_DEDUPE_MINUTES))
+    if meta:
+        recent = recent.filter(metadata=meta)
+    if not recent.exists():
+        record(action, target=target, actor=viewer, request=request, **meta)
+
+
+def masked_phone(phone: str) -> str:
+    return f"•••• {phone[-4:]}" if phone else ""

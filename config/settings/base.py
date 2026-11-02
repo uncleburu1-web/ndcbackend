@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "apps.news",
     "apps.notifications",
     "apps.posts",
+    "apps.dashboard",
 ]
 
 MIDDLEWARE = [
@@ -102,6 +103,8 @@ REST_FRAMEWORK = {
         "news_write": "30/hour",  # per user: edits, images, withdrawals, bylines
         "news_report": "5/hour",  # per user, or per IP for guests (also used for candidate-post reports, spec 09)
         "posts_write": "30/hour",  # per user: candidate post writes (spec 09 §7.2)
+        "admin_write": "60/hour",  # per admin: grants, revokes, deactivations, reveals (spec 11 §7)
+        "admin_read": "300/hour",  # per admin: overview, user search, audit search (spec 11 §9)
     },
 }
 

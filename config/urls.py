@@ -14,6 +14,9 @@ api_v1 = [
     path("", include("apps.news.urls")),
     path("", include("apps.notifications.urls")),
     path("", include("apps.posts.urls")),
+    path("", include("apps.access.urls")),
+    path("", include("apps.audit.urls")),
+    path("", include("apps.dashboard.urls")),
 ]
 
 urlpatterns = [path("api/v1/", include(api_v1))]

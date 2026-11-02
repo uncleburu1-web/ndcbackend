@@ -134,6 +134,10 @@ class CommandTests(APITestCase):
         a = RoleAssignment.objects.get(user=u)
         self.assertEqual(a.granted_by_label, "system:cli")
         self.assertTrue(AuditLog.objects.filter(action="role.granted", actor_label="system:cli", target_id=str(a.id)).exists())
+        with self.assertRaisesMessage(CommandError, "at least one system administrator"):  # spec 11 §3.5: never zero admins, CLI too
+            self.run_cmd("revoke_role", "boss@example.com", "system_admin")
+        mk("user_c2", "boss2@example.com")
+        self.run_cmd("grant_role", "boss2@example.com", "system_admin")
         self.run_cmd("revoke_role", "boss@example.com", "system_admin", "--reason", "rotation")
         self.assertTrue(AuditLog.objects.filter(action="role.revoked", actor_label="system:cli").exists())
 

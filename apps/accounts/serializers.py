@@ -21,10 +21,11 @@ class MeSerializer(serializers.ModelSerializer):
     roles = serializers.SerializerMethodField()
     is_system_admin = serializers.SerializerMethodField()
     pvc_status = serializers.SerializerMethodField()
+    admin_areas = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ["id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status"]
+        fields = ["id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status", "admin_areas"]
         read_only_fields = fields
 
     def get_pvc_status(self, obj) -> str:
@@ -34,6 +35,11 @@ class MeSerializer(serializers.ModelSerializer):
 
     def get_roles(self, obj) -> list:
         return RoleSummarySerializer(obj.role_assignments.filter(is_active=True), many=True).data
+
+    def get_admin_areas(self, obj) -> list:
+        from apps.dashboard.services import admin_areas
+
+        return admin_areas(obj)  # spec 11: one place decides which admin areas the header and AdminNav show
 
     def get_is_system_admin(self, obj) -> bool:
         return is_system_admin(obj)

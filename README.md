@@ -61,6 +61,10 @@ Health check: `GET http://localhost:8000/api/v1/health/`
 | GET / POST | `/api/v1/campaign/candidates/` · `<candidate_id>/posts/` · GET / PATCH / DELETE `<post_id>/` · PUT / DELETE `<post_id>/image/` | accounts linked to that candidate (`candidate` role) |
 | GET / POST | `/api/v1/admin/posts/` · `<id>/` · `<id>/{remove,restore}/` · `reports/<id>/dismiss/` · `/api/v1/admin/candidates/<id>/posts/` | system admin |
 | GET | `/api/v1/me/notifications/` · `unread-count/` · POST `<id>/read/` · `read-all/` · GET / PATCH `preferences/` | signed in |
+| GET | `/api/v1/admin/overview/` | any admin role — only that role's cards and numbers (spec 11) |
+| GET / POST | `/api/v1/admin/team/` (`?revoked=1`) · POST `<assignment_id>/revoke/` | system admin |
+| GET | `/api/v1/admin/users/?q=` (3+ chars, or `filter=ban_failed`) · `<id>/` · POST `<id>/{phone,deactivate,reactivate}/` | system admin (views and reveals audited) |
+| GET | `/api/v1/admin/audit/` (`area, action, actor, target, from, to`) · `actions/` | system admin (searches audited) |
 
 Single-candidate admin responses include `followers: {total, notify_on}` — counts only; no endpoint lists who follows a candidate.
 Follows are political-opinion data (NDPA 2023): private to the user, never audited, deleted when the account is deleted.
@@ -68,9 +72,11 @@ Follows are political-opinion data (NDPA 2023): private to the user, never audit
 Candidate photos are saved under `media/` (git-ignored) in development and served by Django only when `DEBUG` is on.
 
 Errors always look like `{"error": {"status", "code", "message", "fields"}}`.
-Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429), `invalid_transition` (409), `invalid_photo` (400), `storage_unavailable` (503), `too_many_pending` (409), `self_review` (403), `publishing_paused` (409, with `until`), `too_many_pinned` (409), `source_required` (400), `candidate_not_published` (409), `posting_paused` (409), `self_moderation` (403).
+Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429), `invalid_transition` (409), `invalid_photo` (400), `storage_unavailable` (503), `too_many_pending` (409), `self_review` (403), `publishing_paused` (409, with `until`), `too_many_pinned` (409), `source_required` (400), `candidate_not_published` (409), `posting_paused` (409), `self_moderation` (403), `self_change` (403), `last_system_admin` (409), `user_not_found` (404), `role_exists` (409), `user_inactive` (409), `query_too_short` (400), `invalid_role` (400).
 
-## Roles (no UI yet)
+## Roles
+
+System admins grant and revoke roles at `/admin/team` (spec 11). The commands below stay for bootstrapping the first admin and emergencies.
 
 ```bash
 python manage.py grant_role ada@example.com system_admin
@@ -81,6 +87,8 @@ python manage.py reactivate_user spam@example.com
 ```
 
 The user must have signed in or signed up at least once (so the local record exists). Every command is audited as `system:cli`.
+There is always at least one system admin: revoking or deactivating the last one fails, in the browser and on the CLI (grant someone else first).
+Nobody can change their own roles or deactivate themselves from the browser.
 There is no password superuser and no Django admin site: platform users never have passwords.
 
 ## Donations (spec 05)
@@ -135,6 +143,14 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **Blackouts:** `CAMPAIGN_BLACKOUTS` (JSON in `.env`, defaults to the 2027 windows) pauses campaign announcements and community approvals in the 24 hours before polls.
 - **Daily:** `python manage.py prune_news` (rejected/withdrawn after 180 days; removed and dismissed reports after 1 year) and `python manage.py prune_notifications` (read after 180 days, unread after 365).
 - Article images are saved under `media/news/` (metadata stripped, WebP, aspect ratio kept).
+
+## Admin dashboard and background jobs (spec 11)
+
+- `/admin` shows each admin role its own queues, weekly counts, readiness (gates and settings as set/not set, never values), background jobs and recent activity. Numbers are cached 30 seconds per role set.
+- Every scheduled command records a `JobRun` (shown under Background jobs; "Overdue" when it hasn't run in time). Suggested schedule:
+  - every 15 minutes: `sweep_payments` (or the alias `sweep_donations`);
+  - daily: `check_donations`, `prune_pvc`, `prune_news`, `prune_notifications`, `prune_posts`;
+  - weekly: `prune_jobruns` (job records older than 90 days).
 
 ## Tests
 
