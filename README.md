@@ -61,6 +61,7 @@ Health check: `GET http://localhost:8000/api/v1/health/`
 | GET / POST | `/api/v1/campaign/candidates/` · `<candidate_id>/posts/` · GET / PATCH / DELETE `<post_id>/` · PUT / DELETE `<post_id>/image/` | accounts linked to that candidate (`candidate` role) |
 | GET / POST | `/api/v1/admin/posts/` · `<id>/` · `<id>/{remove,restore}/` · `reports/<id>/dismiss/` · `/api/v1/admin/candidates/<id>/posts/` | system admin |
 | GET | `/api/v1/me/notifications/` · `unread-count/` · POST `<id>/read/` · `read-all/` · GET / PATCH `preferences/` | signed in |
+| GET | `/api/v1/search/?q=` (`type`, `state`, `position`, `year`, `source`, `since`, `page`) · `/api/v1/search/suggest/?q=` · `/api/v1/states/` · `/api/v1/states/<state>/` | anyone — anonymous, cacheable 60 s, public items only (spec 12) |
 | GET | `/api/v1/admin/overview/` | any admin role — only that role's cards and numbers (spec 11) |
 | GET / POST | `/api/v1/admin/team/` (`?revoked=1`) · POST `<assignment_id>/revoke/` | system admin |
 | GET | `/api/v1/admin/users/?q=` (3+ chars, or `filter=ban_failed`) · `<id>/` · POST `<id>/{phone,deactivate,reactivate}/` | system admin (views and reveals audited) |
@@ -72,7 +73,7 @@ Follows are political-opinion data (NDPA 2023): private to the user, never audit
 Candidate photos are saved under `media/` (git-ignored) in development and served by Django only when `DEBUG` is on.
 
 Errors always look like `{"error": {"status", "code", "message", "fields"}}`.
-Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429), `invalid_transition` (409), `invalid_photo` (400), `storage_unavailable` (503), `too_many_pending` (409), `self_review` (403), `publishing_paused` (409, with `until`), `too_many_pinned` (409), `source_required` (400), `candidate_not_published` (409), `posting_paused` (409), `self_moderation` (403), `self_change` (403), `last_system_admin` (409), `user_not_found` (404), `role_exists` (409), `user_inactive` (409), `query_too_short` (400), `invalid_role` (400).
+Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429), `invalid_transition` (409), `invalid_photo` (400), `storage_unavailable` (503), `too_many_pending` (409), `self_review` (403), `publishing_paused` (409, with `until`), `too_many_pinned` (409), `source_required` (400), `candidate_not_published` (409), `posting_paused` (409), `self_moderation` (403), `self_change` (403), `last_system_admin` (409), `user_not_found` (404), `role_exists` (409), `user_inactive` (409), `query_too_short` (400), `invalid_role` (400), `query_too_long` (400), `invalid_filter` (400), `search_unavailable` (503).
 
 ## Roles
 
@@ -151,6 +152,13 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
   - every 15 minutes: `sweep_payments` (or the alias `sweep_donations`);
   - daily: `check_donations`, `prune_pvc`, `prune_news`, `prune_notifications`, `prune_posts`;
   - weekly: `prune_jobruns` (job records older than 90 days).
+
+## Search (spec 12)
+
+- **Needs the `pg_trgm` extension.** `migrate` creates it; on managed PostgreSQL, if the app's database user isn't allowed to, run `CREATE EXTENSION pg_trgm;` once as the database owner, then `migrate` again.
+- The index (`search.SearchEntry`) holds public items only and updates in the same transaction as every candidate, article and post save. `python manage.py rebuild_search` rebuilds it (weekly, and after deploys); the admin Readiness shows "Search index" and the job shows under Background jobs.
+- Searches are anonymous and never stored. Django logs show `q=[redacted]`. **Reverse proxy:** strip the query string for `/api/v1/search/` and `/api/v1/candidates/` from access logs too (for nginx, log `$uri` instead of `$request_uri` for those paths).
+- `PATCH /me` accepts `home_state` (optional, private; only pre-fills state filters in the browser).
 
 ## Tests
 

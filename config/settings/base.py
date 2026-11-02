@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",  # search: SearchVector, trigram (spec 12)
     "rest_framework",
     "corsheaders",
     "apps.core",
@@ -36,6 +37,7 @@ INSTALLED_APPS = [
     "apps.notifications",
     "apps.posts",
     "apps.dashboard",
+    "apps.search",
 ]
 
 MIDDLEWARE = [
@@ -104,7 +106,8 @@ REST_FRAMEWORK = {
         "news_report": "5/hour",  # per user, or per IP for guests (also used for candidate-post reports, spec 09)
         "posts_write": "30/hour",  # per user: candidate post writes (spec 09 §7.2)
         "admin_write": "60/hour",  # per admin: grants, revokes, deactivations, reveals (spec 11 §7)
-        "admin_read": "300/hour",  # per admin: overview, user search, audit search (spec 11 §9)
+        "admin_read": "300/hour",
+        "search_public": "60/min",  # per IP (spec 12 §7)  # per admin: overview, user search, audit search (spec 11 §9)
     },
 }
 
@@ -132,9 +135,17 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {"simple": {"format": "%(asctime)s %(levelname)s %(name)s: %(message)s"}},
-    "filters": {"redact_pii": {"()": "apps.core.logging.RedactPII"}},  # VIN/NIN never reach logs (spec 06 §9)
-    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "simple", "filters": ["redact_pii"]}},
+    "filters": {
+        "redact_pii": {"()": "apps.core.logging.RedactPII"},  # VIN/NIN never reach logs (spec 06 §9)
+        "redact_query": {"()": "apps.core.logging.RedactSearchQuery"},  # search text never reaches logs (spec 12 §9)
+    },
+    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "simple", "filters": ["redact_pii", "redact_query"]}},
     "root": {"handlers": ["console"], "level": "INFO"},
+    # Django's request and dev-server loggers don't propagate to root by default; route them through the same filters.
+    "loggers": {
+        "django.server": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "django.request": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+    },
 }
 
 # No CSRF middleware on purpose: the API authenticates ONLY by Bearer header and

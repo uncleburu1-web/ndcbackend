@@ -141,6 +141,11 @@ def readiness(now):
     local = backend.endswith("FileSystemStorage") or not backend
     out.append(_item("media", "Media storage", "warning" if local and not settings.DEBUG else "ready",
                      "Local disk" + (" (development)" if settings.DEBUG and local else "") if local else "Production store"))
+    from apps.search.index import health as search_health
+
+    h = search_health()  # spec 12 §6.6: entries vs public items, within 1%
+    out.append(_item("search", "Search index", "ready" if h["ok"] else "warning",
+                     f"{h['entries']} of {h['public']} public items" + ("" if h["ok"] else " · run rebuild_search")))
     return {"items": out, "blackouts": [_blackout_payload(w, now) for w in blackouts.windows()]}
 
 

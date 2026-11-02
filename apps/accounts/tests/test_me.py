@@ -24,7 +24,7 @@ class MeTests(APITestCase):
     def test_get_returns_only_own_profile_shape(self):
         res = self.client.get(ME, **self.auth)
         self.assertEqual(
-            set(res.data), {"id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status", "admin_areas"}
+            set(res.data), {"id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status", "admin_areas", "home_state"}
         )
         self.assertEqual(res.data["pvc_status"], "unverified")
 

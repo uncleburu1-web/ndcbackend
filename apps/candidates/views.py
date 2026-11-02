@@ -89,7 +89,15 @@ class PublicCandidateList(generics.ListAPIView):
             qs = qs.filter(state=qp["state"])
         q = (qp.get("q") or "").strip()[:100]
         if q:
-            qs = qs.filter(Q(full_name__icontains=q) | Q(area_name__icontains=q) | Q(ward_name__icontains=q))
+            # Spec 12 §4.3: same engine as /search (diacritics, aliases, name typos); relevance order with fixed tie-breaks.
+            from apps.search.services import ranked_candidate_ids
+
+            try:
+                ids = ranked_candidate_ids(q, year=year)
+            except ServiceError:  # a single character: keep the old prefix-style match
+                return qs.filter(Q(full_name__icontains=q) | Q(area_name__icontains=q)).order_by("rank", "state", "full_name", "id")
+            order = Case(*[When(pk=pk, then=Value(i)) for i, pk in enumerate(ids)], output_field=IntegerField())
+            return qs.filter(pk__in=ids).annotate(search_order=order).order_by("search_order")
         return qs.order_by("rank", "state", "full_name", "id")
 
     def list(self, request, *args, **kwargs):

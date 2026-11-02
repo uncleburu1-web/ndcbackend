@@ -95,6 +95,7 @@ def mark_deleted(clerk_user_id: str) -> Optional[User]:
         user.email = ""
         user.full_name = ""
         user.phone_number = ""
+        user.home_state = ""
         user.is_active = False
         user.deactivated_at = user.deactivated_at or now
         user.clerk_deleted_at = now
@@ -129,7 +130,7 @@ def mark_deleted(clerk_user_id: str) -> Optional[User]:
     return user
 
 
-def update_profile(user: User, *, full_name=None, phone_number=None, request=None) -> bool:
+def update_profile(user: User, *, full_name=None, phone_number=None, home_state=None, request=None) -> bool:
     """
     Apply validated profile fields. Returns True exactly once: the first time the
     profile becomes complete (spec §6.3 `just_completed`).
@@ -143,13 +144,16 @@ def update_profile(user: User, *, full_name=None, phone_number=None, request=Non
         if phone_number is not None and phone_number != user.phone_number:
             user.phone_number = phone_number
             changed.append("phone_number")
+        pref_changed = home_state is not None and home_state != user.home_state
+        if pref_changed:
+            user.home_state = home_state  # a private preference (spec 12 §4.5): saved, not audited
 
         just_completed = False
         if user.profile_completed_at is None and user.full_name and user.phone_number:
             user.profile_completed_at = timezone.now()
             just_completed = True
 
-        if changed or just_completed:
+        if changed or just_completed or pref_changed:
             user.save()
 
     if just_completed:

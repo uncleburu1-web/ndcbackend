@@ -33,6 +33,8 @@ class User(AbstractBaseUser):
     full_name = models.CharField(max_length=150, blank=True)
     phone_number = models.CharField(max_length=14, blank=True, help_text="E.164, e.g. +2348031234567 (unverified)")
     profile_completed_at = models.DateTimeField(null=True, blank=True)
+    # Spec 12: optional, user-set, private. Only pre-fills state filters; never ranks or targets anything.
+    home_state = models.CharField(max_length=20, blank=True, default="")
     welcome_shown_at = models.DateTimeField(null=True, blank=True)  # set by the welcome-animation spec
     is_active = models.BooleanField(default=True)
     deactivated_at = models.DateTimeField(null=True, blank=True)

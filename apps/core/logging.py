@@ -23,3 +23,19 @@ class RedactPII(logging.Filter):
         if record.args:
             record.args = _scrub(record.args) if isinstance(record.args, (dict, tuple)) else record.args
         return True
+
+
+_QUERY = re.compile(r"([?&](?:q|query)=)[^&\s\"]*")
+
+
+class RedactSearchQuery(logging.Filter):
+    """Spec 12 §9: search text never reaches logs. `/search/?q=osun` is logged as `q=[redacted]`."""
+
+    def filter(self, record):
+        try:
+            message = record.getMessage()
+        except Exception:  # noqa: BLE001 - never break logging
+            return True
+        if "q=" in message or "query=" in message:
+            record.msg, record.args = _QUERY.sub(r"\1[redacted]", message), ()
+        return True

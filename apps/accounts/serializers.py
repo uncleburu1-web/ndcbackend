@@ -25,7 +25,8 @@ class MeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status", "admin_areas"]
+        fields = ["id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status", "admin_areas",
+                  "home_state"]
         read_only_fields = fields
 
     def get_pvc_status(self, obj) -> str:
@@ -56,6 +57,14 @@ class ProfileUpdateSerializer(serializers.Serializer):
         required=False, allow_blank=True, max_length=25,
         error_messages={"blank": "Enter your phone number."},
     )
+    home_state = serializers.CharField(required=False, allow_blank=True, max_length=20)  # spec 12 §4.5
+
+    def validate_home_state(self, value):
+        from apps.candidates.reference import State
+
+        if value and value not in State.values:
+            raise serializers.ValidationError("Choose a state from the list.")
+        return value
 
     def validate_full_name(self, value):
         try:
