@@ -24,17 +24,26 @@ class Page20(PageNumberPagination):
     page_size = 20
 
 
-def item(n):
+def item(n, request=None):
     a = n.article
-    return {"id": n.id, "kind": n.kind, "created_at": n.created_at, "read_at": n.read_at, "decision": n.decision,
-            "article": {"id": a.id, "source": a.source, "title": a.title, "public": a.status == "successful"} if a else None}
+    out = {"id": n.id, "kind": n.kind, "created_at": n.created_at, "read_at": n.read_at, "decision": n.decision,
+           "article": {"id": a.id, "source": a.source, "title": a.title, "public": a.status == "successful"} if a else None}
+    p = n.candidate_post
+    if p is not None:  # spec 09 §7.4
+        from apps.candidates.photos import public_url
+
+        c = p.candidate
+        out["post"] = {"id": p.id, "kind": p.kind, "kind_label": p.get_kind_display(), "title": p.title}
+        out["candidate"] = {"slug": c.slug, "full_name": c.full_name,
+                            "photo": {"url_200": public_url(request, c.photo_200)} if c.photo_200 else None}
+    return out
 
 
 class NotificationList(_Private):
     def get(self, request):
         paginator = Page20()
         page = paginator.paginate_queryset(services.visible(request.user).order_by("-created_at"), request, view=self)
-        return paginator.get_paginated_response([item(n) for n in page])
+        return paginator.get_paginated_response([item(n, request) for n in page])
 
 
 class UnreadCount(_Private):

@@ -1,6 +1,6 @@
 """
 In-app notifications — spec 07 §6.4. The only place notifications are written (code standards).
-09 adds deliver_post for candidate posts here.
+Candidate posts (spec 09) are delivered by deliver_post.
 """
 import logging
 from datetime import timedelta
@@ -51,6 +51,45 @@ def deliver_announcement_on_commit(article):
     transaction.on_commit(run)
 
 
+POST_SQL = """
+INSERT INTO notifications_notification (id, recipient_id, kind, candidate_post_id, article_id, decision, created_at)
+SELECT gen_random_uuid(), f.user_id, 'candidate_post', %(post)s, NULL, '', now()
+FROM follows_candidatefollow f JOIN accounts_user u ON u.id = f.user_id
+WHERE f.candidate_id = %(candidate)s AND f.notify AND f.notify_changed_at <= %(published_at)s
+  AND u.is_active AND u.clerk_deleted_at IS NULL
+ON CONFLICT DO NOTHING
+"""
+
+
+def deliver_post(post) -> int:
+    """Spec 09 §6.3 (follows 04 §6.3): bell-on, active, non-deleted followers who opted in before publishing. Idempotent."""
+    from apps.posts.services import candidate_published
+
+    if post.status != "published" or not candidate_published(post.candidate):
+        return 0
+    with connection.cursor() as cur:
+        cur.execute(POST_SQL, {"post": post.pk, "candidate": post.candidate_id, "published_at": post.published_at})
+        n = cur.rowcount
+    record(AuditLog.Action.POST_DELIVERED, target=post, actor_label="system:notifications", delivered=n)  # a count only
+    return n
+
+
+def deliver_post_on_commit(post):
+    def run():
+        try:
+            deliver_post(post)
+        except Exception:  # the post stays published; re-run with `deliver_post <id>` (spec 09 §11)
+            logger.exception("Candidate post delivery failed for post %s", post.pk)
+
+    transaction.on_commit(run)
+
+
+def remove_for_unfollow(user, candidate) -> int:
+    """Spec 09 §3.7 — unfollowing deletes that candidate's post notifications for the user."""
+    n, _ = Notification.objects.filter(recipient=user, kind=Kind.CANDIDATE_POST, candidate_post__candidate=candidate).delete()
+    return n
+
+
 def notify_decision(article, decision: str):
     """Written inside the decision's transaction (spec 07 §6.4)."""
     author = article.author
@@ -69,8 +108,11 @@ def notify_pvc_decision(user, decision: str):
 def visible(user):
     """Announcements only while their article is public; decisions about your own requests always."""
     return (Notification.objects.filter(recipient=user)
-            .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION]) | Q(kind=Kind.ANNOUNCEMENT, article__status="successful"))
-            .select_related("article"))
+            .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION])
+                    | Q(kind=Kind.ANNOUNCEMENT, article__status="successful")
+                    | Q(kind=Kind.CANDIDATE_POST, candidate_post__status="published", candidate_post__candidate__status="published",
+                        candidate_post__candidate__verified_at__isnull=False))
+            .select_related("article", "candidate_post__candidate"))
 
 
 def unread_count(user) -> int:

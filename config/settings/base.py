@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "apps.membership",
     "apps.news",
     "apps.notifications",
+    "apps.posts",
 ]
 
 MIDDLEWARE = [
@@ -99,7 +100,8 @@ REST_FRAMEWORK = {
         "news_public": "120/min",  # per IP (spec 07 §9)
         "news_submit": "5/day",  # per user
         "news_write": "30/hour",  # per user: edits, images, withdrawals, bylines
-        "news_report": "5/hour",  # per user, or per IP for guests
+        "news_report": "5/hour",  # per user, or per IP for guests (also used for candidate-post reports, spec 09)
+        "posts_write": "30/hour",  # per user: candidate post writes (spec 09 §7.2)
     },
 }
 
@@ -186,3 +188,4 @@ NEWS_MAX_PINNED = 3
 NEWS_COMMUNITY_MIN_BODY = 100
 NEWS_COMMUNITY_MAX_BODY = 5_000
 NEWS_OFFICIAL_MAX_BODY = 20_000
+CANDIDATE_POST_MAX_BODY = 10_000

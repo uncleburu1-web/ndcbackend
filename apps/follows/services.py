@@ -48,7 +48,15 @@ def unfollow(user, slug: str) -> None:
     """Always succeeds, whatever the candidate's status, so a stale tab can unfollow (§6.1)."""
     if not valid_slug(slug):
         return
-    CandidateFollow.objects.filter(user=user, candidate__slug=slug).delete()
+    follow = CandidateFollow.objects.filter(user=user, candidate__slug=slug).select_related("candidate").first()
+    if follow is None:
+        return
+    candidate = follow.candidate
+    follow.delete()
+    # Notifications reveal the follow, so they go with it (spec 09 §3.7).
+    from apps.notifications.services import remove_for_unfollow
+
+    remove_for_unfollow(user, candidate)
 
 
 def set_notify(user, candidate: Candidate, on: bool) -> CandidateFollow:

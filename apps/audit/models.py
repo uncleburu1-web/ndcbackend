@@ -61,6 +61,14 @@ class AuditLog(models.Model):
         ANNOUNCEMENT_PINNED = "announcement.pinned"
         ANNOUNCEMENT_DELIVERED = "announcement.delivered"
         PVC_SETTINGS_CHANGED = "pvc.settings_changed"
+        POST_CREATED = "post.created"
+        POST_UPDATED = "post.updated"
+        POST_IMAGE_UPDATED = "post.image_updated"
+        POST_DELETED = "post.deleted"
+        POST_REMOVED = "post.removed"
+        POST_RESTORED = "post.restored"
+        POST_REPORT_RESOLVED = "post.report_resolved"
+        POST_DELIVERED = "post.delivered"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

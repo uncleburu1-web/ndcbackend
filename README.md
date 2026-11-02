@@ -57,6 +57,9 @@ Health check: `GET http://localhost:8000/api/v1/health/`
 | GET / POST | `/api/v1/me/news/` · GET / PATCH `<id>/` · PUT / DELETE `<id>/image/` · POST `<id>/withdraw/` | signed in (writes: completed profile) |
 | GET / POST | `/api/v1/admin/news/` · `<id>/` · `<id>/{approve,reject,remove,restore}/` · `reports/<id>/dismiss/` | news reviewer or system admin |
 | GET / POST | `/api/v1/admin/announcements/` · `notify-count/` · `<id>/` · `<id>/image/` · `<id>/{pin,unpin,unpublish,restore}/` | system admin |
+| GET | `/api/v1/candidates/<slug>/posts/` · `<id>/` · POST `<id>/report/` | anyone — visible candidate posts only |
+| GET / POST | `/api/v1/campaign/candidates/` · `<candidate_id>/posts/` · GET / PATCH / DELETE `<post_id>/` · PUT / DELETE `<post_id>/image/` | accounts linked to that candidate (`candidate` role) |
+| GET / POST | `/api/v1/admin/posts/` · `<id>/` · `<id>/{remove,restore}/` · `reports/<id>/dismiss/` · `/api/v1/admin/candidates/<id>/posts/` | system admin |
 | GET | `/api/v1/me/notifications/` · `unread-count/` · POST `<id>/read/` · `read-all/` · GET / PATCH `preferences/` | signed in |
 
 Single-candidate admin responses include `followers: {total, notify_on}` — counts only; no endpoint lists who follows a candidate.
@@ -65,7 +68,7 @@ Follows are political-opinion data (NDPA 2023): private to the user, never audit
 Candidate photos are saved under `media/` (git-ignored) in development and served by Django only when `DEBUG` is on.
 
 Errors always look like `{"error": {"status", "code", "message", "fields"}}`.
-Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429), `invalid_transition` (409), `invalid_photo` (400), `storage_unavailable` (503), `too_many_pending` (409), `self_review` (403), `publishing_paused` (409, with `until`), `too_many_pinned` (409), `source_required` (400).
+Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429), `invalid_transition` (409), `invalid_photo` (400), `storage_unavailable` (503), `too_many_pending` (409), `self_review` (403), `publishing_paused` (409, with `until`), `too_many_pinned` (409), `source_required` (400), `candidate_not_published` (409), `posting_paused` (409), `self_moderation` (403).
 
 ## Roles (no UI yet)
 
@@ -116,6 +119,14 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **Officers:** `python manage.py grant_role officer@example.com pvc_officer` (membership officers can use the queue too). Nobody can decide their own check.
 - Users get an in-app notification when their check is verified or rejected, and can opt in to a public "Verified voter" badge.
 - System admins edit the "Get your PVC" guidance at `/admin/pvc/settings`. "Register, transfer or replace" stays hidden until `INEC_PVC_URL` is set.
+
+## Candidate posts (spec 09)
+
+- Accounts linked to a candidate (admin → candidate → linked accounts, or `grant_role <email> candidate --scope-type candidate --scope-id <candidate-uuid>`) publish straight away at `/campaign`. There is no Pending.
+- Followers with the bell on get an in-app notification after the post commits. If delivery failed, re-run `python manage.py deliver_post <post-id>` (safe to repeat). Edits and restores never notify again.
+- Posting pauses for the candidate's office inside `CAMPAIGN_BLACKOUTS`; deleting still works.
+- System admins moderate at `/admin/posts` (an admin linked to the candidate can't moderate its posts).
+- **Daily:** `python manage.py prune_posts` (deleted/removed posts and dismissed reports after 1 year).
 
 ## News and announcements (spec 07)
 

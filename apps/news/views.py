@@ -17,7 +17,7 @@ from apps.candidates.reference import State
 from apps.core.exceptions import ServiceError
 
 from . import announcements, reports, services
-from .feed import feed
+from .feed import feed_page
 from .images import PhotoError
 from .models import Article, ArticleReport, ArticleStatus, ReportStatus, Source
 from .serializers import (
@@ -101,16 +101,25 @@ class NewsList(APIView):
     throttle_classes = [PublicThrottle]
 
     def get(self, request):
+        from apps.posts.models import CandidatePost
+        from apps.posts.serializers import FeedPostSerializer
+
         source = request.query_params.get("source", "")
         state = request.query_params.get("state", "")
         if state and state not in State.values:
             state = ""
-        pinned, qs = feed(source if source in Source.values else "", state)
-        paginator = Page20()
-        page = paginator.paginate_queryset(qs, request, view=self)
-        response = paginator.get_paginated_response(PublicArticleSerializer(page, many=True, context={"request": request}).data)
-        first = paginator.page.number == 1
-        response.data["pinned"] = PublicArticleSerializer(pinned, many=True, context={"request": request}).data if first else []
+        try:
+            page = max(1, int(request.query_params.get("page", 1)))
+        except ValueError:
+            page = 1
+        pinned, items, count = feed_page(source, state, page)
+        ctx = {"request": request}
+        results = [FeedPostSerializer(i, context=ctx).data if isinstance(i, CandidatePost) else PublicArticleSerializer(i, context=ctx).data
+                   for i in items]
+        if page > 1 and not results:
+            raise ServiceError("Invalid page.", code="not_found", status_code=404)
+        response = Response({"count": count, "next": None, "previous": None, "results": results,
+                             "pinned": PublicArticleSerializer(pinned, many=True, context=ctx).data if page == 1 else []})
         patch_cache_control(response, public=True, max_age=60)
         return response
 

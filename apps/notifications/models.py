@@ -1,4 +1,4 @@
-"""In-app notifications — spec 07 §5.4. 08 adds pvc_decision; 09 adds candidate_post."""
+"""In-app notifications — spec 07 §5.4; pvc_decision from 08; candidate_post from 09."""
 import uuid
 
 from django.conf import settings
@@ -10,6 +10,7 @@ class Kind(models.TextChoices):
     ANNOUNCEMENT = "announcement", "Announcement"
     NEWS_DECISION = "news_decision", "News decision"
     PVC_DECISION = "pvc_decision", "PVC decision"  # spec 08: no FK and no PVC data in the row
+    CANDIDATE_POST = "candidate_post", "Candidate post"  # spec 09: follow data — never audited
 
 
 class Notification(models.Model):
@@ -17,6 +18,7 @@ class Notification(models.Model):
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
     kind = models.CharField(max_length=20, choices=Kind.choices)
     article = models.ForeignKey("news.Article", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
+    candidate_post = models.ForeignKey("posts.CandidatePost", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
     decision = models.CharField(max_length=10, blank=True)  # approved | rejected (news) · verified | rejected (pvc)
     created_at = models.DateTimeField(auto_now_add=True)
     read_at = models.DateTimeField(null=True, blank=True)
@@ -26,9 +28,12 @@ class Notification(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["recipient", "article"], name="notif_one_announcement",
                                     condition=Q(kind="announcement")),
-            models.CheckConstraint(name="notif_article_by_kind",
-                                   condition=(Q(kind__in=["announcement", "news_decision"], article__isnull=False)
-                                              | Q(kind="pvc_decision", article__isnull=True))),
+            models.UniqueConstraint(fields=["recipient", "candidate_post"], name="notif_one_candidate_post",
+                                    condition=Q(kind="candidate_post")),
+            models.CheckConstraint(name="notif_target_by_kind",
+                                   condition=(Q(kind__in=["announcement", "news_decision"], article__isnull=False, candidate_post__isnull=True)
+                                              | Q(kind="pvc_decision", article__isnull=True, candidate_post__isnull=True)
+                                              | Q(kind="candidate_post", candidate_post__isnull=False, article__isnull=True))),
         ]
         indexes = [
             models.Index(fields=["recipient", "-created_at"], name="notif_recipient_idx"),
