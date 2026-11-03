@@ -21,7 +21,7 @@ BODY = {"vin": VIN, "surname": "Obi", "state": "kano", "lga": "Nassarawa", "cons
 
 def mk_user(cid, role=None, **kw):
     u = User.objects.create_user(cid, email=f"{cid}@example.com", full_name=kw.pop("full_name", "Ada Obi"),
-                                 phone_number="+2348031234567", profile_completed_at=timezone.now(), **kw)
+                                 phone_number="+2348031234567", profile_completed_at=timezone.now(), adult_confirmed_at=timezone.now(), **kw)
     if role:
         grant_role(user=u, role=role)
     return u

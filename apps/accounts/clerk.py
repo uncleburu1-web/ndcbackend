@@ -124,3 +124,14 @@ def unban_user(clerk_user_id: str) -> bool:
     except Exception:
         logger.error("Clerk unban failed for %s — re-run reactivate_user to retry.", clerk_user_id, exc_info=True)
         return False
+
+
+def delete_user(clerk_user_id: str) -> bool:
+    """Spec 14 §6.3: self-service deletion. Returns False on failure (logged); the caller erases nothing then."""
+    try:
+        with _client() as clerk:
+            clerk.users.delete(user_id=clerk_user_id)
+        return True
+    except Exception:
+        logger.error("Clerk delete failed for %s", clerk_user_id, exc_info=True)
+        return False

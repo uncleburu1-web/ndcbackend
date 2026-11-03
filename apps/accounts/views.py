@@ -27,14 +27,14 @@ class MeView(APIView):
         return [ProfileWriteThrottle()] if self.request.method == "PATCH" else []
 
     def get(self, request):
-        return Response(MeSerializer(request.user).data)
+        return Response(MeSerializer(request.user, context={"auth": request.auth}).data)
 
     def patch(self, request):
         ser = ProfileUpdateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         just_completed = services.update_profile(request.user, **ser.validated_data, request=request)
         request.user.refresh_from_db()
-        data = MeSerializer(request.user).data
+        data = MeSerializer(request.user, context={"auth": request.auth}).data
         if just_completed:
             data["just_completed"] = True
         return Response(data, status=status.HTTP_200_OK)

@@ -34,7 +34,7 @@ PRIVATE = tempfile.mkdtemp(prefix="ndc-moderation-test-")
 
 def mk_user(cid, *roles, **kw):
     u = User.objects.create_user(cid, email=f"{cid}@example.com", full_name=kw.pop("full_name", f"Person {cid}"), phone_number="+2348031234567",
-                                 profile_completed_at=timezone.now(), **kw)
+                                 profile_completed_at=timezone.now(), adult_confirmed_at=timezone.now(), **kw)
     for r in roles:
         grant_role(user=u, role=r)
     return u

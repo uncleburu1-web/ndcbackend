@@ -24,12 +24,13 @@ class MeTests(APITestCase):
     def test_get_returns_only_own_profile_shape(self):
         res = self.client.get(ME, **self.auth)
         self.assertEqual(
-            set(res.data), {"id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status", "admin_areas", "home_state"}
+            set(res.data), {"id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status", "admin_areas", "home_state",
+             "adult_confirmed", "mfa_enabled", "consents_needed", "privacy_version", "admin_mfa_required"}
         )
         self.assertEqual(res.data["pvc_status"], "unverified")
 
     def test_just_completed_is_returned_exactly_once(self):
-        first = self.patch({"full_name": "Ada Obi", "phone_number": "0803 123 4567"})
+        first = self.patch({"full_name": "Ada Obi", "phone_number": "0803 123 4567", "adult_confirmed": True})
         self.assertEqual(first.status_code, 200, first.content)
         self.assertTrue(first.data["just_completed"])
         self.assertTrue(first.data["profile_complete"])
@@ -47,6 +48,8 @@ class MeTests(APITestCase):
         self.assertFalse(res.data["profile_complete"])
         self.assertNotIn("just_completed", res.data)
         res = self.patch({"full_name": "Ada Obi"})
+        self.assertFalse(res.data["profile_complete"])  # spec 14 §4.3: 18+ confirmation needed too
+        res = self.patch({"adult_confirmed": True})
         self.assertTrue(res.data["just_completed"])
 
     def test_validation_errors_use_envelope(self):

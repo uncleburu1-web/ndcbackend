@@ -33,7 +33,7 @@ NOW = timezone.now
 
 def mk_user(cid, **kw):
     return User.objects.create_user(cid, email=f"{cid}@example.com", full_name=kw.pop("full_name", "Ada Obi"),
-                                    phone_number="+2348031234567", profile_completed_at=timezone.now(), **kw)
+                                    phone_number="+2348031234567", profile_completed_at=timezone.now(), adult_confirmed_at=timezone.now(), **kw)
 
 
 def mk_candidate(slug, name, position="governor", state="kano", year=2027, published=True, **kw):

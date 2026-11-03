@@ -33,6 +33,11 @@ class User(AbstractBaseUser):
     full_name = models.CharField(max_length=150, blank=True)
     phone_number = models.CharField(max_length=14, blank=True, help_text="E.164, e.g. +2348031234567 (unverified)")
     profile_completed_at = models.DateTimeField(null=True, blank=True)
+    # Spec 14 §4.3: NDCConnect is for voters; a complete profile has confirmed "I'm 18 or older".
+    adult_confirmed_at = models.DateTimeField(null=True, blank=True)
+    # Spec 14 §4.6: last activity, for the admin access review only (updated at most hourly; cleared on deletion).
+    last_seen_at = models.DateTimeField(null=True, blank=True)
+    mfa_enabled = models.BooleanField(null=True, blank=True)  # from the last session token's `mfa` claim (access review only)
     # Spec 12: optional, user-set, private. Only pre-fills state filters; never ranks or targets anything.
     home_state = models.CharField(max_length=20, blank=True, default="")
     welcome_shown_at = models.DateTimeField(null=True, blank=True)  # set by the welcome-animation spec
@@ -59,7 +64,7 @@ class User(AbstractBaseUser):
 
     @property
     def profile_complete(self) -> bool:
-        return self.profile_completed_at is not None
+        return self.profile_completed_at is not None and self.adult_confirmed_at is not None
 
 
 class ProcessedWebhook(models.Model):

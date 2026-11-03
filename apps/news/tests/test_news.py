@@ -29,7 +29,8 @@ WINDOW = [{"positions": ["president"], "start": (NOW - timedelta(hours=1)).isofo
 
 def mk_user(cid, complete=True, **extra):
     return User.objects.create_user(cid, email=f"{cid}@example.com", full_name=extra.pop("full_name", "Ada Obi"),
-                                    phone_number="+2348031234567", profile_completed_at=timezone.now() if complete else None, **extra)
+                                    phone_number="+2348031234567", profile_completed_at=timezone.now() if complete else None,
+                                    adult_confirmed_at=timezone.now() if complete else None, **extra)
 
 
 def mk_role(cid, role, **kw):

@@ -53,6 +53,9 @@ def _event(user, kind, actor=None, note=""):
 
 
 def submit(user, *, vin: str, surname: str, state: str, lga: str, polling_unit: str = "", request=None) -> PvcVerification:
+    from apps.privacy.consent import require_consent
+
+    require_consent(user, "pvc_check")  # spec 14 §4.2
     vin = normalise_vin(vin)
     if not valid_vin(vin):
         raise ServiceError("Enter the VIN exactly as printed on your card (19 letters and numbers), or its last 10 characters.",
@@ -117,6 +120,10 @@ def reject(rec, officer, reason, request=None):
 
 
 def set_badge(user, show: bool) -> PvcVerification:
+    if show:
+        from apps.privacy.consent import require_consent
+
+        require_consent(user, "verified_badge")  # spec 14 §4.2
     with transaction.atomic():
         rec = PvcVerification.objects.select_for_update().filter(user=user).first()
         if rec is None or rec.status != PvcStatus.SUCCESSFUL:
@@ -165,6 +172,14 @@ def prune(*, rejected_after_days=90) -> int:
         _event(rec.user, PvcEvent.Kind.VIN_PRUNED)
         n += 1
     return n
+
+
+def erase_for_withdrawn_consent(user) -> bool:
+    """Spec 14 §4.2: withdrawing PVC consent deletes the record (VIN included)."""
+    n, _ = PvcVerification.objects.filter(user=user).delete()
+    if n:
+        _event(user, PvcEvent.Kind.WITHDRAWN, user, "consent withdrawn")
+    return bool(n)
 
 
 def erase_for_deleted_user(user) -> None:

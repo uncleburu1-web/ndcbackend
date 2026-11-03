@@ -40,6 +40,9 @@ def published_candidate(slug: str) -> Candidate:
 
 def follow(user, candidate: Candidate) -> tuple[CandidateFollow, bool]:
     """Idempotent. The unique constraint + get_or_create keep concurrent taps to one row."""
+    from apps.privacy.consent import require_consent
+
+    require_consent(user, "political_following")  # spec 14 §4.2: explicit consent (NDPA s. 30)
     with transaction.atomic():
         return CandidateFollow.objects.get_or_create(user=user, candidate=candidate)
 
@@ -60,6 +63,10 @@ def unfollow(user, slug: str) -> None:
 
 
 def set_notify(user, candidate: Candidate, on: bool) -> CandidateFollow:
+    if on:
+        from apps.privacy.consent import require_consent
+
+        require_consent(user, "political_following")
     with transaction.atomic():
         f = CandidateFollow.objects.select_for_update().filter(user=user, candidate=candidate).first()
         if f is None:

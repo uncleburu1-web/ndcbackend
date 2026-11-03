@@ -22,11 +22,17 @@ class MeSerializer(serializers.ModelSerializer):
     is_system_admin = serializers.SerializerMethodField()
     pvc_status = serializers.SerializerMethodField()
     admin_areas = serializers.SerializerMethodField()
+    adult_confirmed = serializers.SerializerMethodField()
+    mfa_enabled = serializers.SerializerMethodField()
+    consents_needed = serializers.SerializerMethodField()
+    privacy_version = serializers.SerializerMethodField()
+    admin_mfa_required = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ["id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status", "admin_areas",
-                  "home_state"]
+                  "home_state", "adult_confirmed", "mfa_enabled", "consents_needed", "privacy_version",
+                  "admin_mfa_required"]
         read_only_fields = fields
 
     def get_pvc_status(self, obj) -> str:
@@ -45,6 +51,34 @@ class MeSerializer(serializers.ModelSerializer):
     def get_is_system_admin(self, obj) -> bool:
         return is_system_admin(obj)
 
+    # spec 14
+    def get_adult_confirmed(self, obj) -> bool:
+        return obj.adult_confirmed_at is not None
+
+    def get_mfa_enabled(self, obj):
+        from apps.access.security import mfa_claim_present, mfa_enabled
+
+        claims = getattr(self.context.get("auth"), "claims", None)
+        if claims is None or not mfa_claim_present(claims):
+            return obj.mfa_enabled
+        return mfa_enabled(claims)
+
+    def get_consents_needed(self, obj) -> list:
+        from apps.privacy.consent import consents_needed
+
+        return consents_needed(obj)
+
+    def get_admin_mfa_required(self, obj) -> bool:
+        """Spec 14 §4.6: the admin pages show the two-step gate only when the server would refuse."""
+        from django.conf import settings
+
+        return bool(settings.ADMIN_MFA_REQUIRED)
+
+    def get_privacy_version(self, obj) -> int:
+        from apps.privacy.register import PRIVACY_VERSION
+
+        return PRIVACY_VERSION
+
 
 class ProfileUpdateSerializer(serializers.Serializer):
     """PATCH /me — only full_name and phone_number are writable. Anything else is ignored."""
@@ -58,6 +92,12 @@ class ProfileUpdateSerializer(serializers.Serializer):
         error_messages={"blank": "Enter your phone number."},
     )
     home_state = serializers.CharField(required=False, allow_blank=True, max_length=20)  # spec 12 §4.5
+    adult_confirmed = serializers.BooleanField(required=False)  # spec 14 §4.3; only `true` does anything
+
+    def validate_adult_confirmed(self, value):
+        if value is not True:
+            raise serializers.ValidationError("NDCConnect is for voters: you need to be 18 or older.")
+        return value
 
     def validate_home_state(self, value):
         from apps.candidates.reference import State

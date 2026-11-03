@@ -119,6 +119,9 @@ def membership_for(user) -> Membership | None:
 # ---------------------------------------------------------------- details
 def save_details(user, data: dict, *, request=None) -> Membership:
     """Drafts can be partial (spec 06 §7.1). Rejected/cancelled/refunded members may start again."""
+    from apps.privacy.consent import require_consent
+
+    require_consent(user, "membership")  # spec 14 §4.2
     with transaction.atomic():
         m, created = Membership.objects.select_for_update().get_or_create(user=user)
         if m.status in REAPPLY_FROM:
@@ -480,7 +483,18 @@ def register_row(m: Membership) -> list:
 
 
 # ------------------------------------------------------- account deletion (§6.7)
-def erase_for_deleted_user(user) -> bool:
+def erase_for_withdrawn_consent(user) -> bool:
+    """Spec 14 §4.2: withdrawing membership consent cancels the membership and erases the register data, as on deletion.
+    Refused while a fee payment is still being checked (the caller rolls everything back)."""
+    m = Membership.objects.filter(user=user).first()
+    if m is None:
+        return False
+    if m.status == M.PAYMENT_PENDING or m.payments.filter(status__in=OPEN_PAYMENT_STATES).exists():
+        raise ServiceError("Your payment is still being checked. Try again in a few minutes.", code="invalid_transition", status_code=409)
+    return erase_for_deleted_user(user, reason="consent withdrawn", actor=user)
+
+
+def erase_for_deleted_user(user, *, reason="account deleted", actor=None) -> bool:
     """PVC data is erased by accounts.mark_deleted itself (spec 08 §6.2)."""
     m = Membership.objects.filter(user=user).first()
     if m is None:
@@ -488,8 +502,8 @@ def erase_for_deleted_user(user) -> bool:
     with transaction.atomic():
         m = Membership.objects.select_for_update().get(pk=m.pk)
         if m.status not in (M.CANCELLED, M.REJECTED, M.REFUNDED):
-            _event(m, m.status, M.CANCELLED, None, "account deleted")
-            m.status, m.cancelled_at, m.cancel_reason = M.CANCELLED, timezone.now(), "account deleted"
+            _event(m, m.status, M.CANCELLED, actor, reason)
+            m.status, m.cancelled_at, m.cancel_reason = M.CANCELLED, timezone.now(), reason
         photo = m.photo
         m.nin_encrypted, m.nin_last4, m.date_of_birth, m.photo = b"", "", None, ""
         m.save()
@@ -498,5 +512,5 @@ def erase_for_deleted_user(user) -> bool:
             private_storage().delete(photo)
         except OSError:  # pragma: no cover
             pass
-    record(AuditLog.Action.MEMBERSHIP_ERASED, target=m, actor_label="clerk:webhook")
+    record(AuditLog.Action.MEMBERSHIP_ERASED, target=m, actor=actor, actor_label="" if actor else "clerk:webhook", reason=reason)
     return True

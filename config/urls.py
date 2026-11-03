@@ -19,6 +19,7 @@ api_v1 = [
     path("", include("apps.dashboard.urls")),
     path("", include("apps.search.urls")),
     path("", include("apps.moderation.urls")),
+    path("", include("apps.privacy.urls")),
 ]
 
 urlpatterns = [path("api/v1/", include(api_v1))]

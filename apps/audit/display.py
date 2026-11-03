@@ -92,6 +92,20 @@ ACTIONS: dict[str, tuple[str, tuple[str, ...]]] = {
     A.MODERATION_LEGAL_HOLD_CHANGED: ("changed a legal hold", ("on",)),
     A.MODERATION_ATTACHMENT_VIEWED: ("opened a legal notice attachment", ()),
     A.MODERATION_COMPLIANCE_EXPORTED: ("downloaded the compliance report", ("year",)),
+    A.PRIVACY_CONSENT_WITHDRAWN: ("withdrew a consent", ("purpose",)),
+    A.PRIVACY_REQUEST_VIEWED: ("opened a privacy request", ("reference",)),
+    A.PRIVACY_REQUEST_CLOSED: ("closed a privacy request", ("reference", "outcome")),
+    A.PRIVACY_DATA_EXPORTED_BY_OFFICER: ("exported a person's data for a privacy request", ("reference",)),
+    A.PRIVACY_ACCOUNT_DELETED_SELF: ("deleted their own account", ()),
+    A.PRIVACY_LINKED_ACTION: ("acted on a privacy request", ("reference", "linked_action")),
+    A.SECURITY_INCIDENT_LOGGED: ("logged an incident", ("reference", "risk")),
+    A.SECURITY_INCIDENT_UPDATED: ("updated an incident", ("reference", "fields", "notified")),
+    A.SECURITY_INCIDENT_CLOSED: ("closed an incident", ("reference",)),
+    A.SECURITY_NOTICE_SENT: ("sent a security notice", ("reference", "recipients", "audience", "version")),
+    A.SECURITY_INCIDENTS_EXPORTED: ("exported the breach register", ("rows",)),
+    A.SECURITY_ACCESS_REVIEW_COMPLETED: ("finished an access review", ("kept", "revoked")),
+    A.SECURITY_ADMIN_ACCESS_DENIED: ("was refused admin access repeatedly", ("count", "window")),
+    A.SECURITY_RESTORE_DRILL: ("recorded a restore test", ("notes",)),
 }
 
 # area → (words, action prefixes)
@@ -105,6 +119,8 @@ AREAS: dict[str, tuple[str, tuple[str, ...]]] = {
     "announcements": ("Announcements", ("announcement.",)),
     "posts": ("Candidate posts", ("post.",)),
     "moderation": ("Moderation", ("moderation.",)),
+    "privacy": ("Privacy", ("privacy.",)),
+    "security": ("Security", ("security.",)),
     "audit": ("Audit views", ("audit.",)),
 }
 
@@ -124,6 +140,9 @@ TARGET_WORDS = {
     "moderation.appeal": "Appeal",
     "moderation.legalnotice": "Legal notice",
     "moderation.report": "Report",
+    "privacy.datarequest": "Privacy request",
+    "privacy.incident": "Incident",
+    "privacy.accessreview": "Access review",
 }
 
 TARGET_LINKS = {
@@ -136,6 +155,8 @@ TARGET_LINKS = {
     "access.roleassignment": "/admin/team",
     "moderation.case": "/admin/moderation/{id}",
     "moderation.legalnotice": "/admin/moderation/legal/{id}",
+    "privacy.datarequest": "/admin/privacy/requests/{id}",
+    "privacy.incident": "/admin/privacy/incidents/{id}",
 }
 
 ACTOR_LABELS = {"system:cli": "System (CLI)", "clerk:webhook": "Clerk", "system:jit": "System", "system:notifications": "System",

@@ -37,7 +37,7 @@ PHONE = "+2348031234567"
 
 def mk(cid, email=None, **kw):
     return User.objects.create_user(cid, email=email or f"{cid}@example.com", full_name=kw.pop("full_name", f"Person {cid}"),
-                                    phone_number=PHONE, profile_completed_at=timezone.now(), **kw)
+                                    phone_number=PHONE, profile_completed_at=timezone.now(), adult_confirmed_at=timezone.now(), **kw)
 
 
 def client(user=None):
@@ -113,7 +113,7 @@ class OverviewAccessTests(Base):
 
     def test_each_role_gets_exactly_its_sections(self):
         expect = {
-            "sa": (["reports_review", "reports_urgent", "appeals_waiting", "legal_due", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
+            "sa": (["incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
                     "donations_review", "candidates_unpublished", "ban_failed"],
                    ["people", "candidates", "content", "pvc", "membership", "donations"], True),
             "news": (["reports_review", "reports_urgent", "appeals_waiting", "news_pending"], ["content"], False),
@@ -325,7 +325,8 @@ class TeamTests(Base):
         r = client(self.sa).get(reverse("admin-team"))
         self.assertEqual(r.status_code, 200)
         self.assertEqual([g["role"] for g in r.data["grantable"]],
-                         ["system_admin", "news_reviewer", "pvc_officer", "membership_officer", "finance_officer", "moderator"])
+                         ["system_admin", "news_reviewer", "pvc_officer", "membership_officer", "finance_officer", "moderator",
+                          "privacy_officer"])
         own = [a for a in r.data["results"] if a["is_own"]]
         self.assertEqual([a["role"] for a in own], ["system_admin"])
         r = client(self.sa).post(reverse("admin-team"), {"email": "U_PLAIN@example.com", "role": "news_reviewer", "note": "Lagos desk"},
@@ -516,7 +517,7 @@ class MeAreasTests(Base):
         self.assertEqual(admin_areas(self.pvc), ["overview", "pvc"])
         self.assertEqual(admin_areas(self.mem), ["overview", "pvc", "membership"])
         self.assertEqual(admin_areas(self.fin), ["overview", "donations"])
-        self.assertEqual(admin_areas(self.sa), ["overview", "candidates", "donations", "pvc", "membership", "moderation", "news", "announcements",
-                                                "posts", "team", "audit"])
+        self.assertEqual(admin_areas(self.sa), ["overview", "candidates", "donations", "pvc", "membership", "moderation", "news", "privacy",
+                                                "announcements", "posts", "team", "audit"])
         r = client(self.news).get(reverse("me"))
         self.assertEqual(r.data["admin_areas"], ["overview", "moderation", "news"])

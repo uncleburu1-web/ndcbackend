@@ -1,0 +1,74 @@
+name: security
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 4 * * 1"
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ndc
+          POSTGRES_PASSWORD: ndc
+          POSTGRES_DB: ndcbackend
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://ndc:ndc@localhost:5432/ndcbackend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - run: DJANGO_SETTINGS_MODULE=config.settings.test python manage.py test apps
+      - name: check_security with production settings and dummy values (must pass)
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.prod
+          DJANGO_SECRET_KEY: ci-dummy-secret-key-that-is-long-enough-for-the-check-0123456789
+          DJANGO_ALLOWED_HOSTS: api.example.ng
+          DATABASE_URL: postgres://ndc:ndc@localhost:5432/ndcbackend?sslmode=disable
+          CORS_ALLOWED_ORIGINS: https://app.example.ng
+          CLERK_SECRET_KEY: sk_test_ci_dummy
+          CLERK_JWT_KEY: ci-dummy
+          CLERK_WEBHOOK_SIGNING_SECRET: whsec_Y2ktZHVtbXk=
+          CLERK_AUTHORIZED_PARTIES: https://app.example.ng
+          PII_ENCRYPTION_KEYS: n_Y65S7dmM7W529y6AmuOOgeSHUaayG9MMPgxNXWi-4=
+          PAYMENT_PROVIDER: paystack
+          PAYSTACK_SECRET_KEY: sk_test_ci_dummy
+          SECURITY_CONTACT_EMAIL: security@example.ng
+          PRIVACY_CONTACT_EMAIL: dpo@example.ng
+        run: |
+          python manage.py migrate --noinput
+          # sslmode=disable here on purpose: the check must name the failure without printing the URL
+          python manage.py check_security | tee check.txt || true
+          grep -q "FAIL Database uses TLS" check.txt
+          ! grep -q "ci-dummy" check.txt
+
+  dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install pip-audit
+      - run: pip-audit -r requirements.txt
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: no live payment keys
+        run: "! git grep -nE '(sk|pk)_live_[A-Za-z0-9]{8,}' -- ."

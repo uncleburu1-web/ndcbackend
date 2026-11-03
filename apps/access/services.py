@@ -83,6 +83,9 @@ def grant_role(*, user, role, scope_type=ScopeType.GLOBAL, scope_id=None, note="
     except ValidationError as exc:
         raise RoleError("; ".join(m for msgs in exc.message_dict.values() for m in msgs)) from exc
     assignment.save()
+    from .security import forget_admin
+
+    forget_admin(user)
     record(AuditLog.Action.ROLE_GRANTED, target=assignment, actor=actor, actor_label=actor_label,
            user_id=str(user.pk), role=role, scope_type=scope_type, scope_id=str(scope_id) if scope_id else None)
     return assignment
@@ -100,6 +103,9 @@ def revoke_role(*, assignment, reason="", actor=None, actor_label=""):
     assignment.revoked_at = timezone.now()
     assignment.revoked_by = actor
     assignment.save(update_fields=["is_active", "revoked_at", "revoked_by", "updated_at"])
+    from .security import forget_admin
+
+    forget_admin(assignment.user)
     record(AuditLog.Action.ROLE_REVOKED, target=assignment, actor=actor, actor_label=actor_label,
            user_id=str(assignment.user_id), role=assignment.role, reason=reason)
     return assignment
@@ -144,7 +150,7 @@ def reactivate_user(*, user, reason="", actor=None, actor_label="") -> bool:
 # Team page (spec 11 §4.3, §6.4)
 # --------------------------------------------------------------------------
 ROLE_ORDER = [Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER,
-              Role.MODERATOR, Role.CANDIDATE]
+              Role.MODERATOR, Role.PRIVACY_OFFICER, Role.CANDIDATE]
 ROLE_DESCRIPTIONS = {
     Role.SYSTEM_ADMIN: "manage every admin area, people, roles and settings",
     Role.NEWS_REVIEWER: "approve or reject community news and act on reports about community news",
@@ -152,10 +158,12 @@ ROLE_DESCRIPTIONS = {
     Role.MEMBERSHIP_OFFICER: "check PVCs, approve memberships and export the register",
     Role.FINANCE_OFFICER: "see donation records and export them",
     Role.MODERATOR: "review reports on community news and candidate posts, remove or restore content, warn or pause authors",
+    Role.PRIVACY_OFFICER: "handle privacy requests, incidents and the data register",
     Role.CANDIDATE: "post for one candidate (linked on the candidate page)",
 }
 # Granted from the browser. `candidate` needs the candidate record (03). `moderator` became grantable with spec 13.
-GRANTABLE = [Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.MODERATOR]
+GRANTABLE = [Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.MODERATOR,
+             Role.PRIVACY_OFFICER]
 
 
 def grantable_roles() -> list[dict]:

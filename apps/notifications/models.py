@@ -17,19 +17,25 @@ class Kind(models.TextChoices):
     ACCOUNT_WARNING = "account_warning", "Account warning"
     SUBMISSIONS_PAUSED = "submissions_paused", "Submissions paused"
     APPEAL_DECISION = "appeal_decision", "Appeal decision"
+    # spec 14: security notices and privacy request updates
+    SECURITY_NOTICE = "security_notice", "Security notice"
+    PRIVACY_REQUEST_UPDATE = "privacy_request_update", "Privacy request update"
 
 
 MODERATION_KINDS = ["report_outcome", "content_removed", "account_warning", "submissions_paused", "appeal_decision"]
+PRIVACY_KINDS = ["security_notice", "privacy_request_update"]
 
 
 class Notification(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
-    kind = models.CharField(max_length=20, choices=Kind.choices)
+    kind = models.CharField(max_length=32, choices=Kind.choices)
     article = models.ForeignKey("news.Article", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
     candidate_post = models.ForeignKey("posts.CandidatePost", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
     case = models.ForeignKey("moderation.Case", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
     appeal = models.ForeignKey("moderation.Appeal", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
+    data_request = models.ForeignKey("privacy.DataRequest", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
+    incident = models.ForeignKey("privacy.Incident", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
     decision = models.CharField(max_length=10, blank=True)  # approved | rejected (news) · verified | rejected (pvc)
     created_at = models.DateTimeField(auto_now_add=True)
     read_at = models.DateTimeField(null=True, blank=True)
@@ -45,7 +51,8 @@ class Notification(models.Model):
                                    condition=(Q(kind__in=["announcement", "news_decision"], article__isnull=False, candidate_post__isnull=True)
                                               | Q(kind="pvc_decision", article__isnull=True, candidate_post__isnull=True)
                                               | Q(kind="candidate_post", candidate_post__isnull=False, article__isnull=True)
-                                              | Q(kind__in=MODERATION_KINDS, article__isnull=True, candidate_post__isnull=True))),
+                                              | Q(kind__in=MODERATION_KINDS, article__isnull=True, candidate_post__isnull=True)
+                                              | Q(kind__in=PRIVACY_KINDS, article__isnull=True, candidate_post__isnull=True))),
         ]
         indexes = [
             models.Index(fields=["recipient", "-created_at"], name="notif_recipient_idx"),

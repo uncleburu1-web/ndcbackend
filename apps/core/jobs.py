@@ -32,6 +32,10 @@ KNOWN_JOBS = {
     "rebuild_search": ("Rebuild search index", 8 * 24 * H),
     "moderation_tick": ("Moderation upkeep (claims, burst flags, copyright windows)", 1 * H),
     "prune_moderation": ("Clear old moderation records", 26 * H),
+    "privacy_tick": ("Privacy upkeep (request and incident clocks)", 2 * H),
+    "verify_audit": ("Check the audit log chain", 8 * 24 * H),
+    "prune_audit": ("Clear audit and privacy records past 6 years", 8 * 24 * H),
+    "restore_drill": ("Record a restore test", None),
 }
 MANUAL_STALE = 24 * H  # a by-hand run that hasn't finished after this "didn't finish"
 KEEP = timedelta(days=90)
@@ -94,8 +98,9 @@ STATE_WORDS = {"never": "Never run", "running": "Running", "ok": "Succeeded", "f
 def latest_runs(now=None) -> list[dict]:
     now = now or timezone.now()
     out = []
+    latest = {r.job: r for r in JobRun.objects.filter(job__in=list(KNOWN_JOBS)).order_by("job", "-started_at").distinct("job")}
     for job, (label, overdue) in KNOWN_JOBS.items():
-        row = JobRun.objects.filter(job=job).order_by("-started_at").first()
+        row = latest.get(job)
         st = state(row, job, now)
         out.append({"job": job, "label": label, "state": st, "state_label": STATE_WORDS[st],
                     "manual": overdue is None, "started_at": row.started_at if row else None,

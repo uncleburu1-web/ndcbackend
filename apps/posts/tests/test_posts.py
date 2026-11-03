@@ -31,7 +31,7 @@ POST = {"kind": "announcement", "title": "Town hall in Ikeja on Saturday", "body
 
 def mk_user(cid, **kw):
     return User.objects.create_user(cid, email=f"{cid}@example.com", full_name=kw.pop("full_name", "Ada Obi"), phone_number="+2348031234567",
-                                    profile_completed_at=timezone.now(), **kw)
+                                    profile_completed_at=timezone.now(), adult_confirmed_at=timezone.now(), **kw)
 
 
 def mk_candidate(slug="amina-bello", name="Amina Bello", position="governor", state="lagos", published=True):

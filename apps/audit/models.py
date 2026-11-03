@@ -88,6 +88,21 @@ class AuditLog(models.Model):
         MODERATION_LEGAL_HOLD_CHANGED = "moderation.legal_hold_changed"
         MODERATION_ATTACHMENT_VIEWED = "moderation.attachment_viewed"
         MODERATION_COMPLIANCE_EXPORTED = "moderation.compliance_exported"
+        # spec 14: security and privacy
+        PRIVACY_CONSENT_WITHDRAWN = "privacy.consent_withdrawn"
+        PRIVACY_REQUEST_VIEWED = "privacy.request_viewed"
+        PRIVACY_REQUEST_CLOSED = "privacy.request_closed"
+        PRIVACY_DATA_EXPORTED_BY_OFFICER = "privacy.data_exported_by_officer"
+        PRIVACY_ACCOUNT_DELETED_SELF = "privacy.account_deleted_self"
+        PRIVACY_LINKED_ACTION = "privacy.linked_action"
+        SECURITY_INCIDENT_LOGGED = "security.incident_logged"
+        SECURITY_INCIDENT_UPDATED = "security.incident_updated"
+        SECURITY_INCIDENT_CLOSED = "security.incident_closed"
+        SECURITY_NOTICE_SENT = "security.notice_sent"
+        SECURITY_INCIDENTS_EXPORTED = "security.incidents_exported"
+        SECURITY_ACCESS_REVIEW_COMPLETED = "security.access_review_completed"
+        SECURITY_ADMIN_ACCESS_DENIED = "security.admin_access_denied"
+        SECURITY_RESTORE_DRILL = "security.restore_drill"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
@@ -100,6 +115,10 @@ class AuditLog(models.Model):
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    # Spec 14 §4.8: tamper-evident hash chain. Assigned in services.record() under an advisory lock.
+    seq = models.BigIntegerField(null=True, blank=True, unique=True)
+    prev_hash = models.CharField(max_length=64, blank=True)
+    hash = models.CharField(max_length=64, blank=True)
 
     class Meta:
         ordering = ["-created_at"]

@@ -1,9 +1,15 @@
-"""Logging filter: never let VIN/NIN values reach logs (spec 06 §9)."""
+"""Logging filters: never let VIN/NIN values (spec 06 §9), emails, phone numbers, tokens or keys (spec 14 §4.9) reach logs."""
 import logging
 import re
 
 SENSITIVE_KEYS = {"vin", "nin", "vin_encrypted", "nin_encrypted"}
 _INLINE = re.compile(r"(?i)\b(vin|nin)(['\"]?\s*[:=]\s*['\"]?)([A-Za-z0-9]{6,})")
+# spec 14 §4.9
+_EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+")
+_PHONE = re.compile(r"(?<![\w])(?:\+?234|0)[789][01]\d{8}(?!\d)")
+_BEARER = re.compile(r"(?i)\b(bearer\s+)[A-Za-z0-9._~+/=-]{8,}")
+_AUTH = re.compile(r"(?i)(authorization['\"]?\s*[:=]\s*['\"]?)[^'\",\s}]+")
+_KEYS = re.compile(r"\b(sk|pk|whsec|rk)_(?:live|test)_[A-Za-z0-9]{6,}|\bsk_[A-Za-z0-9]{20,}")
 
 
 def _scrub(value):
@@ -12,7 +18,12 @@ def _scrub(value):
     if isinstance(value, (list, tuple)):
         return type(value)(_scrub(v) for v in value)
     if isinstance(value, str):
-        return _INLINE.sub(lambda m: f"{m.group(1)}{m.group(2)}[redacted]", value)
+        value = _INLINE.sub(lambda m: f"{m.group(1)}{m.group(2)}[redacted]", value)
+        value = _KEYS.sub("[key]", value)
+        value = _BEARER.sub(lambda m: f"{m.group(1)}[token]", value)
+        value = _AUTH.sub(lambda m: f"{m.group(1)}[redacted]", value)
+        value = _EMAIL.sub("[email]", value)
+        return _PHONE.sub("[phone]", value)
     return value
 
 

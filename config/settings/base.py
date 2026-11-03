@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "apps.dashboard",
     "apps.search",
     "apps.moderation",
+    "apps.privacy",
 ]
 
 MIDDLEWARE = [
@@ -46,6 +47,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.core.middleware.SecurityHeaders",  # spec 14 §4.9
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -109,6 +111,8 @@ REST_FRAMEWORK = {
         "admin_write": "60/hour",  # per admin: grants, revokes, deactivations, reveals (spec 11 §7)
         "admin_read": "300/hour",  # per admin: overview, user search, audit search (spec 11 §9)
         "search_public": "60/min",  # per IP (spec 12 §7)
+        "data_export": "3/day",  # spec 14 §4.4: per user
+        "privacy_public": "10/hour",  # per user: privacy requests, consent changes, self-deletion
         "moderation_public": "5/hour",  # per user or IP: copyright notices, appeals and counter-notices (spec 13 §9)
     },
 }
@@ -216,3 +220,25 @@ COPYRIGHT_COUNTER_NOTICE_DAYS = config("COPYRIGHT_COUNTER_NOTICE_DAYS", default=
 COMPLIANCE_SAFETY_STATEMENT = config("COMPLIANCE_SAFETY_STATEMENT", default=(
     "Community rules R1, R2, R5 and R6 protect adults and children from harmful content. Reports on these rules are urgent; "
     "every decision is made by a person; removed content is labelled with the rule and can be appealed."))
+
+# --------------------------------------------------------------------------
+# Security and privacy (spec 14). Contacts are shown on /privacy and /security; blank shows "not set".
+# --------------------------------------------------------------------------
+PRIVACY_CONTACT_EMAIL = config("PRIVACY_CONTACT_EMAIL", default="")
+SECURITY_CONTACT_EMAIL = config("SECURITY_CONTACT_EMAIL", default="")
+CONTROLLER_NAME = config("CONTROLLER_NAME", default="NDC — Data Protection Officer")  # spec 14 §15.1
+HOSTING_LOCATION = config("HOSTING_LOCATION", default="")  # spec 14 §15.6: blank = "to be confirmed"
+# Admin roles need two-step verification (Clerk custom session claim `mfa` = {{user.two_factor_enabled}}). On in production.
+ADMIN_MFA_REQUIRED = config("ADMIN_MFA_REQUIRED", default=False, cast=bool)
+# Sensitive actions need a factor verified within this many minutes (Clerk `fva` claim).
+REVERIFY_MINUTES = config("REVERIFY_MINUTES", default=10, cast=int)
+REVERIFICATION_REQUIRED = config("REVERIFICATION_REQUIRED", default=True, cast=bool)
+# Consent before political-opinion processing (spec 14 §3.2). Never turned off outside tests.
+PRIVACY_CONSENT_REQUIRED = config("PRIVACY_CONSENT_REQUIRED", default=True, cast=bool)  # off only for older live checks
+PRIVACY_REQUEST_DAYS = 30  # GAID 2025
+RECORD_RETENTION_DAYS = 6 * 365  # audit log, consents, privacy requests and incidents (spec 14 §15.7)
+ACCESS_REVIEW_DAYS = 90
+ADMIN_INACTIVE_DAYS = 60
+RESTORE_DRILL_MAX_DAYS = 100
+DATA_UPLOAD_MAX_MEMORY_SIZE = 12 * 1024 * 1024  # spec 14 §4.9
+CROSS_ORIGIN_RESOURCE_POLICY = config("CROSS_ORIGIN_RESOURCE_POLICY", default="same-site")

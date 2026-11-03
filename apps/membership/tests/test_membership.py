@@ -38,7 +38,7 @@ DETAILS = {"full_name": "Ada Nneka Obi", "sex": "female", "date_of_birth": "1990
 
 def mk_user(cid="user_m"):
     return User.objects.create_user(cid, email=f"{cid}@example.com", full_name="Ada Obi", phone_number="+2348031234567",
-                                    profile_completed_at=timezone.now())
+                                    profile_completed_at=timezone.now(), adult_confirmed_at=timezone.now())
 
 
 def mk_role(cid, role):

@@ -21,14 +21,15 @@ from .cards import Card, Stat, to_dict
 logger = logging.getLogger(__name__)
 
 # Order matters: cards appear in this order (spec 11 §4.2).
-SUMMARY_APPS = ["moderation", "news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts"]
-CARD_ORDER = ["reports_review", "reports_urgent", "appeals_waiting", "legal_due", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
-              "donations_review", "candidates_unpublished", "ban_failed"]
+SUMMARY_APPS = ["privacy", "moderation", "news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts"]
+CARD_ORDER = ["audit_chain_broken", "incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
+              "donations_review", "candidates_unpublished", "ban_failed", "access_review_due"]
 GROUPS = [("people", "People"), ("candidates", "Candidates and following"), ("content", "Content"), ("pvc", "PVC"),
           ("membership", "Membership"), ("donations", "Donations")]
-ADMIN_ROLES = {Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.MODERATOR}
+ADMIN_ROLES = {Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.MODERATOR,
+               Role.PRIVACY_OFFICER}
 CACHE_SECONDS = 30
-APP_LABELS = {"moderation": "Moderation", "news": "News", "posts": "Candidate posts", "pvc": "PVC checks", "membership": "Membership", "donations": "Donations",
+APP_LABELS = {"privacy": "Privacy and security", "moderation": "Moderation", "news": "News", "posts": "Candidate posts", "pvc": "PVC checks", "membership": "Membership", "donations": "Donations",
               "candidates": "Candidates", "follows": "Following", "accounts": "Accounts"}
 
 
@@ -58,6 +59,8 @@ def admin_areas(user) -> list[str]:
         areas.append("moderation")  # spec 13 §4.9
     if has_role(user, Role.NEWS_REVIEWER):
         areas.append("news")
+    if has_role(user, Role.PRIVACY_OFFICER):
+        areas.append("privacy")  # spec 14 §4.13 (implied by system admin)
     if sysadmin:
         areas += ["announcements", "posts", "team", "audit"]
     return areas
@@ -148,6 +151,22 @@ def readiness(now):
     h = search_health()  # spec 12 §6.6: entries vs public items, within 1%
     out.append(_item("search", "Search index", "ready" if h["ok"] else "warning",
                      f"{h['entries']} of {h['public']} public items" + ("" if h["ok"] else " · run rebuild_search")))
+    from apps.privacy import checks as sec
+
+    words = {"PASS": "ready", "WARN": "warning", "FAIL": "error"}
+    memo = {}
+    audit_state, audit_words = sec.audit_state(now, memo)
+    restore_state, restore_words = sec.restore_state(now, memo)
+    for name, state in sec.run(now, memo):
+        if name == "Audit log chain intact":
+            out.append(_item("security", audit_words, words[audit_state]))
+        elif name == "Restore test within 100 days":
+            out.append(_item("security", restore_words, words[restore_state]))
+        elif name == "Admin two-step verification claim configured" and state != "PASS":
+            out.append(_item("security", "Admin two-step verification: claim missing" if state == "FAIL" else
+                             "Admin two-step verification: no admin sign-in yet", words[state]))
+        else:
+            out.append(_item("security", name, words[state]))
     return {"items": out, "blackouts": [_blackout_payload(w, now) for w in blackouts.windows()]}
 
 

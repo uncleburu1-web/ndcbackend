@@ -115,14 +115,14 @@ def notify_moderation(user, kind: str, *, case=None, appeal=None, decision=""):
 
 def visible(user):
     """Announcements only while their article is public; decisions about your own requests always."""
-    from .models import MODERATION_KINDS
+    from .models import MODERATION_KINDS, PRIVACY_KINDS
 
     return (Notification.objects.filter(recipient=user)
-            .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION, *MODERATION_KINDS])
+            .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION, *MODERATION_KINDS, *PRIVACY_KINDS])
                     | Q(kind=Kind.ANNOUNCEMENT, article__status="successful")
                     | Q(kind=Kind.CANDIDATE_POST, candidate_post__status="published", candidate_post__candidate__status="published",
                         candidate_post__candidate__verified_at__isnull=False))
-            .select_related("article", "candidate_post__candidate", "case", "appeal__case"))
+            .select_related("article", "candidate_post__candidate", "case", "appeal__case", "data_request", "incident"))
 
 
 def unread_count(user) -> int:

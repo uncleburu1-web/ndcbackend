@@ -45,6 +45,11 @@ def item(n, request=None):
                        "rule": case.rule, "rule_title": rule_title(case.rule) if case.rule else ""}
     if n.appeal_id:
         out["appeal"] = {"id": n.appeal.id, "status": n.appeal.status, "reason": n.appeal.decision_reason}
+    if n.data_request_id:  # spec 14 §4.4: reference and status only; the update itself is on Your data
+        r = n.data_request
+        out["privacy_request"] = {"id": str(r.pk), "reference": r.reference, "status": r.status, "status_label": r.get_status_display()}
+    if n.incident_id:  # the officer's notice text, never the internal incident record
+        out["security_notice"] = {"reference": n.incident.reference, "text": n.incident.notice_text}
     return out
 
 

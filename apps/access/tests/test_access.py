@@ -104,6 +104,8 @@ class PermissionClassTests(TestCase):
         from django.utils import timezone
 
         u.profile_completed_at = timezone.now()
+        self.assertFalse(self.check(IsProfileComplete, u))  # spec 14 §4.3
+        u.adult_confirmed_at = timezone.now()
         self.assertTrue(self.check(IsProfileComplete, u))
 
     def test_has_role_reads_scope_from_url(self):

@@ -21,6 +21,7 @@ class Role(models.TextChoices):
     MEMBERSHIP_OFFICER = "membership_officer", "Membership officer"
     FINANCE_OFFICER = "finance_officer", "Finance officer"  # spec 05: donation records + exports only
     PVC_OFFICER = "pvc_officer", "PVC officer"  # spec 08: the PVC check queue only
+    PRIVACY_OFFICER = "privacy_officer", "Privacy officer"  # spec 14: the DPO and helpers
 
 
 class ScopeType(models.TextChoices):
@@ -37,11 +38,13 @@ ALLOWED_SCOPES: dict[str, set[str]] = {
     Role.MEMBERSHIP_OFFICER: {ScopeType.GLOBAL},
     Role.FINANCE_OFFICER: {ScopeType.GLOBAL},
     Role.PVC_OFFICER: {ScopeType.GLOBAL},
+    Role.PRIVACY_OFFICER: {ScopeType.GLOBAL},
 }
 
 # system_admin passes these checks too. It does NOT imply `candidate`:
 # an admin doesn't publish as a candidate.
-IMPLIED_BY_SYSTEM_ADMIN = {Role.MODERATOR, Role.NEWS_REVIEWER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.PVC_OFFICER}
+IMPLIED_BY_SYSTEM_ADMIN = {Role.MODERATOR, Role.NEWS_REVIEWER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.PVC_OFFICER,
+                           Role.PRIVACY_OFFICER}  # spec 14 §15.2: implied for now; a named DPO is better
 
 
 class RoleAssignment(TimeStampedModel):

@@ -105,3 +105,58 @@ class TeamRevokeView(AdminView):
             raise role_error(exc) from exc
         a.refresh_from_db()
         return Response(assignment_payload(a, request.user))
+
+
+# --------------------------------------------------------------------------
+# Access review (spec 14 §4.6)
+# --------------------------------------------------------------------------
+def review_rows(viewer):
+    from django.conf import settings as dj
+    from django.utils import timezone
+
+    now = timezone.now()
+    rows = []
+    for a in services.team_list():
+        if a.role == Role.CANDIDATE:
+            continue
+        u = a.user
+        inactive = u.last_seen_at is None or (now - u.last_seen_at).days >= dj.ADMIN_INACTIVE_DAYS
+        rows.append({**assignment_payload(a, viewer), "last_seen_at": u.last_seen_at, "mfa_enabled": u.mfa_enabled, "inactive": inactive})
+    return rows
+
+
+def review_status():
+    from django.utils import timezone
+
+    from apps.privacy.models import AccessReview
+
+    last = AccessReview.objects.order_by("-completed_at").first()
+    from apps.privacy.dashboard import access_review_due
+
+    due = access_review_due(timezone.now())
+    return {"last_review": {"completed_at": last.completed_at, "by": last.completed_by.email if last and last.completed_by else None,
+                            "kept": last.kept, "revoked": last.revoked} if last else None, "due": due}
+
+
+class TeamReviewView(AdminView):
+    permission_classes = [IsSystemAdmin]
+
+    def get_throttles(self):
+        return [AdminWriteThrottle()] if self.request.method == "POST" else [AdminReadThrottle()]
+
+    def get(self, request):
+        return Response({**review_status(), "results": review_rows(request.user)})
+
+    def post(self, request):
+        from apps.audit.models import AuditLog
+        from apps.audit.services import record
+        from apps.privacy.models import AccessReview
+
+        try:
+            kept, revoked = int(request.data.get("kept", 0)), int(request.data.get("revoked", 0))
+        except (TypeError, ValueError):
+            kept, revoked = 0, 0
+        r = AccessReview.objects.create(completed_by=request.user, kept=max(0, kept), revoked=max(0, revoked),
+                                        notes=str(request.data.get("notes", "") or "")[:1000])
+        record(AuditLog.Action.SECURITY_ACCESS_REVIEW_COMPLETED, target=r, actor=request.user, request=request, kept=r.kept, revoked=r.revoked)
+        return Response(review_status(), status=status.HTTP_201_CREATED)

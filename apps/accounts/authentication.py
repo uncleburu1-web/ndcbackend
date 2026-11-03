@@ -40,6 +40,9 @@ class ClerkSessionAuthentication(BaseAuthentication):
         user = get_or_create_for_session(session.clerk_user_id)
         if not user.is_active:
             raise AccountDeactivated()
+        from apps.access.security import enforce
+
+        enforce(request, user, session.claims)  # spec 14: admin two-step verification and reverification
         return (user, session)
 
     def authenticate_header(self, request):

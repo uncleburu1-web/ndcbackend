@@ -67,6 +67,14 @@ def api_exception_handler(exc, context):
             code, message = "not_authenticated", "Sign in to continue."
 
     response.data = {"error": {"status": response.status_code, "code": code, "message": message, "fields": fields}}
+    request = context.get("request")
+    if response.status_code == 403 and request is not None and request.path.startswith("/api/v1/admin/"):
+        from apps.access.security import note_admin_denied
+
+        try:
+            note_admin_denied(request)
+        except Exception:  # pragma: no cover - never break an error response
+            logger.exception("Couldn't count a denied admin request")
     extra = getattr(exc, "extra", None)  # e.g. {"until": …} for publishing_paused (spec 07 §7.6)
     if isinstance(extra, dict):
         response.data["error"].update({k: v for k, v in extra.items() if k not in response.data["error"]})

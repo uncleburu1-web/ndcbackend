@@ -96,6 +96,7 @@ def mark_deleted(clerk_user_id: str) -> Optional[User]:
         user.full_name = ""
         user.phone_number = ""
         user.home_state = ""
+        user.last_seen_at, user.mfa_enabled = None, None  # spec 14 §10
         user.is_active = False
         user.deactivated_at = user.deactivated_at or now
         user.clerk_deleted_at = now
@@ -124,13 +125,17 @@ def mark_deleted(clerk_user_id: str) -> Optional[User]:
         from apps.news.services import erase_for_deleted_user as erase_news
 
         news_erased = erase_news(user)
+        # Privacy requests keep what was asked, detached from the account (spec 14 §10). Consents stay on the anonymised row.
+        from apps.privacy.models import DataRequest
+
+        DataRequest.objects.filter(user=user).update(user=None)
     record(AuditLog.Action.USER_DELETED, target=user, actor_label="clerk:webhook", roles_revoked=roles_revoked,
            follows_removed=follows_removed, donations_anonymised=donations_anonymised, membership_erased=membership_erased,
            pvc_erased=pvc_erased, news_erased=news_erased)
     return user
 
 
-def update_profile(user: User, *, full_name=None, phone_number=None, home_state=None, request=None) -> bool:
+def update_profile(user: User, *, full_name=None, phone_number=None, home_state=None, adult_confirmed=None, request=None) -> bool:
     """
     Apply validated profile fields. Returns True exactly once: the first time the
     profile becomes complete (spec §6.3 `just_completed`).
@@ -148,12 +153,16 @@ def update_profile(user: User, *, full_name=None, phone_number=None, home_state=
         if pref_changed:
             user.home_state = home_state  # a private preference (spec 12 §4.5): saved, not audited
 
-        just_completed = False
-        if user.profile_completed_at is None and user.full_name and user.phone_number:
+        was_complete = user.profile_complete
+        adult_changed = bool(adult_confirmed) and user.adult_confirmed_at is None
+        if adult_changed:
+            user.adult_confirmed_at = timezone.now()  # spec 14 §4.3: "I'm 18 or older"
+        details_now = user.profile_completed_at is None and bool(user.full_name and user.phone_number)
+        if details_now:
             user.profile_completed_at = timezone.now()
-            just_completed = True
+        just_completed = not was_complete and user.profile_complete
 
-        if changed or just_completed or pref_changed:
+        if changed or details_now or pref_changed or adult_changed:
             user.save()
 
     if just_completed:

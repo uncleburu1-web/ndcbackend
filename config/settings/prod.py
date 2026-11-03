@@ -29,5 +29,8 @@ SECURE_HSTS_SECONDS = 60 * 60 * 24 * 365
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_REFERRER_POLICY = "same-origin"
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"  # spec 14 §4.9
 X_FRAME_OPTIONS = "DENY"
+
+# Spec 14 §3.4: every admin role uses two-step verification in production (needs Clerk Pro + the `mfa` session claim).
+ADMIN_MFA_REQUIRED = config("ADMIN_MFA_REQUIRED", default=True, cast=bool)

@@ -157,7 +157,8 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - Every scheduled command records a `JobRun` (shown under Background jobs; "Overdue" when it hasn't run in time). Suggested schedule:
   - every 15 minutes: `sweep_payments` (or the alias `sweep_donations`) and `moderation_tick`;
   - daily: `check_donations`, `prune_pvc`, `prune_news`, `prune_notifications`, `prune_posts`, `prune_moderation`;
-  - weekly: `prune_jobruns` (job records older than 90 days).
+  - hourly: `privacy_tick`;
+  - weekly: `prune_jobruns` (job records older than 90 days), `verify_audit`, `prune_audit`.
 
 ## Search (spec 12)
 
@@ -177,6 +178,22 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **Settings:** `MODERATION_LEGAL_EMAIL` (shown on `/rules` for agencies; NDCConnect records acknowledgements, it doesn't send them), `COPYRIGHT_COUNTER_NOTICE_DAYS` (default 10, pending a lawyer's confirmation), `COMPLIANCE_SAFETY_STATEMENT`.
 - **NITDA annual report:** `/admin/moderation/compliance` shows every figure for a year (Lagos time) with its definition; "Download CSV" is audited and holds no personal data. `prune_moderation` freezes a year's figures before it deletes old cases.
 - **Schedule:** `moderation_tick` every 15 minutes (releases stale claims, burst flags, copyright windows); `prune_moderation` daily (closed cases, their reports and appeals 1 year after closing).
+
+## Security and privacy (spec 14)
+
+- **Data register** (`apps/privacy/register.py`): every category of personal data, its purpose, lawful basis (NDPA 2023), who sees it, retention and the job that enforces it. `/api/v1/privacy/` (and the web app's `/privacy`) is generated from it. A test fails when a model isn't in the register or in `NOT_PERSONAL` with a reason. Wording ships marked draft (`PRIVACY_DRAFT`) until the DPO and legal team sign it off.
+- **Consent** (`apps/privacy/consent.py`): following candidates, membership applications, PVC checks and the verified-voter badge each need a `ConsentRecord` for the purpose's current version (403 `consent_required` with the text; the web app shows a dialog and retries). Withdrawing from Your data undoes the processing at once. Records from before this unit were migrated as `before_records`.
+- **18+:** a profile is complete only once `adult_confirmed_at` is set (`PATCH /me {"adult_confirmed": true}`).
+- **Your data** (`/account/privacy`): download (`POST /me/data-export/`, a ZIP built in memory and streamed, 3 a day), consents, privacy requests (`PRV-…`, 30-day clock paused while waiting for the person), and self-service deletion (`POST /me/delete/`, deletes the user in Clerk, then erases at once).
+- **Admin two-step verification:** in the Clerk dashboard, (1) turn on multi-factor (Pro plan since Feb 2026; authenticator app and passkeys, SMS only as a backup) and (2) add the custom session claim `"mfa": "{{user.two_factor_enabled}}"` under Sessions → Customize session token. With `ADMIN_MFA_REQUIRED` (on by default in production) every `/api/v1/admin/` request from an admin role needs `mfa: true` (403 `mfa_required`).
+- **Reverification:** reveals (VIN, NIN, phone, member photo, legal attachments), exports, role grants/revokes, deactivation and incident close/notice need a second factor verified within `REVERIFY_MINUTES` (10), read from Clerk's `fva` claim; the error uses Clerk's reverification shape so the web app's `useReverification()` prompts and retries. Your own download and deletion need any factor within 10 minutes. The table is `apps/access/security.py`.
+- **Incidents** (`/admin/privacy/incidents`, privacy officers and system admins): NDPC (72 h from awareness, NDPA s. 40) and ngCERT (72 h from detection, Cybercrimes (Amendment) Act 2024 s. 21) clocks, notification records, in-app security notices, and the breach register CSV. Nothing is sent automatically.
+- **Audit log** is hash-chained (SHA-256, `seq`/`prev_hash`/`hash`). `verify_audit` checks it; `prune_audit` removes entries and privacy records older than 6 years and keeps an anchor.
+- **Access review:** every 90 days (`/admin/team/review`); holders inactive 60 days are flagged.
+- **Settings:** `PRIVACY_CONTACT_EMAIL`, `SECURITY_CONTACT_EMAIL`, `CONTROLLER_NAME`, `HOSTING_LOCATION`, `ADMIN_MFA_REQUIRED`, `REVERIFY_MINUTES`, `CROSS_ORIGIN_RESOURCE_POLICY` (`same-site`; `cross-origin` for split domains). Production `DATABASE_URL` must end in `?sslmode=require` (or `verify-full`).
+- **`python manage.py check_security`** prints PASS/FAIL/WARN and a name per check (never values) and exits 1 on any FAIL; the admin readiness panel shows the same under Security. CI (`.github/workflows/security.yml`) runs the tests, `check_security` with production settings and dummy values, `pip-audit` and gitleaks.
+- **Backups and restore tests:** see `docs/backups.md`; record each quarterly test with `python manage.py restore_drill --ok "notes"`.
+- **Schedule:** `privacy_tick` hourly; `verify_audit` and `prune_audit` weekly.
 
 ## Tests
 
