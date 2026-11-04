@@ -31,3 +31,32 @@ class JobRun(models.Model):
 
     def __str__(self):
         return f"{self.job} @ {self.started_at:%Y-%m-%d %H:%M}"
+
+
+class OutboxJob(models.Model):
+    """Spec 15 §9.3: work that must happen after a commit and must not be lost. Written in the caller's transaction.
+    `payload` holds IDs only — never personal data, tokens or keys."""
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        RUNNING = "running", "Running"
+        DONE = "done", "Done"
+        FAILED = "failed", "Failed"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    kind = models.CharField(max_length=32)
+    payload = models.JSONField(default=dict)
+    dedupe_key = models.CharField(max_length=128, blank=True)
+    request_id = models.CharField(max_length=64, blank=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    attempts = models.PositiveSmallIntegerField(default=0)
+    next_attempt_at = models.DateTimeField()
+    last_error = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["next_attempt_at"]
+        indexes = [models.Index(fields=["status", "next_attempt_at"], name="core_outbox_due_idx")]
+        constraints = [models.UniqueConstraint(fields=["dedupe_key"], condition=models.Q(status__in=["pending", "running"]) & ~models.Q(dedupe_key=""),
+                                               name="core_outbox_one_pending_per_key")]

@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.cache import add_never_cache_headers, patch_cache_control
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
@@ -171,16 +171,15 @@ class CampaignPostDetail(_Private):
 
 class CampaignPostImage(_Private):
     permission_classes = [IsSignedIn]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     throttle_classes = [WriteThrottle]
 
     def put(self, request, candidate_id, post_id):
+        from apps.media.http import upload_or_asset
+
         p = _campaign_post(request, candidate_id, post_id)
-        upload = request.FILES.get("image")
-        if upload is None:
-            raise ServiceError("Choose an image to upload.", code="validation_error", status_code=400)
-        confirmed = str(request.data.get("rights_confirmed", "")).lower() in ("true", "1", "on", "yes")
         try:
+            upload, confirmed = upload_or_asset(request, field="image", purpose="post_image", target_id=p.pk)
             p = services.set_image(p, request.user, upload, rights_confirmed=confirmed, request=request)
         except PhotoError as exc:
             return Response({"error": {"status": 400, "code": "invalid_photo", "message": str(exc), "fields": {"image": [str(exc)]}}}, status=400)

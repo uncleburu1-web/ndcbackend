@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres",  # search: SearchVector, trigram (spec 12)
     "rest_framework",
     "corsheaders",
+    "drf_spectacular",  # OpenAPI schema (spec 15 §3.2, §14)
     "apps.core",
     "apps.audit",
     "apps.accounts",
@@ -40,9 +41,12 @@ INSTALLED_APPS = [
     "apps.search",
     "apps.moderation",
     "apps.privacy",
+    "apps.integrations",  # spec 15: registry, HTTP client, webhook register
+    "apps.media",  # spec 15 §7: Cloudinary / local images
 ]
 
 MIDDLEWARE = [
+    "apps.core.requestid.RequestIdMiddleware",  # spec 15 §4.10: first, so every later log line carries the ID
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -89,6 +93,7 @@ REST_FRAMEWORK = {
     "UNAUTHENTICATED_USER": "django.contrib.auth.models.AnonymousUser",
     "EXCEPTION_HANDLER": "apps.core.exceptions.api_exception_handler",
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "DEFAULT_SCHEMA_CLASS": "apps.core.schema.NDCAutoSchema",  # spec 15 §14
     # 0 = throttle on REMOTE_ADDR. Set to the number of proxies in front of Django in production.
     "NUM_PROXIES": config("NUM_PROXIES", default=0, cast=int),
     "DEFAULT_THROTTLE_RATES": {
@@ -114,14 +119,68 @@ REST_FRAMEWORK = {
         "data_export": "3/day",  # spec 14 §4.4: per user
         "privacy_public": "10/hour",  # per user: privacy requests, consent changes, self-deletion
         "moderation_public": "5/hour",  # per user or IP: copyright notices, appeals and counter-notices (spec 13 §9)
+        "media_sign": "60/hour",  # per user: upload signatures (spec 15 §7.3)
+        "ready": "120/min",  # per IP: /ready/ (spec 15 §12.5)
     },
 }
+
+# --------------------------------------------------------------------------
+# OpenAPI (spec 15 §14). The schema is internal: system admins in production, anyone in development.
+# --------------------------------------------------------------------------
+SPECTACULAR_SETTINGS = {
+    "TITLE": "NDCConnect API",
+    "DESCRIPTION": "The NDCConnect web app's API (v1, additive changes only). Conventions: docs/api.md.",
+    "VERSION": "1.0.0",
+    "OAS_VERSION": "3.1.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SCHEMA_PATH_PREFIX": r"/api/v1",
+    "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_GENERATE_CHOICE_DESCRIPTION": False,
+    "DISABLE_ERRORS_AND_WARNINGS": False,
+    "SORT_OPERATIONS": False,
+    "ENUM_NAME_OVERRIDES": {"IntegrationStateEnum": ["ok", "failing", "unavailable", "not_configured", "not_in_use"],
+                            "NigerianStateEnum": "apps.candidates.reference.State",
+                            "NotificationKindEnum": "apps.notifications.models.Kind"},
+    "APPEND_COMPONENTS": {"securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "Clerk session JWT"}}},
+    "POSTPROCESSING_HOOKS": ["drf_spectacular.hooks.postprocess_schema_enums", "apps.core.schema.postprocess"],
+}
+
+# --------------------------------------------------------------------------
+# Shared cache (spec 15 §11.4). Rate limits, circuit breakers and pending uploads must be shared by every
+# worker, so production uses PostgreSQL's database cache (no new technology). `memory` is per process.
+# --------------------------------------------------------------------------
+CACHE_BACKEND = config("CACHE_BACKEND", default="memory")  # memory | database
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "ndc_cache",
+                      "OPTIONS": {"MAX_ENTRIES": 50_000, "CULL_FREQUENCY": 4}}
+          if CACHE_BACKEND == "database" else {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
+
+# Request logging (spec 15 §12.6)
+SLOW_REQUEST_MS = config("SLOW_REQUEST_MS", default=1500, cast=int)
+
+# --------------------------------------------------------------------------
+# Media (spec 15 §7). `cloudinary` in production; `local` keeps files under MEDIA_ROOT.
+# CLOUDINARY_API_SECRET is backend-only. The *_BASE values exist for the fake servers used in live checks.
+# --------------------------------------------------------------------------
+MEDIA_BACKEND = config("MEDIA_BACKEND", default="local")
+CLOUDINARY_CLOUD_NAME = config("CLOUDINARY_CLOUD_NAME", default="")
+CLOUDINARY_API_KEY = config("CLOUDINARY_API_KEY", default="")
+CLOUDINARY_API_SECRET = config("CLOUDINARY_API_SECRET", default="")
+CLOUDINARY_UPLOAD_PRESET = config("CLOUDINARY_UPLOAD_PRESET", default="ndcconnect_signed")
+CLOUDINARY_FOLDER = config("CLOUDINARY_FOLDER", default="ndcconnect/dev")
+CLOUDINARY_API_BASE = config("CLOUDINARY_API_BASE", default="https://api.cloudinary.com")
+CLOUDINARY_DELIVERY_BASE = config("CLOUDINARY_DELIVERY_BASE", default="https://res.cloudinary.com")
 
 # --------------------------------------------------------------------------
 # CORS — frontend origins (spec §10)
 # --------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="http://localhost:5173", cast=Csv())
 CORS_ALLOW_CREDENTIALS = False  # auth is a Bearer header, not cookies
+CORS_EXPOSE_HEADERS = ["X-Request-ID", "Retry-After", "Content-Disposition"]  # spec 15 §11.1
+# The web app sends its own X-Request-ID so a failure without a response still has a reference (spec 15 §4.10).
+from corsheaders.defaults import default_headers  # noqa: E402
+
+CORS_ALLOW_HEADERS = (*default_headers, "x-request-id")
+CORS_PREFLIGHT_MAX_AGE = 3600
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Africa/Lagos"
@@ -140,12 +199,15 @@ CANDIDATE_PHOTO_MIN_SIDE = 400
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"simple": {"format": "%(asctime)s %(levelname)s %(name)s: %(message)s"}},
+    "formatters": {"simple": {"format": "%(asctime)s %(levelname)s %(name)s [%(request_id)s]: %(message)s"},
+                   "json": {"()": "apps.core.requestid.JsonFormatter"}},
     "filters": {
+        "request_id": {"()": "apps.core.requestid.RequestIdFilter"},  # spec 15 §4.10
         "redact_pii": {"()": "apps.core.logging.RedactPII"},  # VIN/NIN never reach logs (spec 06 §9)
         "redact_query": {"()": "apps.core.logging.RedactSearchQuery"},  # search text never reaches logs (spec 12 §9)
     },
-    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "simple", "filters": ["redact_pii", "redact_query"]}},
+    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": config("LOG_FORMAT", default="text").replace("text", "simple"),
+                             "filters": ["request_id", "redact_pii", "redact_query"]}},
     "root": {"handlers": ["console"], "level": "INFO"},
     # Django's request and dev-server loggers don't propagate to root by default; route them through the same filters.
     "loggers": {
@@ -169,7 +231,9 @@ DONATIONS_ENABLED = config("DONATIONS_ENABLED", default=False, cast=bool)
 DONATIONS_COMPLIANCE_APPROVED = config("DONATIONS_COMPLIANCE_APPROVED", default=False, cast=bool)
 PAYMENT_PROVIDER = config("PAYMENT_PROVIDER", default="paystack")  # paystack | fake (fake: DEBUG/tests only)
 PAYSTACK_SECRET_KEY = config("PAYSTACK_SECRET_KEY", default="")
-PAYSTACK_API_BASE = "https://api.paystack.co"
+PAYSTACK_API_BASE = config("PAYSTACK_API_BASE", default="https://api.paystack.co")  # only the fake server in live checks overrides it
+# Optional Paystack webhook source allow-list (spec 15 §19.8: off by default; the signature is the control).
+PAYSTACK_WEBHOOK_IPS = config("PAYSTACK_WEBHOOK_IPS", default="", cast=Csv())
 PAYSTACK_CHANNELS = config("PAYSTACK_CHANNELS", default="card,bank,ussd,bank_transfer", cast=Csv())
 FAKE_PAYMENTS_SECRET = config("FAKE_PAYMENTS_SECRET", default="fake-payments-dev-secret")
 DONATION_MIN_KOBO = config("DONATION_MIN_KOBO", default=500_00, cast=int)  # ₦500

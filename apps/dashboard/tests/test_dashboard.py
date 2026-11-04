@@ -16,7 +16,8 @@ from rest_framework.test import APIClient, APITestCase
 
 from apps.access.models import Role, RoleAssignment
 from apps.access.services import RoleError, deactivate_user, grant_role, revoke_role
-from apps.accounts.models import ProcessedWebhook, User
+from apps.accounts.models import User
+from apps.integrations.models import WebhookReceipt
 from apps.audit.models import AuditLog
 from apps.audit.services import record
 from apps.candidates.models import Candidate
@@ -114,7 +115,7 @@ class OverviewAccessTests(Base):
     def test_each_role_gets_exactly_its_sections(self):
         expect = {
             "sa": (["incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
-                    "donations_review", "candidates_unpublished", "ban_failed"],
+                    "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing"],
                    ["people", "candidates", "content", "pvc", "membership", "donations"], True),
             "news": (["reports_review", "reports_urgent", "appeals_waiting", "news_pending"], ["content"], False),
             "pvc": (["pvc_pending"], ["pvc"], False),
@@ -255,7 +256,7 @@ class ReadinessTests(Base):
         self.assertEqual(items[("donations", "DONATIONS_ENABLED")]["state"], "not_set")
         self.assertEqual(items[("inec", "INEC PVC portal link")]["state"], "ready")
         self.assertEqual(items[("signin", "Last Clerk webhook")]["state"], "warning")
-        ProcessedWebhook.objects.create(svix_id="msg_1", event_type="user.created")
+        WebhookReceipt.objects.create(provider="clerk", event_id="msg_1", event_type="user.created")
         items = {(i["group"], i["label"]): i for i in overview(self.sa).data["readiness"]["items"]}
         self.assertEqual(items[("signin", "Last Clerk webhook")]["state"], "ready")
 
@@ -518,6 +519,6 @@ class MeAreasTests(Base):
         self.assertEqual(admin_areas(self.mem), ["overview", "pvc", "membership"])
         self.assertEqual(admin_areas(self.fin), ["overview", "donations"])
         self.assertEqual(admin_areas(self.sa), ["overview", "candidates", "donations", "pvc", "membership", "moderation", "news", "privacy",
-                                                "announcements", "posts", "team", "audit"])
+                                                "announcements", "posts", "team", "audit", "integrations"])
         r = client(self.news).get(reverse("me"))
         self.assertEqual(r.data["admin_areas"], ["overview", "moderation", "news"])

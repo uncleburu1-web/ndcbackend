@@ -20,10 +20,14 @@ class Kind(models.TextChoices):
     # spec 14: security notices and privacy request updates
     SECURITY_NOTICE = "security_notice", "Security notice"
     PRIVACY_REQUEST_UPDATE = "privacy_request_update", "Privacy request update"
+    # spec 15 §9.2
+    MEMBERSHIP_DECISION = "membership_decision", "Membership decision"
+    DONATION_RECEIPT = "donation_receipt", "Donation receipt"
 
 
 MODERATION_KINDS = ["report_outcome", "content_removed", "account_warning", "submissions_paused", "appeal_decision"]
 PRIVACY_KINDS = ["security_notice", "privacy_request_update"]
+OWN_RECORD_KINDS = ["membership_decision", "donation_receipt"]  # spec 15: about the person's own record; no amounts in the row
 
 
 class Notification(models.Model):
@@ -36,6 +40,8 @@ class Notification(models.Model):
     appeal = models.ForeignKey("moderation.Appeal", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
     data_request = models.ForeignKey("privacy.DataRequest", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
     incident = models.ForeignKey("privacy.Incident", null=True, blank=True, on_delete=models.CASCADE, related_name="notifications")
+    membership = models.ForeignKey("membership.Membership", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    donation = models.ForeignKey("donations.Donation", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     decision = models.CharField(max_length=10, blank=True)  # approved | rejected (news) · verified | rejected (pvc)
     created_at = models.DateTimeField(auto_now_add=True)
     read_at = models.DateTimeField(null=True, blank=True)
@@ -47,12 +53,15 @@ class Notification(models.Model):
                                     condition=Q(kind="announcement")),
             models.UniqueConstraint(fields=["recipient", "candidate_post"], name="notif_one_candidate_post",
                                     condition=Q(kind="candidate_post")),
+            models.UniqueConstraint(fields=["recipient", "donation"], name="notif_one_donation_receipt",
+                                    condition=Q(kind="donation_receipt")),
             models.CheckConstraint(name="notif_target_by_kind",
                                    condition=(Q(kind__in=["announcement", "news_decision"], article__isnull=False, candidate_post__isnull=True)
                                               | Q(kind="pvc_decision", article__isnull=True, candidate_post__isnull=True)
                                               | Q(kind="candidate_post", candidate_post__isnull=False, article__isnull=True)
                                               | Q(kind__in=MODERATION_KINDS, article__isnull=True, candidate_post__isnull=True)
-                                              | Q(kind__in=PRIVACY_KINDS, article__isnull=True, candidate_post__isnull=True))),
+                                              | Q(kind__in=PRIVACY_KINDS, article__isnull=True, candidate_post__isnull=True)
+                                              | Q(kind__in=OWN_RECORD_KINDS, article__isnull=True, candidate_post__isnull=True))),
         ]
         indexes = [
             models.Index(fields=["recipient", "-created_at"], name="notif_recipient_idx"),

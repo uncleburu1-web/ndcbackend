@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle, SimpleRateThrottle, UserRateThrottle
 from rest_framework.views import APIView
 
+from apps.core import filters as F
 from apps.access.models import Role
 from apps.access.permissions import HasRole, IsProfileComplete, IsSignedIn, IsSystemAdmin
 from apps.audit.services import client_ip
@@ -89,12 +90,11 @@ def _image_errors(fn):
                            code="storage_unavailable", status_code=503) from exc
 
 
-def _upload(request):
-    upload = request.FILES.get("image")
-    if upload is None:
-        raise ServiceError("Choose an image to upload.", code="validation_error", status_code=400)
-    confirmed = str(request.data.get("rights_confirmed", "")).lower() in ("true", "1", "on", "yes")
-    return upload, confirmed
+def _upload(request, article):
+    from apps.media.http import upload_or_asset
+
+    purpose = "announcement_image" if article.source == "official" else "news_image"
+    return upload_or_asset(request, field="image", purpose=purpose, target_id=article.pk)
 
 
 # ------------------------------------------------------------------ public
@@ -107,10 +107,8 @@ class NewsList(APIView):
         from apps.posts.models import CandidatePost
         from apps.posts.serializers import FeedPostSerializer
 
-        source = request.query_params.get("source", "")
-        state = request.query_params.get("state", "")
-        if state and state not in State.values:
-            state = ""
+        source = F.choice(request, "source", ["official", "community", "candidate"])
+        state = F.choice(request, "state", State.values)
         try:
             page = max(1, int(request.query_params.get("page", 1)))
         except ValueError:
@@ -200,14 +198,18 @@ class MyNewsDetail(_Private):
 
 class MyNewsImage(_Private):
     permission_classes = [IsProfileComplete]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     throttle_classes = [WriteThrottle]
 
     def put(self, request, pk):
         a = _mine(request, pk)
-        upload, confirmed = _upload(request)
-        return _image_errors(lambda: Response(MyArticleSerializer(
-            services.set_image(a, request.user, upload, rights_confirmed=confirmed, request=request), context={"request": request}).data))
+
+        def run():
+            upload, confirmed = _upload(request, a)
+            return Response(MyArticleSerializer(services.set_image(a, request.user, upload, rights_confirmed=confirmed, request=request),
+                                                context={"request": request}).data)
+
+        return _image_errors(run)
 
     def delete(self, request, pk):
         a = services.remove_image(_mine(request, pk), request.user, request=request)
@@ -346,13 +348,17 @@ class AdminAnnouncementDetail(_Private):
 
 class AnnouncementImage(_Private):
     permission_classes = [IsSystemAdmin]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def put(self, request, pk):
         a = _official(pk)
-        upload, confirmed = _upload(request)
-        return _image_errors(lambda: (services.set_image(a, request.user, upload, rights_confirmed=confirmed, request=request),
-                                      Response(AdminArticleDetailSerializer(_official(pk), context={"request": request}).data))[1])
+
+        def run():
+            upload, confirmed = _upload(request, a)
+            services.set_image(a, request.user, upload, rights_confirmed=confirmed, request=request)
+            return Response(AdminArticleDetailSerializer(_official(pk), context={"request": request}).data)
+
+        return _image_errors(run)
 
     def delete(self, request, pk):
         services.remove_image(_official(pk), request.user, request=request)

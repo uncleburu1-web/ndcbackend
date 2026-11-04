@@ -15,6 +15,8 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 
+from apps.candidates.reference import State
+from apps.core import filters as F
 from apps.access.models import Role
 from apps.access.permissions import HasRole, IsProfileComplete, IsSignedIn, IsSystemAdmin
 from apps.audit.models import AuditLog
@@ -23,7 +25,7 @@ from apps.core.exceptions import ServiceError
 from apps.donations.views import csv_safe
 
 from . import services
-from .models import Membership, MembershipPayment, MembershipStatus as M
+from .models import Membership, MembershipPayment, MembershipStatus as M, PaymentStatus
 from .serializers import AdminMembershipSerializer, AdminPaymentRowSerializer, DetailsSerializer, MyMembershipSerializer
 
 OfficerOnly = HasRole(Role.MEMBERSHIP_OFFICER)
@@ -251,8 +253,9 @@ class AdminMembershipPayments(_Private):
 
     def get(self, request):
         qs = MembershipPayment.objects.select_related("membership").order_by("-created_at")
-        if request.query_params.get("status"):
-            qs = qs.filter(status=request.query_params["status"])
+        status = F.choice(request, "status", PaymentStatus.values)
+        if status:
+            qs = qs.filter(status=status)
         paginator = Page20()
         page = paginator.paginate_queryset(qs, request, view=self)
         return paginator.get_paginated_response(AdminPaymentRowSerializer(page, many=True).data)
@@ -269,7 +272,7 @@ class AdminRegisterCsv(_Private):
     permission_classes = [OfficerOnly]
 
     def get(self, request):
-        state = request.query_params.get("state", "")
+        state = F.choice(request, "state", State.values)
         qs = services.register_queryset(state)
         record(AuditLog.Action.MEMBERSHIP_REGISTER_EXPORTED, actor=request.user, request=request, kind="csv", state=state,
                rows=qs.count())
@@ -289,7 +292,7 @@ class AdminRegisterPhotos(_Private):
     permission_classes = [OfficerOnly]
 
     def get(self, request):
-        state = request.query_params.get("state", "")
+        state = F.choice(request, "state", State.values)
         qs = services.register_queryset(state).exclude(photo="")
         record(AuditLog.Action.MEMBERSHIP_REGISTER_EXPORTED, actor=request.user, request=request, kind="photos", state=state,
                rows=qs.count())

@@ -106,6 +106,8 @@ ACTIONS: dict[str, tuple[str, tuple[str, ...]]] = {
     A.SECURITY_ACCESS_REVIEW_COMPLETED: ("finished an access review", ("kept", "revoked")),
     A.SECURITY_ADMIN_ACCESS_DENIED: ("was refused admin access repeatedly", ("count", "window")),
     A.SECURITY_RESTORE_DRILL: ("recorded a restore test", ("notes",)),
+    A.SECURITY_WEBHOOK_SIGNATURE_FAILURES: ("saw repeated webhook signature failures", ("provider", "count", "window")),
+    A.INTEGRATION_JOB_RETRIED: ("retried a background task", ("kind", "attempts")),
 }
 
 # area → (words, action prefixes)

@@ -1,0 +1,88 @@
+"""The error-code catalogue (spec 15 §4.5). Every `code` an API error can carry is listed here with its usual HTTP
+status and meaning. A test scans the code base and fails on any code missing from this list; the OpenAPI schema
+publishes it (`x-error-codes`) and docs/api.md documents it. `web` marks codes the web app handles specially."""
+
+# code: (usual status, meaning, web app has special handling)
+CATALOGUE: dict[str, tuple[int, str, bool]] = {
+    # generic (DRF and the envelope)
+    "validation_error": (400, "The request had invalid fields; see `fields`.", True),
+    "parse_error": (400, "The request body isn't valid JSON or form data.", False),
+    "not_authenticated": (401, "No valid Clerk session token.", True),
+    "permission_denied": (403, "Signed in, but not allowed to do this.", False),
+    "not_found": (404, "No such item, or not visible to you.", False),
+    "method_not_allowed": (405, "That HTTP method isn't supported here.", False),
+    "not_acceptable": (406, "The requested response format isn't available.", False),
+    "unsupported_media_type": (415, "Send JSON (or multipart for uploads).", False),
+    "throttled": (429, "Too many requests; see `retry_after` and the Retry-After header.", True),
+    "server_error": (500, "Unexpected error; see `request_id`.", True),
+    "error": (400, "Generic fallback when no specific code applies.", False),
+    # accounts and access (02, 11, 14)
+    "account_deactivated": (403, "The account was deactivated by an administrator.", True),
+    "auth_unavailable": (503, "Sign-in can't be checked right now (Clerk keys or Clerk unavailable).", True),
+    "mfa_required": (403, "Admin endpoints need two-step verification.", True),
+    "reverification_required": (403, "Confirm it's you; carries Clerk's reverification hint.", True),
+    "invalid_name": (400, "The full name isn't acceptable.", False),
+    "invalid_phone": (400, "The phone number isn't a valid Nigerian number.", False),
+    "under_18": (400, "NDCConnect and party membership are for people aged 18 and over.", False),
+    "profile_incomplete": (403, "Finish your profile first.", False),
+    "invalid_role": (400, "That role or scope doesn't exist.", False),
+    "role_error": (400, "The role change isn't allowed.", False),
+    "role_exists": (409, "The person already holds that role.", False),
+    "self_change": (403, "You can't change your own roles or deactivate yourself.", False),
+    "last_system_admin": (409, "There must always be at least one system administrator.", False),
+    "user_not_found": (404, "No account with that email or ID.", False),
+    "user_inactive": (409, "The account is deactivated.", False),
+    # candidates, follows, search (03, 04, 12)
+    "candidate_not_published": (409, "The candidate isn't published.", False),
+    "candidate_unavailable": (400, "That candidate can't be chosen here.", False),
+    "photo_invalid": (400, "The image isn't a usable JPEG, PNG or WebP.", False),
+    "invalid_photo": (400, "The image isn't a usable JPEG, PNG or WebP.", False),
+    "storage_unavailable": (503, "Files can't be stored right now.", False),
+    "media_unavailable": (503, "The image service is unavailable right now.", True),
+    "link_failed": (400, "The account couldn't be linked.", False),
+    "query_too_short": (400, "Search needs at least 2 characters.", False),
+    "query_too_long": (400, "Search text is too long.", False),
+    "search_unavailable": (503, "Search is unavailable right now.", False),
+    "invalid_filter": (400, "A filter or ordering value isn't allowed.", False),
+    "too_long": (400, "A text field is too long.", False),
+    # donations, payments, membership, PVC (05, 06, 08)
+    "donations_unavailable": (503, "Donations aren't open.", False),
+    "membership_unavailable": (503, "Membership isn't open.", False),
+    "amount_out_of_range": (400, "The amount is below the minimum or above the limit.", False),
+    "over_limit": (400, "The donation would pass a legal or configured limit.", False),
+    "payment_in_progress": (409, "A payment is already being processed.", False),
+    "payment_provider_unavailable": (502, "The payment provider can't be reached; nothing was charged.", True),
+    "reference_unavailable": (503, "A unique reference couldn't be created; try again.", False),
+    "application_incomplete": (400, "The membership application is missing details.", False),
+    "pvc_not_verified": (403, "A verified PVC is needed first.", False),
+    "invalid_signature": (400, "A webhook signature didn't verify.", False),
+    "invalid_payload": (400, "A webhook body isn't a valid provider event.", False),
+    "webhook_not_configured": (503, "The webhook's signing secret isn't set.", False),
+    # news, posts, moderation (07, 09, 13)
+    "source_required": (400, "Official items need a source.", False),
+    "too_many_pending": (409, "You already have the most pending submissions allowed.", False),
+    "too_many_pinned": (409, "Only 3 announcements can be pinned.", False),
+    "publishing_paused": (403, "Publishing is paused for the election blackout; see `until`.", True),
+    "posting_paused": (403, "Candidate posting is paused for the blackout; see `until`.", True),
+    "submissions_paused": (403, "Your community news submissions are paused; see `until`.", True),
+    "removed": (410, "Removed by NDCConnect under a rule; see `rule`.", True),
+    "rule_required": (400, "A removal must cite a rule.", False),
+    "self_review": (403, "Nobody reviews their own submission.", False),
+    "self_moderation": (403, "Nobody moderates their own content or a linked candidate.", False),
+    "same_decider": (403, "An appeal is decided by someone else.", False),
+    "not_your_case": (403, "Another moderator holds this case.", False),
+    "appeal_exists": (409, "An appeal was already made.", False),
+    "appeal_window_closed": (409, "The appeal window has closed.", False),
+    "legal_basis_required": (400, "Agency notices need a legal basis.", False),
+    "invalid_transition": (409, "The item has already moved to another state.", False),
+    # privacy and security (14)
+    "consent_required": (403, "Consent for this purpose is needed; carries `purpose`, `version`, `text`.", True),
+    "export_limit": (429, "Data downloads are limited to 3 a day.", False),
+    "export_unavailable": (503, "The data download couldn't be prepared.", False),
+    "notice_already_sent": (409, "A security notice was already sent for this incident version.", False),
+    "no_recipients": (400, "No accounts matched the notice audience.", False),
+}
+
+
+def status_for(code: str) -> int:
+    return CATALOGUE.get(code, (400, "", False))[0]

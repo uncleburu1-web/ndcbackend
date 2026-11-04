@@ -20,6 +20,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import SimpleRateThrottle
 from rest_framework.views import APIView
 
+from apps.core import filters as F
 from apps.access.models import Role
 from apps.access.permissions import IsSignedIn, IsSystemAdmin
 from apps.access.services import has_role, is_system_admin
@@ -402,7 +403,7 @@ class AdminAppeals(_Private):
     permission_classes = [IsModerationStaff]
 
     def get(self, request):
-        pending = request.query_params.get("status", "pending") == "pending"
+        pending = F.choice(request, "status", ["pending", "decided"], default="pending") == "pending"
         rows = [_appeal_row(a, request.user) for a in _appeals_for(request.user, pending_only=pending)]
         if not pending:
             rows = [r for r in rows if r["status"] != "pending"][::-1]
@@ -449,8 +450,9 @@ class AdminLegalNotices(_Private):
     def get(self, request):
         now = timezone.now()
         qs = LegalNotice.objects.all()
-        if request.query_params.get("status") in ("open", "closed"):
-            qs = qs.filter(status=request.query_params["status"])
+        status = F.choice(request, "status", ["open", "closed"])
+        if status:
+            qs = qs.filter(status=status)
         paginator = Page20()
         page = paginator.paginate_queryset(qs.order_by("status", "due_at", "-received_at"), request, view=self)
         return paginator.get_paginated_response([_notice_row(n, now) for n in page])

@@ -373,11 +373,14 @@ def _next_number(state: str) -> str:
     return f"NDC-{code}-{year}-{seq.last:06d}"
 
 
-def _activate(m: Membership, *, actor, note=""):
+def _activate(m: Membership, *, actor, note="", decision="activated"):
     """Caller holds the membership row lock."""
+    from apps.notifications.services import notify_membership
+
     _event(m, m.status, M.ACTIVE, actor, note)
     m.status, m.activated_at, m.membership_number = M.ACTIVE, timezone.now(), _next_number(m.state)
     record(AuditLog.Action.MEMBERSHIP_ACTIVATED, target=m, actor=actor, number=m.membership_number)
+    notify_membership(m, decision)  # spec 15 §9.2, in the same transaction
 
 
 def _has_paid(m) -> bool:
@@ -394,7 +397,7 @@ def approve(m: Membership, *, officer, request=None) -> Membership:
         if not pvc_verified(m.user):
             raise ServiceError("This applicant's PVC isn't verified.", code="pvc_not_verified", status_code=409)
         m.decided_by = officer
-        _activate(m, actor=officer, note="approved")
+        _activate(m, actor=officer, note="approved", decision="approved")
         m.save()
     record(AuditLog.Action.MEMBERSHIP_APPROVED, target=m, actor=officer, request=request)
     return m
@@ -410,6 +413,9 @@ def reject(m: Membership, *, officer, reason: str, request=None) -> Membership:
         _event(m, m.status, M.REJECTED, officer, reason)
         m.status, m.decided_by, m.decision_reason = M.REJECTED, officer, reason.strip()[:300]
         m.save()
+        from apps.notifications.services import notify_membership
+
+        notify_membership(m, "rejected")
     record(AuditLog.Action.MEMBERSHIP_REJECTED, target=m, actor=officer, request=request, reason=reason[:300],
            refund_due=refund_due(m))
     return m
@@ -425,6 +431,9 @@ def cancel(m: Membership, *, actor, reason: str, request=None) -> Membership:
         _event(m, m.status, M.CANCELLED, actor, reason)
         m.status, m.cancelled_at, m.cancelled_by, m.cancel_reason = M.CANCELLED, timezone.now(), actor, reason.strip()[:300]
         m.save()
+        from apps.notifications.services import notify_membership
+
+        notify_membership(m, "cancelled")
     record(AuditLog.Action.MEMBERSHIP_CANCELLED, target=m, actor=actor, request=request, reason=reason[:300])
     return m
 

@@ -32,6 +32,7 @@ class CandidatePost(models.Model):
     body = models.TextField(max_length=10_000)
     image = models.CharField(max_length=255, blank=True)
     image_thumb = models.CharField(max_length=255, blank=True)
+    image_asset = models.ForeignKey("media.MediaAsset", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")  # spec 15 §7.4
     image_width = models.PositiveIntegerField(null=True, blank=True)
     image_height = models.PositiveIntegerField(null=True, blank=True)
     status = models.CharField(max_length=10, choices=PostStatus.choices, default=PostStatus.PUBLISHED)

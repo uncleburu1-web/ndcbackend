@@ -21,16 +21,17 @@ from .cards import Card, Stat, to_dict
 logger = logging.getLogger(__name__)
 
 # Order matters: cards appear in this order (spec 11 §4.2).
-SUMMARY_APPS = ["privacy", "moderation", "news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts"]
+SUMMARY_APPS = ["privacy", "moderation", "news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts",
+                "integrations"]
 CARD_ORDER = ["audit_chain_broken", "incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
-              "donations_review", "candidates_unpublished", "ban_failed", "access_review_due"]
+              "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing", "access_review_due"]
 GROUPS = [("people", "People"), ("candidates", "Candidates and following"), ("content", "Content"), ("pvc", "PVC"),
           ("membership", "Membership"), ("donations", "Donations")]
 ADMIN_ROLES = {Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.MODERATOR,
                Role.PRIVACY_OFFICER}
 CACHE_SECONDS = 30
 APP_LABELS = {"privacy": "Privacy and security", "moderation": "Moderation", "news": "News", "posts": "Candidate posts", "pvc": "PVC checks", "membership": "Membership", "donations": "Donations",
-              "candidates": "Candidates", "follows": "Following", "accounts": "Accounts"}
+              "candidates": "Candidates", "follows": "Following", "accounts": "Accounts", "integrations": "Integrations"}
 
 
 def admin_roles(user) -> list[str]:
@@ -62,7 +63,7 @@ def admin_areas(user) -> list[str]:
     if has_role(user, Role.PRIVACY_OFFICER):
         areas.append("privacy")  # spec 14 §4.13 (implied by system admin)
     if sysadmin:
-        areas += ["announcements", "posts", "team", "audit"]
+        areas += ["announcements", "posts", "team", "audit", "integrations"]  # integrations: spec 15
     return areas
 
 
@@ -107,7 +108,6 @@ def _item(group, label, state, detail=""):
 
 def readiness(now):
     """Booleans and names only — never a setting's value (spec 11 §3, §4.2)."""
-    from apps.accounts.models import ProcessedWebhook
     from apps.donations.services import donations_open
     from apps.donations.services import gate_status as donation_gates
     from apps.membership.services import gate_status as membership_gates
@@ -124,7 +124,9 @@ def readiness(now):
     clerk_ok = bool(settings.CLERK_SECRET_KEY or settings.CLERK_JWT_KEY)
     out.append(_item("signin", "Clerk keys configured", "ready" if clerk_ok else "not_set"))
     out.append(_item("signin", "Clerk webhook signing secret", "ready" if settings.CLERK_WEBHOOK_SIGNING_SECRET else "not_set"))
-    last = ProcessedWebhook.objects.order_by("-received_at").first()
+    from apps.integrations.models import WebhookReceipt
+
+    last = WebhookReceipt.objects.filter(provider="clerk", signature_valid=True).order_by("-received_at").first()
     if last is None:
         out.append(_item("signin", "Last Clerk webhook", "warning", "None received yet"))
     else:
@@ -142,10 +144,25 @@ def readiness(now):
     keys = [k for k in settings.PII_ENCRYPTION_KEYS if k.strip()]
     out.append(_item("security", "Personal data encryption key", "ready" if keys else "warning" if settings.DEBUG else "not_set",
                      "" if keys else "Development key" if settings.DEBUG else ""))
-    backend = settings.STORAGES.get("default", {}).get("BACKEND", "") if hasattr(settings, "STORAGES") else ""
-    local = backend.endswith("FileSystemStorage") or not backend
+    local = getattr(settings, "MEDIA_BACKEND", "local") != "cloudinary"  # spec 15 §7
     out.append(_item("media", "Media storage", "warning" if local and not settings.DEBUG else "ready",
-                     "Local disk" + (" (development)" if settings.DEBUG and local else "") if local else "Production store"))
+                     "Local disk" + (" (development)" if settings.DEBUG and local else "") if local else "Cloudinary"))
+    # spec 15 §12.1: one line per external service, in words the frontend renders; never a setting's value
+    from apps.core import outbox
+    from apps.integrations import registry
+
+    words = {"ok": "ready", "failing": "warning", "unavailable": "error", "not_configured": "not_set", "not_in_use": "info"}
+    for svc in registry.snapshot():
+        detail = {"not_in_use": "Not in use", "unavailable": "Unavailable (circuit open)", "failing": "Last call failed"}.get(svc["state"], "")
+        out.append(_item("integrations", svc["name"], words[svc["state"]], detail))
+    st = outbox.stats(now)
+    stuck = st["oldest_due_age_s"] >= outbox.STUCK_AFTER.total_seconds()
+    out.append(_item("integrations", "Background tasks", "error" if stuck else "warning" if st["failed"] else "ready",
+                     f"Oldest waiting {st['oldest_due_age_s'] // 60} min" if stuck else f"{st['failed']} failed" if st["failed"] else ""))
+    from apps.core.ready import cache_is_shared
+
+    out.append(_item("integrations", "Shared cache", "ready" if cache_is_shared() else "info" if settings.DEBUG else "error",
+                     "" if cache_is_shared() else "Per-process memory" + (" (development)" if settings.DEBUG else "")))
     from apps.search.index import health as search_health
 
     h = search_health()  # spec 12 §6.6: entries vs public items, within 1%

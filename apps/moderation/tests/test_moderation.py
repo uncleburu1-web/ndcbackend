@@ -546,7 +546,8 @@ class MigrationTests(TransactionTestCase):
         ex = MigrationExecutor(connection)
         leaves = ex.loader.graph.leaf_nodes()
         ex.migrate(before)
-        others = [n for n in leaves if n[0] not in {"moderation", "news", "posts", "notifications"}]
+        # media's backfill (spec 15) depends on the newer news/posts migrations, so it is rolled back to 0001 with them
+        others = [n for n in leaves if n[0] not in {"moderation", "news", "posts", "notifications", "media"}] + [("media", "0001_initial")]
         old = MigrationExecutor(connection).loader.project_state(before + others).apps
         U, Art, Cand, Post = (old.get_model("accounts", "User"), old.get_model("news", "Article"), old.get_model("candidates", "Candidate"),
                               old.get_model("posts", "CandidatePost"))

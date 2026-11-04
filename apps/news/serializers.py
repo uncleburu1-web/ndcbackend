@@ -27,7 +27,10 @@ def byline(a: Article):
 def image_payload(a: Article, request, full=False):
     if not a.image:
         return None
-    out = {"url_thumb": images.url(a.image_thumb, request), "width": a.image_width, "height": a.image_height}
+    from apps.media.services import srcset
+
+    out = {"url_thumb": images.url(a.image_thumb, request), "width": a.image_width, "height": a.image_height,
+           "srcset": srcset(a.image, "content", request, small=a.image_thumb, width=a.image_width)}
     if full:
         out["url"] = images.url(a.image, request)
     return out

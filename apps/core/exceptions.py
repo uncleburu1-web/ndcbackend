@@ -35,12 +35,22 @@ def _first(data):
     return str(data)
 
 
+def _request_id(context):
+    from .requestid import current
+
+    req = context.get("request")
+    return getattr(getattr(req, "_request", req), "request_id", "") or current()
+
+
 def api_exception_handler(exc, context):
     response = exception_handler(exc, context)
+    rid = _request_id(context)
     if response is None:
         logger.exception("Unhandled API error", exc_info=exc)
         return Response(
-            {"error": {"status": 500, "code": "server_error", "message": "Something went wrong. Please try again.", "fields": {}}},
+            {"error": {"status": 500, "code": "server_error",
+                       "message": f"Something went wrong on our side. Reference: {rid[:8]}" if rid else "Something went wrong on our side.",
+                       "fields": {}, "request_id": rid}},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
@@ -56,7 +66,8 @@ def api_exception_handler(exc, context):
         message = getattr(exc, "envelope_message", message)
     elif isinstance(exc, exceptions.Throttled):
         wait = int(exc.wait or 60)
-        message, code = f"Too many requests. Please wait {wait} seconds and try again.", "throttled"
+        message, code = f"Too many tries. Try again in {wait} seconds.", "throttled"
+        response["Retry-After"] = str(wait)  # spec 15 §11.4
     else:
         detail = data.get("detail", data) if isinstance(data, dict) else data
         message = _first(detail)
@@ -66,7 +77,13 @@ def api_exception_handler(exc, context):
         if isinstance(exc, (exceptions.NotAuthenticated, exceptions.AuthenticationFailed)) and code in ("not_authenticated", "authentication_failed"):
             code, message = "not_authenticated", "Sign in to continue."
 
-    response.data = {"error": {"status": response.status_code, "code": code, "message": message, "fields": fields}}
+    response.data = {"error": {"status": response.status_code, "code": code, "message": message, "fields": fields, "request_id": rid}}
+    if isinstance(exc, exceptions.Throttled):
+        response.data["error"]["retry_after"] = int(exc.wait or 60)
+    from .errors import CATALOGUE
+
+    if code not in CATALOGUE:
+        logger.warning("Error code %s is not in the catalogue (spec 15 §4.5)", code)
     request = context.get("request")
     if response.status_code == 403 and request is not None and request.path.startswith("/api/v1/admin/"):
         from apps.access.security import note_admin_denied

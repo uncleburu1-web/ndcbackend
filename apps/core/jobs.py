@@ -36,6 +36,12 @@ KNOWN_JOBS = {
     "verify_audit": ("Check the audit log chain", 8 * 24 * H),
     "prune_audit": ("Clear audit and privacy records past 6 years", 8 * 24 * H),
     "restore_drill": ("Record a restore test", None),
+    # spec 15
+    "process_outbox": ("Run background tasks (notifications, image clean-up, retries)", H / 6),
+    "prune_outbox": ("Clear finished background tasks", 26 * H),
+    "prune_webhooks": ("Clear webhook receipts past 90 days", 26 * H),
+    "media_audit": ("Find and remove orphan images", 8 * 24 * H),
+    "migrate_media_to_cloudinary": ("Move local images to Cloudinary", None),
 }
 MANUAL_STALE = 24 * H  # a by-hand run that hasn't finished after this "didn't finish"
 KEEP = timedelta(days=90)
@@ -73,6 +79,8 @@ class TrackedCommand(BaseCommand):
     def handle(self, *args, **opts):
         with track(self.job) as t:
             t.summary = self.run(*args, **opts) or ""
+        if t.summary:
+            self.stdout.write(t.summary)
 
 
 def state(row: JobRun | None, job: str, now=None) -> str:

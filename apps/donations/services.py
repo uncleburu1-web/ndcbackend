@@ -260,6 +260,10 @@ def apply_result(donation_id, result, *, source, event="", payload_sha256="", al
             note = d.review_reason if d.status == S.REVIEW else (f"refunded {d.refunded_kobo}" if d.refunded_kobo != prev_refunded else "")
             _event(d, source=source, event=event, status_from=prev, status_to=d.status, result=result, note=note,
                    payload_sha256=payload_sha256)
+        if d.status == S.SUCCESSFUL and prev != S.SUCCESSFUL:
+            from apps.notifications.services import notify_donation_receipt
+
+            notify_donation_receipt(d)  # spec 15 §9.2: signed-in donors only, once per donation
         return d
 
 

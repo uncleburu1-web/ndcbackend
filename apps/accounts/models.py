@@ -65,11 +65,3 @@ class User(AbstractBaseUser):
     @property
     def profile_complete(self) -> bool:
         return self.profile_completed_at is not None and self.adult_confirmed_at is not None
-
-
-class ProcessedWebhook(models.Model):
-    """Svix message IDs already handled — makes the webhook idempotent (spec §6.2)."""
-
-    svix_id = models.CharField(max_length=128, primary_key=True)
-    event_type = models.CharField(max_length=64)
-    received_at = models.DateTimeField(auto_now_add=True)

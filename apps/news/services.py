@@ -167,7 +167,8 @@ def withdraw(article, user, *, request=None) -> Article:
 def set_image(article, user, upload, *, rights_confirmed: bool, request=None) -> Article:
     if not rights_confirmed:
         raise serializers.ValidationError({"rights_confirmed": ["Confirm you took this photo or have the right to share it."]})
-    stored = images.store(upload)  # PhotoError / OSError propagate to the view
+    stored = images.store(upload, purpose="announcement_image" if article.source == Source.OFFICIAL else "news_image", user=user)
+    from apps.media.services import asset_for_name
     with transaction.atomic():
         a = _locked(article)
         allowed = (a.author_id == user.pk and a.status in EDITABLE) if a.source == Source.COMMUNITY else True
@@ -178,6 +179,7 @@ def set_image(article, user, upload, *, rights_confirmed: bool, request=None) ->
         old = (a.image, a.image_thumb)
         for k, v in stored.items():
             setattr(a, k, v)
+        a.image_asset = asset_for_name(stored["image"])
         if a.status == S.SUCCESSFUL:
             a.edited_at = timezone.now()
         a.save()
@@ -195,6 +197,7 @@ def remove_image(article, user, *, request=None) -> Article:
         old = (a.image, a.image_thumb)
         a.image = a.image_thumb = ""
         a.image_width = a.image_height = None
+        a.image_asset = None
         if a.status == S.SUCCESSFUL:
             a.edited_at = timezone.now()
         a.save()
@@ -273,6 +276,9 @@ def remove(article, actor, reason: str, *, request=None, rule="", note_to_author
         a.status, a.removed_by, a.removed_at, a.removed_reason, a.pinned_at = S.REMOVED, actor, now, reason[:500], None
         a.removed_rule = rule
         a.save()
+        from apps.media.services import set_hidden
+
+        set_hidden(a.image, True)  # spec 15 §7.7: the old image URL stops working
         kind = ArticleEvent.Kind.UNPUBLISHED if a.source == Source.OFFICIAL and not rule else ArticleEvent.Kind.REMOVED
         _event(a, kind, actor, reason)
         case = moderation.content_removed("article", a, actor, rule_id=rule, note_to_author=note_to_author, internal_note=internal_note,
@@ -293,6 +299,9 @@ def restore(article, actor, *, request=None, note="") -> Article:
             require_not_paused("Publishing campaign announcements")
         a.status, a.removed_by, a.removed_at, a.removed_reason, a.removed_rule = S.SUCCESSFUL, None, None, "", ""
         a.save()
+        from apps.media.services import set_hidden
+
+        set_hidden(a.image, False)
         _event(a, ArticleEvent.Kind.RESTORED, actor, note)
         moderation.content_restored("article", a, actor, note)
     record(A.ANNOUNCEMENT_RESTORED if a.source == Source.OFFICIAL else A.NEWS_RESTORED, target=a, actor=actor, request=request)
@@ -305,7 +314,7 @@ def erase_for_deleted_user(user) -> dict:
     drafts = Article.objects.filter(author=user, source=Source.COMMUNITY, status__in=[S.PENDING, S.REJECTED])
     old_images = list(drafts.values_list("image", "image_thumb"))
     n_drafts = drafts.update(status=S.WITHDRAWN, title="", body="", source_url="", image="", image_thumb="", image_width=None,
-                             image_height=None, declarations={})
+                             image_height=None, image_asset=None, declarations={})
     n_bylines = Article.objects.filter(author=user, source=Source.COMMUNITY, show_author_name=True).update(show_author_name=False)
     from apps.moderation.services import erase_for_deleted_user as erase_reports
 

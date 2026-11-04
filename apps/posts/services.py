@@ -145,7 +145,9 @@ def set_image(post, author, upload, *, rights_confirmed: bool, request=None) -> 
     _require_not_paused(post.candidate)
     if not rights_confirmed:
         raise serializers.ValidationError({"rights_confirmed": ["Confirm you took this photo or have the right to share it."]})
-    stored = images.store(upload)
+    stored = images.store(upload, purpose="post_image", user=author)
+    from apps.media.services import asset_for_name
+
     with transaction.atomic():
         p = _locked(post)
         if p.status != S.PUBLISHED:
@@ -154,6 +156,7 @@ def set_image(post, author, upload, *, rights_confirmed: bool, request=None) -> 
         old = (p.image, p.image_thumb)
         for k, v in stored.items():
             setattr(p, k, v)
+        p.image_asset = asset_for_name(stored["image"])
         now = timezone.now()
         # The publish form sends the image straight after creating the post; that first image is part of publishing, not an edit.
         if old[0] or now - p.published_at > FIRST_IMAGE_GRACE:
@@ -177,6 +180,7 @@ def remove_image(post, author, *, request=None) -> CandidatePost:
         if any(old):
             p.image = p.image_thumb = ""
             p.image_width = p.image_height = None
+            p.image_asset = None
             p.edited_at, p.updated_by = timezone.now(), author
             p.save()
             _event(p, PostEvent.Kind.IMAGE_CHANGED, author, "removed")
@@ -231,6 +235,9 @@ def remove_post(post, admin, reason: str, *, request=None, rule="", note_to_auth
         now = timezone.now()
         p.status, p.removed_at, p.removed_by, p.removed_reason, p.removed_rule = S.REMOVED, now, admin, reason[:500], rule
         p.save()
+        from apps.media.services import set_hidden
+
+        set_hidden(p.image, True)  # spec 15 §7.7
         _event(p, PostEvent.Kind.REMOVED, admin, reason)
         case = moderation.content_removed("post", p, admin, rule_id=rule, note_to_author=note_to_author, internal_note=internal_note,
                                           source=source)
@@ -248,6 +255,9 @@ def restore_post(post, admin, *, request=None, note="") -> CandidatePost:
             raise ServiceError("Only removed posts can be restored.", code="invalid_transition", status_code=409)
         p.status, p.removed_at, p.removed_by, p.removed_reason, p.removed_rule = S.PUBLISHED, None, None, "", ""
         p.save()
+        from apps.media.services import set_hidden
+
+        set_hidden(p.image, False)
         _event(p, PostEvent.Kind.RESTORED, admin, note)
         moderation.content_restored("post", p, admin, note)
     record(A.POST_RESTORED, target=p, actor=admin, request=request)  # no delivery on restore

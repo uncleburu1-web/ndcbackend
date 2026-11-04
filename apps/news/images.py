@@ -19,23 +19,26 @@ def _fit(rgb, longest: int) -> bytes:
     return out.getvalue()
 
 
-def store(upload) -> dict:
+def store(upload, *, purpose="news_image", user=None) -> dict:
+    """A file (local media backend) or a verified Cloudinary asset (`media.services.Accepted`, spec 15 §7)."""
+    from apps.media.services import Accepted, register_local
+
+    if isinstance(upload, Accepted):
+        return upload.as_content()
     rgb = load_validated_rgb(upload)
     stem = uuid.uuid4().hex
     full = default_storage.save(f"news/{stem}_1600.webp", ContentFile(_fit(rgb, SIZES["full"])))
     thumb = default_storage.save(f"news/{stem}_400.webp", ContentFile(_fit(rgb, SIZES["thumb"])))
     w, h = rgb.size
     scale = min(1.0, SIZES["full"] / max(w, h))
+    register_local(purpose, {"image": full, "thumb": thumb}, width=round(w * scale), height=round(h * scale), user=user)
     return {"image": full, "image_thumb": thumb, "image_width": round(w * scale), "image_height": round(h * scale)}
 
 
 def delete(*names):
-    for name in names:
-        if name:
-            try:
-                default_storage.delete(name)
-            except OSError:  # pragma: no cover
-                pass
+    from apps.media.services import release
+
+    release(*names)
 
 
 def url(name: str, request=None) -> str | None:

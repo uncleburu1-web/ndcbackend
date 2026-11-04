@@ -9,3 +9,5 @@ svix>=1.40
 gunicorn>=22.0
 Pillow>=11.0
 cryptography>=42  # VIN/NIN field encryption (spec 06 §9)
+drf-spectacular>=0.29,<0.30  # OpenAPI schema (spec 15 §3.2)
+cloudinary>=1.46,<2  # Cloudinary request signing only; HTTP goes through apps.integrations.http (spec 15 §3.2)

@@ -8,9 +8,10 @@ from dataclasses import asdict, dataclass
 from datetime import date
 
 PRIVACY_VERSION = 1
-PRIVACY_UPDATED = date(2026, 11, 3)
+PRIVACY_UPDATED = date(2026, 11, 4)
 PRIVACY_DRAFT = True  # wording pending the DPO's and the legal team's review (spec 14 §15.1)
-CHANGES = [(date(2026, 11, 3), "First published.")]
+CHANGES = [(date(2026, 11, 3), "First published."),
+           (date(2026, 11, 4), "Added public images and, when it's in use, Cloudinary as the image host.")]
 
 
 @dataclass(frozen=True)
@@ -97,6 +98,14 @@ CATEGORIES = [
              "Public once published; editing history: system administrators.",
              "While the candidacy is relevant; archived profiles are kept for the record.",
              "Not linked to a member account's deletion."),
+    Category("images", "Images", ("media.MediaAsset",),
+             "Images published with candidate profiles, campaign posts, community news and announcements, the image's size and type, "
+             "and which account uploaded it. Location and camera details are removed before storage.",
+             "To show the images with the content they belong to.",
+             "Legitimate interest and the publisher's agreement, NDPA s. 25(1)(f).",
+             "Public with their content; who uploaded: system administrators.",
+             "While the content is published; removed when it's replaced, deleted or pruned.",
+             "Images of your community news are deleted with it; the uploader link is cleared."),
     Category("notifications", "Notifications", ("notifications.Notification", "notifications.NotificationPreference"),
              "Your in-app notifications and settings.",
              "To tell you about announcements, decisions on your requests and posts you asked for.",
@@ -146,7 +155,8 @@ CATEGORIES = [
 # Models with no personal data, or only derived/public data, and why (the coverage test needs a reason).
 NOT_PERSONAL = {
     "core.JobRun": "background job records: counts only (spec 11)",
-    "accounts.ProcessedWebhook": "Svix message IDs for idempotency",
+    "integrations.WebhookReceipt": "webhook event IDs, types and body hashes; payloads are never stored (spec 15 §12.4)",
+    "core.OutboxJob": "background jobs holding record IDs only (spec 15 §9.3)",
     "membership.MembershipNumberSequence": "a per-state counter",
     "search.SearchEntry": "an index of items that are already public",
     "moderation.ComplianceYear": "yearly aggregate counts",
@@ -206,6 +216,10 @@ def processors():
                   "Email, sign-in methods, sessions"),
         Processor("Paystack", "Payments for donations and membership fees", "Nigeria", "Not a transfer abroad",
                   "Payment details you enter on Paystack's page; NDCConnect never sees card numbers"),
+        *([Processor("Cloudinary", "Stores and delivers public images", "United States and its delivery network",
+                      "Only images already published to everyone (to be confirmed, spec 15 §19.3)",
+                      "Public images with metadata removed; random file names")]
+          if getattr(settings, "MEDIA_BACKEND", "local") == "cloudinary" else []),
         Processor("Hosting provider", "Runs NDCConnect's servers, database and backups", hosting,
                   "Depends on the location (to be confirmed)" if not settings.HOSTING_LOCATION else "As stated on this page", "Everything above"),
     ]

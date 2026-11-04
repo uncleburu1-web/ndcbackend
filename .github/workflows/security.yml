@@ -44,12 +44,53 @@ jobs:
           PAYSTACK_SECRET_KEY: sk_test_ci_dummy
           SECURITY_CONTACT_EMAIL: security@example.ng
           PRIVACY_CONTACT_EMAIL: dpo@example.ng
+          CACHE_BACKEND: database
         run: |
           python manage.py migrate --noinput
           # sslmode=disable here on purpose: the check must name the failure without printing the URL
           python manage.py check_security | tee check.txt || true
           grep -q "FAIL Database uses TLS" check.txt
+          grep -q "PASS Shared cache for rate limits" check.txt
           ! grep -q "ci-dummy" check.txt
+
+  api:
+    # spec 15 §14.2, §4.11: the committed schema matches the code, and v1 stays additive
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ndc
+          POSTGRES_PASSWORD: ndc
+          POSTGRES_DB: ndcbackend
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://ndc:ndc@localhost:5432/ndcbackend
+      DJANGO_SETTINGS_MODULE: config.settings.schema
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - name: schema snapshot is current
+        run: |
+          python manage.py spectacular --format openapi-json --file /tmp/openapi.json --validate --fail-on-warn
+          python -c "import json,sys; a=json.load(open('/tmp/openapi.json')); b=json.load(open('docs/openapi.json')); sys.exit(a!=b)" \
+            || (echo "docs/openapi.json is stale — regenerate it (docs/api.md)"; exit 1)
+      - name: no unexplained breaking changes
+        run: |
+          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -n "$BASE" ] && git cat-file -e "$BASE:docs/openapi.json" 2>/dev/null; then
+            git show "$BASE:docs/openapi.json" > /tmp/base-openapi.json
+            python manage.py api_compat --base /tmp/base-openapi.json --new docs/openapi.json
+          else
+            echo "No earlier schema to compare with."
+          fi
 
   dependencies:
     runs-on: ubuntu-latest

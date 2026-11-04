@@ -88,4 +88,8 @@ class FakeProvider(PaymentProvider):
 
     @staticmethod
     def webhook_body(event: str, reference: str) -> bytes:
-        return json.dumps({"event": event, "data": {"reference": reference}}).encode()
+        """Like Paystack's, the body carries the transaction's state at sending time, so two different events differ and
+        a re-delivery is byte-identical (spec 15 §12.4 de-duplicates on the body hash)."""
+        st = bank_get(reference) or {}
+        return json.dumps({"event": event, "data": {"reference": reference, "status": st.get("status", ""),
+                                                    "refunded_kobo": st.get("refunded_kobo", 0)}}).encode()

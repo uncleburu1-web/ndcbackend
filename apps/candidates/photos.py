@@ -65,26 +65,34 @@ def square_webp(rgb, size: int) -> bytes:
     return out.getvalue()
 
 
-def process_and_store(upload) -> StoredPhoto:
+def process_and_store(upload, *, user=None) -> StoredPhoto:
+    """`upload` is a file (local media backend) or a verified Cloudinary asset (`media.services.Accepted`, spec 15 §7)."""
+    from apps.media.services import Accepted, register_local
+
+    if isinstance(upload, Accepted):
+        return upload.as_photo()
     rgb = load_validated_rgb(upload)
     stem = uuid.uuid4().hex
     names = []
     for size in SIZES:
         names.append(default_storage.save(f"candidates/{stem}_{size}.webp", ContentFile(square_webp(rgb, size))))
+    register_local("candidate_photo", {"800": names[0], "200": names[1]}, width=800, height=800, user=user)
     return StoredPhoto(name_800=names[0], name_200=names[1])
 
 
 def delete_stored(*names: str):
-    for name in names:
-        if name:
-            try:
-                default_storage.delete(name)
-            except Exception:  # pragma: no cover — a missing old file must not block the update
-                pass
+    from apps.media.services import release
+
+    release(*names)
 
 
 def public_url(request, name: str) -> str | None:
     if not name:
         return None
+    from apps.media.services import delivery
+
+    remote = delivery(name)
+    if remote:
+        return remote
     url = default_storage.url(name)
     return request.build_absolute_uri(url) if request is not None and url.startswith("/") else url

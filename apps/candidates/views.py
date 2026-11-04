@@ -4,19 +4,20 @@ from django.shortcuts import get_object_or_404
 from django.utils.cache import patch_cache_control
 from rest_framework import generics, status
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
+from apps.core import filters as F
 from apps.access.permissions import IsSystemAdmin
 from apps.core.exceptions import ServiceError
 
 from . import services
 from .models import Candidate, CandidateStatus
 from .photos import PhotoError
-from .reference import POSITION_ORDER, Position
+from .reference import POSITION_ORDER, Position, State
 from .serializers import (
     AdminCandidateSerializer,
     CandidateWriteSerializer,
@@ -83,10 +84,12 @@ class PublicCandidateList(generics.ListAPIView):
         qs = _published().annotate(rank=POSITION_RANK)
         year = _year_param(self.request)
         qs = qs.filter(election_year=year) if year else qs.none()
-        if qp.get("position") in POSITION_ORDER:
-            qs = qs.filter(position=qp["position"])
-        if qp.get("state"):
-            qs = qs.filter(state=qp["state"])
+        position = F.choice(self.request, "position", POSITION_ORDER)
+        if position:
+            qs = qs.filter(position=position)
+        state = F.choice(self.request, "state", State.values)
+        if state:
+            qs = qs.filter(state=state)
         q = (qp.get("q") or "").strip()[:100]
         if q:
             # Spec 12 §4.3: same engine as /search (diacritics, aliases, name typos); relevance order with fixed tie-breaks.
@@ -116,8 +119,9 @@ class PublicPositions(APIView):
     def get(self, request):
         year = _year_param(request)
         qs = _published().filter(election_year=year) if year else Candidate.objects.none()
-        if request.query_params.get("state"):
-            qs = qs.filter(state=request.query_params["state"])
+        state = F.choice(request, "state", State.values)
+        if state:
+            qs = qs.filter(state=state)
         counts = dict(qs.values_list("position").annotate(n=Count("id")))
         data = [{"position": p, "label": Position(p).label, "count": counts[p]} for p in POSITION_ORDER if counts.get(p)]
         years = sorted(set(_published().values_list("election_year", flat=True)), reverse=True)
@@ -214,16 +218,17 @@ class AdminCandidateAction(APIView):
 
 class AdminCandidatePhoto(APIView):
     permission_classes = [IsSystemAdmin]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def put(self, request, pk):
+        from apps.media.http import upload_or_asset
+
         c = get_object_or_404(Candidate, pk=pk)
-        upload = request.FILES.get("photo")
-        if upload is None:
+        if not request.FILES.get("photo") and not request.data.get("asset"):
             return Response({"error": {"status": 400, "code": "validation_error", "message": "Choose a photo to upload.",
                                        "fields": {"photo": ["Choose a photo to upload."]}}}, status=400)
-        confirmed = str(request.data.get("rights_confirmed", "")).lower() in ("true", "1", "on", "yes")
         try:
+            upload, confirmed = upload_or_asset(request, field="photo", purpose="candidate_photo", target_id=c.pk)
             c = services.set_photo(candidate=c, upload=upload, rights_confirmed=confirmed, actor=request.user, request=request)
         except PhotoError as exc:
             return Response({"error": {"status": 400, "code": "invalid_photo", "message": str(exc),

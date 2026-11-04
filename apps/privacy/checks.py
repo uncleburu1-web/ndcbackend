@@ -98,6 +98,17 @@ def run(now=None, memo=None) -> list[tuple[str, str]]:
     except Exception:
         payments_needed = True
     add("Payment webhook secret set", bool(s.PAYSTACK_SECRET_KEY) or not payments_needed)
+    # spec 15 §11.4, §13.2
+    from apps.core.ready import cache_is_shared
+
+    add("Shared cache for rate limits", cache_is_shared())
+    if getattr(s, "MEDIA_BACKEND", "local") == "cloudinary":
+        add("Cloudinary settings set", bool(s.CLOUDINARY_CLOUD_NAME and s.CLOUDINARY_API_KEY and s.CLOUDINARY_API_SECRET
+                                            and s.CLOUDINARY_UPLOAD_PRESET and s.CLOUDINARY_FOLDER))
+        add("Cloudinary secret isn't the API key", s.CLOUDINARY_API_SECRET != s.CLOUDINARY_API_KEY)
+        add("Cloudinary folder per environment", not s.CLOUDINARY_FOLDER.rstrip("/").endswith("/dev"), warn=True)
+    else:
+        add("Images on Cloudinary", False, warn=True)
     add("Security contact set", bool(s.SECURITY_CONTACT_EMAIL))
     add("Privacy contact set", bool(s.PRIVACY_CONTACT_EMAIL))
     out.append(("Restore test within 100 days", restore_state(now, memo)[0]))

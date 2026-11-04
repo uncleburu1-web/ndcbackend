@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from apps.candidates.photos import public_url
 from apps.news import images
+from apps.media.services import srcset
 from apps.news.serializers import excerpt
 
 from .models import CandidatePost
@@ -9,14 +10,16 @@ from .models import CandidatePost
 
 def candidate_summary(c, request):
     return {"id": c.id, "slug": c.slug, "full_name": c.full_name, "position": c.position, "position_label": c.get_position_display(),
-            "state": c.state, "photo": {"url_200": public_url(request, c.photo_200), "url_800": public_url(request, c.photo_800)}
+            "state": c.state, "photo": {"url_200": public_url(request, c.photo_200), "url_800": public_url(request, c.photo_800),
+                                        "srcset": srcset(c.photo_800, "square", request, small=c.photo_200)}
             if c.photo_200 else None, "verified": c.verified_at is not None}
 
 
 def image_payload(p, request, full=False):
     if not p.image:
         return None
-    out = {"url_thumb": images.url(p.image_thumb, request), "width": p.image_width, "height": p.image_height}
+    out = {"url_thumb": images.url(p.image_thumb, request), "width": p.image_width, "height": p.image_height,
+           "srcset": srcset(p.image, "content", request, small=p.image_thumb, width=p.image_width)}
     if full:
         out["url"] = images.url(p.image, request)
     return out

@@ -181,11 +181,14 @@ def set_photo(*, candidate, upload, rights_confirmed: bool, actor, request=None)
         raise serializers.ValidationError({"rights_confirmed": ["Confirm NDCConnect may publish this photo."]})
     if candidate.status == S.ARCHIVED:
         raise _conflict("Restore this candidate before changing the photo.")
-    stored = photos.process_and_store(upload)  # raises PhotoError; storage errors surface as 503 in the view
+    stored = photos.process_and_store(upload, user=actor)  # raises PhotoError; storage errors surface as 503 in the view
+    from apps.media.services import asset_for_name
+
     with transaction.atomic():
         c = _lock(candidate)
         old = (c.photo_800, c.photo_200)
         c.photo_800, c.photo_200, c.updated_by = stored.name_800, stored.name_200, actor
+        c.photo_asset = asset_for_name(stored.name_800)
         c.save()
     photos.delete_stored(*old)
     record(A.CANDIDATE_PHOTO_UPDATED, target=c, actor=actor, request=request, change="uploaded", rights_confirmed=True)
@@ -197,6 +200,7 @@ def remove_photo(*, candidate, actor, request=None):
         c = _lock(candidate)
         old = (c.photo_800, c.photo_200)
         c.photo_800, c.photo_200, c.updated_by = "", "", actor
+        c.photo_asset = None
         c.save()
     photos.delete_stored(*old)
     record(A.CANDIDATE_PHOTO_UPDATED, target=c, actor=actor, request=request, change="removed")

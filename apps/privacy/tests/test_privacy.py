@@ -689,7 +689,8 @@ class HeadersAndChecksTests(TestCase):
         from django.conf import settings
 
         db = {**settings.DATABASES["default"], "OPTIONS": {"sslmode": "require"}}
-        with override_settings(DATABASES={"default": db}):
+        shared = {**settings.CACHES, "default": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "ndc_cache"}}
+        with override_settings(DATABASES={"default": db}, CACHES=shared):  # spec 15 §11.4: a shared cache is required
             out = io.StringIO()
             call_command("check_security", stdout=out)  # only warnings left (restore test, audit, claim): exit 0
             text = out.getvalue()

@@ -79,16 +79,26 @@ def verify_session_token(authorization_header: Optional[str]) -> Optional[Verifi
 # --------------------------------------------------------------------------
 # Backend API (needs CLERK_SECRET_KEY)
 # --------------------------------------------------------------------------
+CLERK_TIMEOUT_MS = 8000  # spec 15 §12.2: 3 s connect + 5 s read, as one SDK budget
+
+
 def _client() -> Clerk:
     if not settings.CLERK_SECRET_KEY:
         raise ClerkUnavailable("CLERK_SECRET_KEY is not set.")
-    return Clerk(bearer_auth=settings.CLERK_SECRET_KEY)
+    return Clerk(bearer_auth=settings.CLERK_SECRET_KEY, timeout_ms=CLERK_TIMEOUT_MS)
+
+
+def _guarded(operation):
+    from apps.integrations.http import guarded
+
+    return guarded("clerk", operation)
 
 
 def fetch_user(clerk_user_id: str) -> Optional[dict]:
     """Best-effort fetch of a Clerk user as the webhook-shaped dict, or None on any failure."""
     try:
-        with _client() as clerk:
+        client = _client()  # not configured is not a Clerk failure: checked before the breaker
+        with _guarded("users.get"), client as clerk:
             user = clerk.users.get(user_id=clerk_user_id)
     except ClerkUnavailable:
         logger.info("Skipping Clerk user fetch for %s: CLERK_SECRET_KEY not set (webhook will fill details).", clerk_user_id)
@@ -105,31 +115,48 @@ def fetch_user(clerk_user_id: str) -> Optional[dict]:
     }
 
 
+def set_banned(clerk_user_id: str, banned: bool) -> None:
+    """Raises on failure. Used directly by the outbox handlers (spec 15 §9.3)."""
+    client = _client()
+    with _guarded("users.ban" if banned else "users.unban"), client as clerk:
+        (clerk.users.ban if banned else clerk.users.unban)(user_id=clerk_user_id)
+
+
+def _queue(kind, clerk_user_id):
+    from datetime import timedelta
+
+    from apps.core import outbox
+
+    outbox.enqueue(kind, {"clerk_user_id": clerk_user_id}, dedupe_key=f"{kind}:{clerk_user_id}", delay=timedelta(minutes=1))
+
+
 def ban_user(clerk_user_id: str) -> bool:
-    """Ban in Clerk so the person can't sign in at all. Returns False on failure (logged)."""
+    """Ban in Clerk so the person can't sign in at all. On failure the ban is queued in the outbox and retried
+    (spec 15 §12.3); the local deactivation already holds. Returns False when it had to be queued."""
     try:
-        with _client() as clerk:
-            clerk.users.ban(user_id=clerk_user_id)
+        set_banned(clerk_user_id, True)
         return True
     except Exception:
-        logger.error("Clerk ban failed for %s — local deactivation still holds; re-run deactivate_user to retry.", clerk_user_id, exc_info=True)
+        logger.error("Clerk ban failed for %s — local deactivation holds; queued for retry.", clerk_user_id, exc_info=True)
+        _queue("clerk_ban", clerk_user_id)
         return False
 
 
 def unban_user(clerk_user_id: str) -> bool:
     try:
-        with _client() as clerk:
-            clerk.users.unban(user_id=clerk_user_id)
+        set_banned(clerk_user_id, False)
         return True
     except Exception:
-        logger.error("Clerk unban failed for %s — re-run reactivate_user to retry.", clerk_user_id, exc_info=True)
+        logger.error("Clerk unban failed for %s — queued for retry.", clerk_user_id, exc_info=True)
+        _queue("clerk_unban", clerk_user_id)
         return False
 
 
 def delete_user(clerk_user_id: str) -> bool:
     """Spec 14 §6.3: self-service deletion. Returns False on failure (logged); the caller erases nothing then."""
     try:
-        with _client() as clerk:
+        client = _client()
+        with _guarded("users.delete"), client as clerk:
             clerk.users.delete(user_id=clerk_user_id)
         return True
     except Exception:

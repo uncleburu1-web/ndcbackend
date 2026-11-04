@@ -40,6 +40,7 @@ SECOND_FACTOR = {
     "admin-privacy-incident-close": {"POST"},
     "admin-privacy-incident-notice": {"POST"},
     "admin-privacy-request-export": {"POST"},
+    "admin-integrations-outbox-retry": {"POST"},  # spec 15 §15.3
 }
 # Your own data download and account deletion: any factor, recently (spec 14 §3.5).
 ANY_FACTOR = {"my-data-export": {"POST"}, "my-delete": {"POST"}}

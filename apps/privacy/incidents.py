@@ -239,7 +239,8 @@ def preview_notice(audience, lines_text=""):
 
 @transaction.atomic
 def send_notice(pk, by, text, audience, lines_text=""):
-    from apps.notifications.models import Kind, Notification
+    from apps.notifications.models import Kind
+    from apps.notifications.services import notify_many
 
     inc = _locked(pk)
     if inc.notice_sent_version >= inc.notice_version:
@@ -248,7 +249,7 @@ def send_notice(pk, by, text, audience, lines_text=""):
     users, unmatched = audience_users(audience, lines_text)
     if not users:
         raise _err("No accounts matched.", "no_recipients")
-    Notification.objects.bulk_create([Notification(recipient=u, kind=Kind.SECURITY_NOTICE, incident=inc) for u in users], batch_size=1000)
+    notify_many(users, Kind.SECURITY_NOTICE, target=inc)
     now = timezone.now()
     inc.notice_text, inc.notice_sent_at, inc.notice_sent_version = t, now, inc.notice_version
     fields = ["notice_text", "notice_sent_at", "notice_sent_version"]

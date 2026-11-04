@@ -10,7 +10,10 @@ from .reference import Position, State
 def _photo(obj, request):
     if not obj.photo_800:
         return None
-    return {"url_800": photos.public_url(request, obj.photo_800), "url_200": photos.public_url(request, obj.photo_200)}
+    from apps.media.services import srcset
+
+    return {"url_800": photos.public_url(request, obj.photo_800), "url_200": photos.public_url(request, obj.photo_200),
+            "srcset": srcset(obj.photo_800, "square", request, small=obj.photo_200)}
 
 
 class PublicCandidateSerializer(serializers.ModelSerializer):

@@ -20,6 +20,9 @@ api_v1 = [
     path("", include("apps.search.urls")),
     path("", include("apps.moderation.urls")),
     path("", include("apps.privacy.urls")),
+    path("", include("apps.integrations.urls")),
+    path("", include("apps.media.urls")),
+    path("", include("apps.core.schema_urls")),
 ]
 
 urlpatterns = [path("api/v1/", include(api_v1))]

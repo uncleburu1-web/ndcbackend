@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 
+from apps.core import filters as F
 from apps.access.models import Role
 from apps.access.permissions import IsSignedIn, IsSystemAdmin
 from apps.access.services import has_role
@@ -111,11 +112,12 @@ class AdminPvcList(_Private):
 
     def get(self, request):
         qs = PvcVerification.objects.select_related("user", "reviewed_by").order_by("created_at")
-        st = request.query_params.get("status", "pending")
+        st = F.choice(request, "status", [*PvcStatus.values, "all"], default="pending")
         if st in PvcStatus.values:
             qs = qs.filter(status=st)
-        if request.query_params.get("state") in State.values:
-            qs = qs.filter(state=request.query_params["state"])
+        state = F.choice(request, "state", State.values)
+        if state:
+            qs = qs.filter(state=state)
         paginator = Page20()
         page = paginator.paginate_queryset(qs, request, view=self)
         response = paginator.get_paginated_response(AdminPvcSerializer(page, many=True, context={"request": request}).data)

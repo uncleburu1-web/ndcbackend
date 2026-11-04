@@ -1,11 +1,15 @@
 """
-In-app notifications — spec 07 §6.4. The only place notifications are written (code standards).
-Candidate posts (spec 09) are delivered by deliver_post.
+In-app notifications — spec 07 §6.4; one service since spec 15 §9.1. The only place notifications are written.
+
+    notify(user, "membership_decision", target=membership, decision="approved")
+
+`notify` writes one row in the caller's transaction (a decision and its notice commit together). Fan-out kinds
+(announcements, candidate posts) are outbox jobs (`notify_fanout`) running one idempotent INSERT … SELECT.
 """
 import logging
 from datetime import timedelta
 
-from django.db import connection, transaction
+from django.db import connection
 from django.db.models import Q
 from django.utils import timezone
 
@@ -42,13 +46,10 @@ def deliver_announcement(article) -> int:
 
 
 def deliver_announcement_on_commit(article):
-    def run():
-        try:
-            deliver_announcement(article)
-        except Exception:  # the article stays published; re-run with `deliver_announcement <id>` (§11)
-            logger.exception("Announcement delivery failed for article %s", article.pk)
+    """Spec 15 §9.3: an outbox job in the publishing transaction, tried right after commit, retried if it fails."""
+    from apps.core import outbox
 
-    transaction.on_commit(run)
+    outbox.enqueue("notify_fanout", {"kind": "announcement", "article": str(article.pk)}, dedupe_key=f"fanout:announcement:{article.pk}")
 
 
 POST_SQL = """
@@ -75,13 +76,9 @@ def deliver_post(post) -> int:
 
 
 def deliver_post_on_commit(post):
-    def run():
-        try:
-            deliver_post(post)
-        except Exception:  # the post stays published; re-run with `deliver_post <id>` (spec 09 §11)
-            logger.exception("Candidate post delivery failed for post %s", post.pk)
+    from apps.core import outbox
 
-    transaction.on_commit(run)
+    outbox.enqueue("notify_fanout", {"kind": "candidate_post", "post": str(post.pk)}, dedupe_key=f"fanout:candidate_post:{post.pk}")
 
 
 def remove_for_unfollow(user, candidate) -> int:
@@ -90,39 +87,88 @@ def remove_for_unfollow(user, candidate) -> int:
     return n
 
 
+# Which target field each kind links to (None = no link; the row is about the person's own record).
+TARGET_FIELD = {
+    Kind.ANNOUNCEMENT: "article", Kind.NEWS_DECISION: "article", Kind.PVC_DECISION: None, Kind.CANDIDATE_POST: "candidate_post",
+    Kind.REPORT_OUTCOME: "case", Kind.CONTENT_REMOVED: "case", Kind.ACCOUNT_WARNING: "case", Kind.SUBMISSIONS_PAUSED: "case",
+    Kind.APPEAL_DECISION: "appeal", Kind.SECURITY_NOTICE: "incident", Kind.PRIVACY_REQUEST_UPDATE: "data_request",
+    Kind.MEMBERSHIP_DECISION: "membership", Kind.DONATION_RECEIPT: "donation",
+}
+
+
+def can_receive(user) -> bool:
+    return user is not None and user.is_active and not user.clerk_deleted_at
+
+
+def notify(recipient, kind: str, *, target=None, decision: str = "", **links):
+    """Spec 15 §9.1. One row for one person, in the caller's transaction. Returns the row, or None when the
+    recipient can't receive notices (inactive, deleted) or already has this one (unique kinds).
+
+    Rows carry a link and a short decision word only: never VINs, NINs, amounts, reporters or moderators."""
+    if kind not in Kind.values:
+        raise ValueError(f"Unknown notification kind {kind!r}")
+    if not can_receive(recipient):
+        return None
+    field = TARGET_FIELD[kind]
+    fields = dict(links)
+    if target is not None and field:
+        fields[field] = target
+    unknown = set(fields) - {"article", "candidate_post", "case", "appeal", "data_request", "incident", "membership", "donation"}
+    if unknown:
+        raise ValueError(f"Unknown notification target {unknown}")
+    if kind == Kind.DONATION_RECEIPT and Notification.objects.filter(recipient=recipient, kind=kind, donation=fields.get("donation")).exists():
+        return None
+    return Notification.objects.create(recipient=recipient, kind=kind, decision=(decision or "")[:10], **fields)
+
+
+def notify_many(recipients, kind: str, *, target=None) -> int:
+    """The same rules as `notify` for a chosen list (14's security notices): one bulk insert, inactive and deleted skipped."""
+    field = TARGET_FIELD[kind]
+    rows = [Notification(recipient=u, kind=kind, **({field: target} if field and target is not None else {}))
+            for u in recipients if can_receive(u)]
+    Notification.objects.bulk_create(rows, batch_size=1000)
+    return len(rows)
+
+
 def notify_decision(article, decision: str):
     """Written inside the decision's transaction (spec 07 §6.4)."""
-    author = article.author
-    if author is None or not author.is_active or author.clerk_deleted_at:
-        return None
-    return Notification.objects.create(recipient=author, kind=Kind.NEWS_DECISION, article=article, decision=decision)
+    return notify(article.author, Kind.NEWS_DECISION, target=article, decision=decision)
 
 
 def notify_pvc_decision(user, decision: str):
     """Spec 08 §4.3 — always sent (the user's own request); no PVC data in the row. Written in the decision's transaction."""
-    if user is None or not user.is_active or user.clerk_deleted_at:
-        return None
-    return Notification.objects.create(recipient=user, kind=Kind.PVC_DECISION, article=None, decision=decision)
+    return notify(user, Kind.PVC_DECISION, decision=decision)
 
 
 def notify_moderation(user, kind: str, *, case=None, appeal=None, decision=""):
     """Spec 13 §4.6. Written inside the decision's transaction, so a decision and its notices commit together.
     Never names the moderator or the reporter."""
-    if user is None or not user.is_active or user.clerk_deleted_at:
+    return notify(user, kind, decision=decision, case=case, appeal=appeal)
+
+
+def notify_membership(membership, decision: str):
+    """Spec 15 §9.2: approved, activated, rejected or cancelled. Status word only."""
+    return notify(membership.user, Kind.MEMBERSHIP_DECISION, target=membership, decision=decision)
+
+
+def notify_donation_receipt(donation):
+    """Spec 15 §9.2: signed-in donors only (guests have the receipt page). Once per donation."""
+    if not donation.donor_user_id:
         return None
-    return Notification.objects.create(recipient=user, kind=kind, case=case, appeal=appeal, decision=(decision or "")[:10])
+    return notify(donation.donor_user, Kind.DONATION_RECEIPT, target=donation, decision="received")
 
 
 def visible(user):
     """Announcements only while their article is public; decisions about your own requests always."""
-    from .models import MODERATION_KINDS, PRIVACY_KINDS
+    from .models import MODERATION_KINDS, OWN_RECORD_KINDS, PRIVACY_KINDS
 
     return (Notification.objects.filter(recipient=user)
-            .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION, *MODERATION_KINDS, *PRIVACY_KINDS])
+            .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION, *MODERATION_KINDS, *PRIVACY_KINDS, *OWN_RECORD_KINDS])
                     | Q(kind=Kind.ANNOUNCEMENT, article__status="successful")
                     | Q(kind=Kind.CANDIDATE_POST, candidate_post__status="published", candidate_post__candidate__status="published",
                         candidate_post__candidate__verified_at__isnull=False))
-            .select_related("article", "candidate_post__candidate", "case", "appeal__case", "data_request", "incident"))
+            .select_related("article", "candidate_post__candidate", "case", "appeal__case", "data_request", "incident", "membership",
+                            "donation"))
 
 
 def unread_count(user) -> int:

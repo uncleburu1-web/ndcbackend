@@ -12,7 +12,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Health check: `GET http://localhost:8000/api/v1/health/`
+Health check: `GET http://localhost:8000/api/v1/health/` · readiness: `GET /api/v1/ready/` · API docs (development): `/api/v1/schema/docs/`
 
 ## Clerk setup (development instance)
 
@@ -72,13 +72,17 @@ Health check: `GET http://localhost:8000/api/v1/health/`
 | GET / POST | `/api/v1/admin/team/` (`?revoked=1`) · POST `<assignment_id>/revoke/` | system admin |
 | GET | `/api/v1/admin/users/?q=` (3+ chars, or `filter=ban_failed`) · `<id>/` · POST `<id>/{phone,deactivate,reactivate}/` | system admin (views and reveals audited) |
 | GET | `/api/v1/admin/audit/` (`area, action, actor, target, from, to`) · `actions/` | system admin (searches audited) |
+| GET | `/api/v1/ready/` | anyone — names and ok/failed only (spec 15) |
+| GET | `/api/v1/schema/` | system admin (production), anyone (development) |
+| POST | `/api/v1/media/upload-signature/` (`{purpose, target_id}`) | signed in, for a target you may change |
+| GET / POST | `/api/v1/admin/integrations/` · `webhooks/` (`?provider=&status=`) · `outbox/` (`?status=`) · POST `outbox/<id>/retry/` (reverified) | system admin |
 
 Single-candidate admin responses include `followers: {total, notify_on}` — counts only; no endpoint lists who follows a candidate.
 Follows are political-opinion data (NDPA 2023): private to the user, never audited, deleted when the account is deleted.
 
 Candidate photos are saved under `media/` (git-ignored) in development and served by Django only when `DEBUG` is on.
 
-Errors always look like `{"error": {"status", "code", "message", "fields"}}`.
+Errors always look like `{"error": {"status", "code", "message", "fields", "request_id"}}`; the full code list is in `docs/api.md`.
 Codes to handle: `not_authenticated` (401), `account_deactivated` (403), `auth_unavailable` (503), `validation_error` (400), `throttled` (429), `invalid_transition` (409), `invalid_photo` (400), `storage_unavailable` (503), `too_many_pending` (409), `self_review` (403), `publishing_paused` (409, with `until`), `too_many_pinned` (409), `source_required` (400), `candidate_not_published` (409), `posting_paused` (409), `self_moderation` (403), `self_change` (403), `last_system_admin` (409), `user_not_found` (404), `role_exists` (409), `user_inactive` (409), `query_too_short` (400), `invalid_role` (400), `query_too_long` (400), `invalid_filter` (400), `search_unavailable` (503), `removed` (410, with `rule`, `rule_title`, `kind`, `source`), `rule_required` (400), `legal_basis_required` (400), `not_your_case` (403), `same_decider` (403), `submissions_paused` (403, with `until`), `appeal_window_closed` (409), `appeal_exists` (409).
 
 ## Roles
@@ -194,6 +198,45 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **`python manage.py check_security`** prints PASS/FAIL/WARN and a name per check (never values) and exits 1 on any FAIL; the admin readiness panel shows the same under Security. CI (`.github/workflows/security.yml`) runs the tests, `check_security` with production settings and dummy values, `pip-audit` and gitleaks.
 - **Backups and restore tests:** see `docs/backups.md`; record each quarterly test with `python manage.py restore_drill --ok "notes"`.
 - **Schedule:** `privacy_tick` hourly; `verify_audit` and `prune_audit` weekly.
+
+## API and integration (spec 15)
+
+- **Contract:** `docs/openapi.json` (generated) and `docs/api.md` (conventions, error codes, rate limits, how to add an
+  endpoint). Regenerate after any API change:
+  `DJANGO_SETTINGS_MODULE=config.settings.schema python manage.py spectacular --format openapi-json --file docs/openapi.json --validate --fail-on-warn`,
+  then `npm run api:types` in `ndcfrontend`. Breaking changes need an entry in `docs/api-changes.md` (`manage.py api_compat` in CI).
+- **Environments:** development `config.settings.dev` (Clerk development instance, `PAYMENT_PROVIDER=fake`, `MEDIA_BACKEND=local`);
+  tests `config.settings.test`; staging and production `config.settings.prod` with their own Clerk instance, Paystack test
+  (staging) or live (production) keys, `MEDIA_BACKEND=cloudinary` and `CLOUDINARY_FOLDER=ndcconnect/staging` or `ndcconnect/prod`,
+  `CACHE_BACKEND=database`. Never copy production personal data to staging.
+- **Shared cache:** production uses PostgreSQL's database cache (`CACHE_BACKEND=database`; the `ndc_cache` table is created by
+  `migrate`), so rate limits and circuit breakers hold across Gunicorn workers. `check_security` and `/ready/` fail on the
+  per-process memory cache outside development.
+- **Cloudinary setup** (public images only; membership photos stay on NDCConnect's servers):
+  1. Use the party's own Cloudinary account. Settings → API Keys: copy the cloud name and API key into `CLOUDINARY_CLOUD_NAME`
+     and `CLOUDINARY_API_KEY`, the API secret into `CLOUDINARY_API_SECRET` (backend `.env` only — never in the frontend or Git).
+  2. Set `CLOUDINARY_FOLDER` per environment and `MEDIA_BACKEND=cloudinary`.
+  3. `python manage.py cloudinary_setup` creates the signed upload preset (`CLOUDINARY_UPLOAD_PRESET`, default
+     `ndcconnect_signed`): JPEG/PNG/WebP only, originals capped at 2000 px, metadata stripped.
+  4. Existing local images: `python manage.py migrate_media_to_cloudinary --dry-run`, then without `--dry-run`
+     (idempotent; `--delete-local` removes the local files after a verified upload).
+  5. In the web app set `VITE_MEDIA_ORIGIN=https://res.cloudinary.com`.
+- **Uploads:** the browser asks `POST /media/upload-signature/` for one signed upload, sends the file straight to Cloudinary,
+  then sends `{"asset": {public_id, version, signature}}` to the usual image endpoint, which re-checks the asset with
+  Cloudinary (folder, format, ≤ 5 MB, ≥ 400 px) before linking it. In `local` mode the signature answer is `{"mode": "server"}`
+  and the file goes to the image endpoint as before.
+- **Outbox:** work that must happen after a commit and must not be lost (notification fan-out, image deletion and hiding,
+  Clerk ban retries, webhook retries) is written as an `OutboxJob` in the same transaction and tried right after the commit.
+  Run `python manage.py process_outbox` every minute (or `process_outbox --loop` as a long-running process); failures retry
+  after 1 min, 5 min, 30 min, 2 h and 12 h, then show as "Background tasks failing" on `/admin` and at `/admin/integrations`.
+- **Webhook register:** every Clerk and Paystack webhook leaves a `WebhookReceipt` (IDs, types, a body hash; never the payload).
+  Duplicates change nothing; failures are retried. `PAYSTACK_WEBHOOK_IPS` optionally restricts Paystack's source addresses (off by default).
+- **External calls** go through `apps/integrations/http.py`: connect 3 s; read 10 s Paystack, 5 s Clerk, 10 s Cloudinary
+  (30 s server uploads); retries only for idempotent calls; a circuit breaker (5 failures in 60 s → 30 s open). It connects
+  directly (no `HTTPS_PROXY` support): the servers need outbound HTTPS to the providers.
+- **Logs:** one line per request with the route name, status, duration and request ID (`LOG_FORMAT=json` for JSON lines);
+  requests over `SLOW_REQUEST_MS` (1500) are warnings. Error responses carry the request ID; search for it in the logs.
+- **Schedule:** `process_outbox` every minute; `prune_outbox` and `prune_webhooks` daily; `media_audit` weekly.
 
 ## Tests
 

@@ -103,6 +103,9 @@ class AuditLog(models.Model):
         SECURITY_ACCESS_REVIEW_COMPLETED = "security.access_review_completed"
         SECURITY_ADMIN_ACCESS_DENIED = "security.admin_access_denied"
         SECURITY_RESTORE_DRILL = "security.restore_drill"
+        # Spec 15
+        SECURITY_WEBHOOK_SIGNATURE_FAILURES = "security.webhook_signature_failures"
+        INTEGRATION_JOB_RETRIED = "integration.job_retried"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

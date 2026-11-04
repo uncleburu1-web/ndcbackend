@@ -1,5 +1,7 @@
 """Notifications API — spec 07 §7.5. Acts only on request.user; private, no-store."""
 from django.utils.cache import add_never_cache_headers, patch_cache_control
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers as S
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,6 +10,34 @@ from apps.access.permissions import IsSignedIn
 from apps.core.exceptions import ServiceError
 
 from . import services
+from .models import Kind
+
+# OpenAPI shapes (spec 15 §14.1; the web app's generated types use these)
+_Photo = inline_serializer("NotificationCandidatePhoto", {"url_200": S.CharField()}, allow_null=True)
+NOTIFICATION = inline_serializer("Notification", {
+    "id": S.UUIDField(), "kind": S.ChoiceField(Kind.choices), "created_at": S.DateTimeField(), "read_at": S.DateTimeField(allow_null=True),
+    "decision": S.CharField(help_text="A short word: approved, rejected, verified, removed, activated, cancelled, received …"),
+    "article": inline_serializer("NotificationArticle", {"id": S.UUIDField(), "source": S.CharField(), "title": S.CharField(),
+                                                          "public": S.BooleanField()}, allow_null=True),
+    "post": inline_serializer("NotificationPost", {"id": S.UUIDField(), "kind": S.CharField(), "kind_label": S.CharField(),
+                                                    "title": S.CharField()}, required=False),
+    "candidate": inline_serializer("NotificationCandidate", {"slug": S.CharField(), "full_name": S.CharField(), "photo": _Photo},
+                                   required=False),
+    "case": inline_serializer("NotificationCase", {"id": S.UUIDField(), "target_kind": S.CharField(), "title": S.CharField(),
+                                                    "rule": S.CharField(), "rule_title": S.CharField()}, required=False),
+    "appeal": inline_serializer("NotificationAppeal", {"id": S.UUIDField(), "status": S.CharField(), "reason": S.CharField()},
+                                required=False),
+    "privacy_request": inline_serializer("NotificationPrivacyRequest", {"id": S.CharField(), "reference": S.CharField(),
+                                                                         "status": S.CharField(), "status_label": S.CharField()},
+                                         required=False),
+    "security_notice": inline_serializer("NotificationSecurityNotice", {"reference": S.CharField(), "text": S.CharField()},
+                                         required=False),
+    "membership": inline_serializer("NotificationMembership", {"status": S.CharField()}, required=False),
+    "donation": inline_serializer("NotificationDonation", {"reference": S.CharField()}, required=False, allow_null=True),
+})
+NOTIFICATION_PAGE = inline_serializer("NotificationPage", {"count": S.IntegerField(), "next": S.CharField(allow_null=True),
+                                                           "previous": S.CharField(allow_null=True), "results": S.ListField(child=NOTIFICATION)})
+PREFERENCES = inline_serializer("NotificationPreferences", {"announcements": S.BooleanField()})
 
 
 class _Private(APIView):
@@ -50,10 +80,15 @@ def item(n, request=None):
         out["privacy_request"] = {"id": str(r.pk), "reference": r.reference, "status": r.status, "status_label": r.get_status_display()}
     if n.incident_id:  # the officer's notice text, never the internal incident record
         out["security_notice"] = {"reference": n.incident.reference, "text": n.incident.notice_text}
+    if n.kind == "membership_decision":  # spec 15 §9.2: the word only; details are on the membership page
+        out["membership"] = {"status": n.membership.status if n.membership_id else ""}
+    if n.kind == "donation_receipt":  # the person's own receipt link; no amount in the row
+        out["donation"] = {"reference": n.donation.reference} if n.donation_id else None
     return out
 
 
 class NotificationList(_Private):
+    @extend_schema(summary="Your notifications, newest first (20 a page)", responses=NOTIFICATION_PAGE)
     def get(self, request):
         paginator = Page20()
         page = paginator.paginate_queryset(services.visible(request.user).order_by("-created_at"), request, view=self)
@@ -61,11 +96,14 @@ class NotificationList(_Private):
 
 
 class UnreadCount(_Private):
+    @extend_schema(summary="How many unread notifications you have (capped at 100)",
+                   responses=inline_serializer("UnreadCount", {"unread": S.IntegerField()}))
     def get(self, request):
         return Response({"unread": services.unread_count(request.user)})
 
 
 class MarkRead(_Private):
+    @extend_schema(summary="Mark one notification read", request=None, responses=inline_serializer("Ok", {"ok": S.BooleanField()}))
     def post(self, request, pk):
         from .models import Notification
 
@@ -76,14 +114,18 @@ class MarkRead(_Private):
 
 
 class MarkAllRead(_Private):
+    @extend_schema(summary="Mark all your notifications read", request=None,
+                   responses=inline_serializer("MarkedRead", {"updated": S.IntegerField()}))
     def post(self, request):
         return Response({"updated": services.mark_all_read(request.user)})
 
 
 class Preferences(_Private):
+    @extend_schema(summary="Your notification settings", responses=PREFERENCES)
     def get(self, request):
         return Response(services.preferences(request.user))
 
+    @extend_schema(summary="Turn announcement notifications on or off", request=PREFERENCES, responses=PREFERENCES)
     def patch(self, request):
         value = request.data.get("announcements")
         if not isinstance(value, bool):

@@ -51,6 +51,7 @@ class Article(models.Model):
     source_url = models.URLField(max_length=500, blank=True)
     image = models.CharField(max_length=255, blank=True)
     image_thumb = models.CharField(max_length=255, blank=True)
+    image_asset = models.ForeignKey("media.MediaAsset", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")  # spec 15 §7.4
     image_width = models.PositiveIntegerField(null=True, blank=True)
     image_height = models.PositiveIntegerField(null=True, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="news_articles")

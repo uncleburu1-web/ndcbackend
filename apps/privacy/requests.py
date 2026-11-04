@@ -20,12 +20,9 @@ def _err(msg, code, status=400):
 
 
 def _notify(req, decision=""):
-    from apps.notifications.models import Kind, Notification
+    from apps.notifications.services import notify
 
-    u = req.user
-    if u is None or not u.is_active or u.clerk_deleted_at:
-        return None
-    return Notification.objects.create(recipient=u, kind=Kind.PRIVACY_REQUEST_UPDATE, data_request=req, decision=decision[:10])
+    return notify(req.user, "privacy_request_update", target=req, decision=decision)
 
 
 def _event(req, event, actor=None, note="", shown=False):

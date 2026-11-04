@@ -46,6 +46,7 @@ class Candidate(TimeStampedModel):
 
     photo_800 = models.CharField(max_length=255, blank=True, default="")  # storage names (§5.3)
     photo_200 = models.CharField(max_length=255, blank=True, default="")
+    photo_asset = models.ForeignKey("media.MediaAsset", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")  # spec 15 §7.4
 
     status = models.CharField(max_length=12, choices=CandidateStatus.choices, default=CandidateStatus.DRAFT, db_index=True)
     verified_at = models.DateTimeField(null=True, blank=True)

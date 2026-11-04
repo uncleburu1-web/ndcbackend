@@ -7,7 +7,8 @@ from rest_framework.test import APITestCase
 
 from apps.access.models import Role
 from apps.access.services import grant_role
-from apps.accounts.models import ProcessedWebhook, User
+from apps.accounts.models import User
+from apps.integrations.models import WebhookReceipt as ProcessedWebhook
 from apps.audit.models import AuditLog
 
 from .helpers import PUBLIC_PEM, bearer, clerk_user, session_token, signed_webhook

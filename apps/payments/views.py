@@ -31,7 +31,9 @@ class _DRFLike:
 
 
 def _json_error(code, err, message):
-    return HttpResponse(json.dumps({"error": {"status": code, "code": err, "message": message, "fields": {}}}),
+    from apps.core.requestid import current
+
+    return HttpResponse(json.dumps({"error": {"status": code, "code": err, "message": message, "fields": {}, "request_id": current()}}),
                         status=code, content_type="application/json")
 
 
@@ -42,8 +44,15 @@ def payment_webhook(request, provider):
         return HttpResponse(status=405)
     if provider not in ("paystack", "fake") or (provider == "fake" and not fake_allowed()):
         return HttpResponseNotFound()
-    if not WebhookThrottle().allow_request(_DRFLike(request), None):
+    throttle = WebhookThrottle()
+    if not throttle.allow_request(_DRFLike(request), None):
         return HttpResponse(status=429)
+    from django.conf import settings
+
+    allow = [ip.strip() for ip in getattr(settings, "PAYSTACK_WEBHOOK_IPS", []) if ip.strip()]
+    if provider == "paystack" and allow and throttle.get_ident(_DRFLike(request)) not in allow:  # optional, spec 15 §19.8
+        logger.warning("Paystack webhook from an address outside PAYSTACK_WEBHOOK_IPS")
+        return _json_error(403, "permission_denied", "Webhook source not allowed.")
     try:
         dispatch.handle_webhook(provider, request.body, request.headers)
     except InvalidSignature:

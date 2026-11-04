@@ -12,8 +12,6 @@ The secret key comes from settings (backend .env only) and is never logged.
 import hashlib
 import hmac
 import json
-import urllib.error
-import urllib.request
 
 from django.conf import settings
 from django.utils.dateparse import parse_datetime
@@ -26,7 +24,6 @@ HANDLED_EVENTS = {"charge.success", "refund.processed", "refund.failed", "refund
 
 class PaystackProvider(PaymentProvider):
     name = "paystack"
-    timeout = 15
 
     def _key(self) -> str:
         return settings.PAYSTACK_SECRET_KEY or ""
@@ -35,21 +32,21 @@ class PaystackProvider(PaymentProvider):
         return self._key().startswith(("sk_test_", "sk_live_"))
 
     def _call(self, method: str, path: str, body=None) -> dict:
-        req = urllib.request.Request(
-            settings.PAYSTACK_API_BASE + path,
-            method=method,
-            data=json.dumps(body).encode() if body is not None else None,
-            headers={"Authorization": f"Bearer {self._key()}", "Content-Type": "application/json", "Accept": "application/json"},
-        )
+        """Through the shared client (spec 15 §12.2): 3 s connect, 10 s read, breaker; retries only for GETs."""
+        from apps.integrations import http
+
+        op = path.split("?")[0].rsplit("/", 1)[0] if path.startswith("/transaction/verify/") else path.split("?")[0]
         try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as res:
-                data = json.loads(res.read() or b"{}")
-        except urllib.error.HTTPError as exc:
+            res = http.call("paystack", method, settings.PAYSTACK_API_BASE + path, operation=op, json=body,
+                            headers={"Authorization": f"Bearer {self._key()}", "Accept": "application/json"},
+                            idempotent=method == "GET")
+        except http.ProviderUnavailable as exc:
+            raise ProviderError(f"Paystack unreachable: {exc.reason}") from None
+        data = res.json()
+        if res.status >= 400:
             # Never include the request (it carries the key) in the error.
-            raise ProviderError(f"Paystack {path.split('?')[0]} returned {exc.code}") from None
-        except (urllib.error.URLError, TimeoutError, ValueError) as exc:
-            raise ProviderError(f"Paystack unreachable: {type(exc).__name__}") from None
-        if not data.get("status"):
+            raise ProviderError(f"Paystack {path.split('?')[0]} returned {res.status}")
+        if not isinstance(data, dict) or not data.get("status"):
             raise ProviderError(f"Paystack {path.split('?')[0]} refused the request")
         return data.get("data") or {}
 
