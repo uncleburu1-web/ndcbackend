@@ -6,7 +6,7 @@ NDCConnect API — Django 5.2 LTS + Django REST Framework + PostgreSQL. Authenti
 
 ```bash
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt                    # production servers: requirements.txt only
 cp .env.example .env                                   # fill in Clerk dev keys
 python manage.py migrate
 python manage.py runserver
@@ -278,8 +278,11 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 ## Tests
 
 ```bash
-python manage.py test apps
+python manage.py test apps --parallel
 ```
+
+`--parallel` runs the tests across your CPU cores. `tblib` (in `requirements-dev.txt`) keeps the real traceback when a test fails
+in that mode; without it a failure shows only as "cannot pickle 'traceback' object". Drop `--parallel` to run one at a time.
 
 `manage.py test` always uses `config.settings.test` (unless you pass `--settings`) and ignores `.env` except `DATABASE_URL`,
 so your local keys, gates and consent switches can't change the results. Works the same on Windows (PowerShell) and Linux.
