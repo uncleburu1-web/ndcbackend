@@ -112,6 +112,12 @@ ACTIONS: dict[str, tuple[str, tuple[str, ...]]] = {
     A.MODERATION_UNHIDDEN: ("unhid a community item", ("kind",)),
     A.COMMUNITY_SETTINGS_CHANGED: ("changed a community's settings", ("fields",)),
     A.COMMUNITY_COUNTS_VIEWED: ("viewed community member counts", ()),
+    A.EVENT_PUBLISHED: ("published an event", ("organiser",)),
+    A.EVENT_CANCELLED: ("cancelled an event", ()),
+    A.EVENT_CHECKIN_LIST_OPENED: ("opened an event's check-in list", ()),
+    A.EVENT_PARTY_CREATED: ("published a party event", ()),
+    A.VOLUNTEER_CONTACT_VIEWED: ("viewed an accepted volunteer's contact details", ()),
+    A.VOLUNTEER_OPENING_CHANGED: ("changed a campaign's volunteer opening", ("open",)),
 }
 
 # area → (words, action prefixes)
@@ -126,6 +132,7 @@ AREAS: dict[str, tuple[str, tuple[str, ...]]] = {
     "posts": ("Candidate posts", ("post.",)),
     "moderation": ("Moderation", ("moderation.",)),
     "communities": ("Communities", ("community.",)),
+    "events": ("Events and volunteering", ("event.", "volunteer.")),
     "privacy": ("Privacy", ("privacy.",)),
     "security": ("Security", ("security.",)),
     "audit": ("Audit views", ("audit.",)),
@@ -147,6 +154,7 @@ TARGET_WORDS = {
     "moderation.appeal": "Appeal",
     "moderation.legalnotice": "Legal notice",
     "communities.community": "Community",
+    "events.event": "Event",
     "moderation.report": "Report",
     "privacy.datarequest": "Privacy request",
     "privacy.incident": "Incident",

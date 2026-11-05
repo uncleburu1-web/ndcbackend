@@ -113,6 +113,13 @@ class AuditLog(models.Model):
         MODERATION_UNHIDDEN = "moderation.unhidden"
         COMMUNITY_SETTINGS_CHANGED = "community.settings_changed"
         COMMUNITY_COUNTS_VIEWED = "community.counts_viewed"
+        # spec 18 §15.4 (registrations and applications themselves are never audited)
+        EVENT_PUBLISHED = "event.published"
+        EVENT_CANCELLED = "event.cancelled"
+        EVENT_CHECKIN_LIST_OPENED = "event.checkin_list_opened"
+        EVENT_PARTY_CREATED = "event.party_created"
+        VOLUNTEER_CONTACT_VIEWED = "volunteer.contact_viewed"
+        VOLUNTEER_OPENING_CHANGED = "volunteer.opening_changed"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

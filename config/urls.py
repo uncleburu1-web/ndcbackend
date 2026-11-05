@@ -23,6 +23,8 @@ api_v1 = [
     path("", include("apps.integrations.urls")),
     path("", include("apps.media.urls")),
     path("", include("apps.communities.urls")),  # spec 17
+    path("", include("apps.events.urls")),  # spec 18
+    path("", include("apps.volunteers.urls")),  # spec 18
     path("", include("apps.core.schema_urls")),
 ]
 

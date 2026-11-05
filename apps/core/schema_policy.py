@@ -16,6 +16,11 @@ JSON_REASONS = {
     "moderation.ComplianceYear.figures": "a frozen yearly report; never queried by field",
     "privacy.Incident.data_categories": "a few category keys chosen by the officer, shown with the incident",
     "media.MediaAsset.local_files": "variant → storage name for local files; read only by the media service",
+    "events.Event.declarations": "the declarations confirmed at publishing, with the time, kept as evidence (spec 18 rules 3–5)",
+    "volunteers.VolunteerOpening.roles": "a few role keys from a fixed list, always read with the opening",
+    "volunteers.VolunteerOpening.states": "a few state slugs, always read with the opening",
+    "volunteers.VolunteerApplication.roles": "the role keys the person offered, from the opening's list",
+    "volunteers.VolunteerApplication.availability": "up to three availability keys, shown with the application",
 }
 
 # Owner-of-private-data links to a person (CASCADE is the rule; §5.1 row 2).
@@ -24,6 +29,7 @@ USER_OWNER_LINKS = {
     "notifications.NotificationPreference.user", "privacy.ConsentRecord.user", "pvc.PvcVerification.user", "pvc.PvcEvent.user",
     "moderation.Restriction.user",
     "communities.CommunityMembership.user", "communities.CommunitySettings.user", "communities.CommunityReaction.user",  # spec 17
+    "events.EventRegistration.user", "volunteers.VolunteerApplication.user",  # spec 18
 }
 USER_LEGAL_RECORDS = {"membership.Membership.user"}  # PROTECT (§5.1 row 3)
 MONEY_PARENTS = {"donations.Donation", "membership.Membership", "membership.MembershipPayment"}
@@ -59,7 +65,7 @@ def expected(f) -> tuple[set, str]:
         return {models.SET_NULL}, "a person as actor; the record outlives the account"
     if f.model.__name__.endswith("Event") and target in MONEY_PARENTS:
         return {models.PROTECT, models.CASCADE}, "money history: kept with its record, removed only by the record's own erasure"
-    if f.model.__name__.endswith("Event"):
+    if f.model.__name__.endswith("Event") and f.model._meta.label != "events.Event":  # events.Event is content (spec 18)
         return {models.CASCADE}, "history goes when retention deletes its parent"
     if target == "candidates.Candidate":
         return {models.PROTECT}, "candidates are archived, never deleted"
@@ -75,6 +81,10 @@ def expected(f) -> tuple[set, str]:
         return {models.PROTECT}, "communities are deactivated, never deleted"
     if target == "communities.CommunityPost":
         return {models.CASCADE}, "comments and likes go with their post (retention only)"
+    if target == "events.Event":
+        return {models.CASCADE}, "registrations, updates and history go with their event (retention only)"
+    if target in ("volunteers.VolunteerApplication", "volunteers.VolunteerUpdate"):
+        return {models.CASCADE}, "history and notices go with their application or update (retention only)"
     return set(), "not covered by the policy: add a reason to EXCEPTIONS"
 
 

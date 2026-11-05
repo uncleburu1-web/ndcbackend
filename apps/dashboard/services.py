@@ -21,16 +21,16 @@ from .cards import Card, Stat, to_dict
 logger = logging.getLogger(__name__)
 
 # Order matters: cards appear in this order (spec 11 §4.2).
-SUMMARY_APPS = ["privacy", "moderation", "communities", "news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts",
+SUMMARY_APPS = ["privacy", "moderation", "communities", "events", "news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts",
                 "integrations"]
-CARD_ORDER = ["audit_chain_broken", "incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "community_hidden_waiting", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
-              "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing", "data_integrity_issues", "communities_unmoderated", "access_review_due"]
+CARD_ORDER = ["audit_chain_broken", "incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "community_hidden_waiting", "events_reported", "events_hidden_waiting", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
+              "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing", "data_integrity_issues", "communities_unmoderated", "events_in_blackout", "access_review_due"]
 GROUPS = [("people", "People"), ("candidates", "Candidates and following"), ("content", "Content"), ("pvc", "PVC"),
           ("membership", "Membership"), ("donations", "Donations")]
 ADMIN_ROLES = {Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.MODERATOR,
                Role.PRIVACY_OFFICER}
 CACHE_SECONDS = 30
-APP_LABELS = {"privacy": "Privacy and security", "moderation": "Moderation", "communities": "Communities", "news": "News", "posts": "Candidate posts", "pvc": "PVC checks", "membership": "Membership", "donations": "Donations",
+APP_LABELS = {"privacy": "Privacy and security", "moderation": "Moderation", "communities": "Communities", "events": "Events", "news": "News", "posts": "Candidate posts", "pvc": "PVC checks", "membership": "Membership", "donations": "Donations",
               "candidates": "Candidates", "follows": "Following", "accounts": "Accounts", "integrations": "Integrations"}
 
 
@@ -66,7 +66,7 @@ def admin_areas(user) -> list[str]:
     if has_role(user, Role.PRIVACY_OFFICER):
         areas.append("privacy")  # spec 14 §4.13 (implied by system admin)
     if sysadmin:
-        areas += ["announcements", "posts", "team", "audit", "integrations", "communities"]  # integrations: spec 15; communities: 17
+        areas += ["announcements", "posts", "team", "audit", "integrations", "communities", "events"]  # 15; communities: 17; events: 18
     return areas
 
 
@@ -184,6 +184,15 @@ def readiness(now):
                      (run.summary[:120] if run and run.summary else "") if run else "Not run yet · run sync_communities"))
     mods = RA.objects.filter(role=Role.MODERATOR, scope_type=ScopeType.GLOBAL, is_active=True, user__is_active=True).exists()
     out.append(_item("security", "Moderators in place", "ready" if mods else "warning", "" if mods else "No platform-wide moderator yet"))
+    # spec 18 §15.3
+    from apps.core import blackouts
+
+    unset = blackouts.unset_period_offices()
+    out.append(_item("security", "Campaign periods", "warning" if len(unset) == 7 else "ready",
+                     ("Not set for " + ", ".join(unset)) if unset else ""))
+    tick = JobRun.objects.filter(job="events_tick", ok=True).order_by("-finished_at").first()
+    fresh = bool(tick and tick.finished_at and tick.finished_at >= now - timedelta(minutes=30))
+    out.append(_item("security", "Events jobs", "ready" if fresh else "warning", "" if fresh else "events_tick hasn't run in 30 minutes"))
     from apps.search.index import health as search_health
 
     h = search_health()  # spec 12 §6.6: entries vs public items, within 1%

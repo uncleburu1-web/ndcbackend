@@ -222,7 +222,7 @@ class AdminCases(_Private):
                 qs = qs.filter(status=CaseStatus.OPEN)
         if tab != "closed":
             qs = qs.order_by("priority_rank", "opened_at")
-        kind = {"news": "article", "posts": "post", "profiles": "candidate"}.get(qp.get("type", ""), qp.get("type", ""))
+        kind = {"news": "article", "posts": "post", "profiles": "candidate", "events": "event"}.get(qp.get("type", ""), qp.get("type", ""))
         if kind == "communities":  # spec 17: community posts and comments together
             qs = qs.filter(target_kind__in=T.COMMUNITY_KINDS)
         elif kind in TargetKind.values:
@@ -286,6 +286,11 @@ def _item_payload(case, obj, request):
         out |= {"body": obj.body, "community": {"id": com.id, "name": com.name, "path": com.path, "level": com.level},
                 "author": {"label": short_name(obj.author) + (f" · Campaign team · {obj.campaign_candidate.full_name}"
                                                                if obj.campaign_candidate_id else "")},
+                "hidden_at": obj.hidden_at}
+    elif k == TargetKind.EVENT:  # spec 18 §8: the event as readers see it; never who registered
+        out |= {"body": obj.description, "state": obj.state, "author": {"label": obj.organiser_label},
+                "event": {"type_label": obj.get_type_display(), "starts_at": obj.starts_at, "venue": obj.venue_name or "Online",
+                          "venue_type_label": obj.get_venue_type_display() if obj.venue_type else "", "registered": obj.registered_count},
                 "hidden_at": obj.hidden_at}
     else:
         out |= {"body": obj.biography, "position": obj.get_position_display(), "author": None}

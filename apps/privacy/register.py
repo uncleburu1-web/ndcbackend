@@ -102,6 +102,31 @@ CATEGORIES = [
              "account through an audited view.",
              "Posts you delete: text erased after 30 days. Removed posts: 1 year. Ended memberships: 30 days.",
              "Memberships and likes are deleted; your posts and comments stay as 'Former member'.", sensitive=True, job="prune_communities"),
+    Category("events", "Events", ("events.EventRegistration",),
+             "The events you register for, your ticket code, whether you were waitlisted and when you were checked in.",
+             "To give you a place at events and send you updates and reminders.",
+             "Your explicit consent, NDPA s. 30(1)(a) (registering for a political event shows your political opinions).",
+             "You. The event's organiser sees how many people registered and, from 24 hours before to 24 hours after the event, your "
+             "first name and last initial with your ticket code for check-in. Nobody else, admins included, sees that you registered.",
+             "Deleted 90 days after the event ends; counts are kept.",
+             "Your registrations are deleted.", sensitive=True, job="prune_events"),
+    Category("event_records", "Event listings", ("events.Event", "events.EventUpdate", "events.EventChange"),
+             "Events published by campaigns and the party, their updates and their history, and which account created them.",
+             "To publish campaign and party events.",
+             "Legitimate interest in publishing public campaign activity, NDPA s. 25(1)(b).",
+             "Published events are public under the campaign's or the party's name; who created them: system administrators only.",
+             "2 years after the event ends (removed events: the moderation preservation period).",
+             "Events stay under the organiser; the creator link is cleared.", job="prune_events"),
+    Category("volunteering", "Volunteering", ("volunteers.VolunteerApplication", "volunteers.VolunteerChange",
+                                              "volunteers.VolunteerUpdate", "volunteers.VolunteerOpening"),
+             "Your volunteer applications (roles, state and LGA, availability, a note, whether to share your phone), the campaign's "
+             "decision, the updates campaigns send their volunteers, and campaigns' volunteer settings.",
+             "To let you volunteer for a campaign and let the campaign coordinate with you (FR-047–FR-050).",
+             "Your explicit consent, NDPA s. 30(1)(a) (volunteering shows which candidate you support).",
+             "You and the campaign you applied to: first name and last initial, state, LGA, roles, availability and note; if they accept "
+             "you, your full name and, if you chose, your phone number (each view is recorded). Nobody else.",
+             "Declined, withdrawn or ended: 90 days. Accepted: until 90 days after the candidate's election. Updates: 1 year.",
+             "Your applications are deleted.", sensitive=True, job="prune_volunteers"),
     Category("candidates", "Candidate profiles", ("candidates.Candidate",),
              "Public candidate details (name, office, area, biography, photo, links) and which admins created or edited them.",
              "To publish verified candidate profiles.",
@@ -215,6 +240,18 @@ CONSENT_PURPOSES = {
         "The badge is turned off.", notice_anchor="pvc"),
     # v2 adds communities (spec 17 §17.1). Material for communities only: a v1 record keeps the badge on community news, and the
     # badge shows in communities once the person agrees to v2 (pvc.services.community_badge; consents_needed asks them).
+    "event_registration": ConsentPurpose(
+        "event_registration", "Event registration", 1,
+        "Registering for an event tells NDCConnect, and the event's organiser, that you plan to attend a political event. The organiser "
+        "sees your first name and last initial with your ticket code around the event, and how many people registered. Nobody else sees "
+        "that you registered. You can cancel any time.",
+        "Your upcoming registrations are cancelled and deleted.", notice_anchor="events"),
+    "volunteering": ConsentPurpose(
+        "volunteering", "Volunteering", 1,
+        "Volunteering tells NDCConnect, and the campaign you apply to, that you support that candidate. The campaign sees your first name "
+        "and last initial, state, LGA, roles, availability and note; if they accept you, your full name, and your phone number if you "
+        "choose to share it. You can withdraw any time.",
+        "Your open applications are withdrawn and the campaign can no longer see your contact details.", notice_anchor="volunteering"),
     "community_membership": ConsentPurpose(
         "community_membership", "Communities", 1,
         "Communities let you discuss politics with people in your state, LGA, ward and polling unit. Joining records which communities "

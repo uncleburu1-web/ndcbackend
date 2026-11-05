@@ -24,6 +24,7 @@ class TargetKind(models.TextChoices):
     CANDIDATE = "candidate", "Candidate profile"
     COMMUNITY_POST = "community_post", "Community post"  # spec 17 §8.1
     COMMUNITY_COMMENT = "community_comment", "Community comment"
+    EVENT = "event", "Event"  # spec 18 §8
 
 
 class ReportStatus(models.TextChoices):

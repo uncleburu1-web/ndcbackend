@@ -115,15 +115,16 @@ class OverviewAccessTests(Base):
     def test_each_role_gets_exactly_its_sections(self):
         expect = {
             "sa": (["incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due",
-                    "community_hidden_waiting", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
-                    "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing", "data_integrity_issues",
-                    "communities_unmoderated"],
+                    "community_hidden_waiting", "events_reported", "events_hidden_waiting", "news_pending", "pvc_pending",
+                    "membership_approvals", "membership_payments_review", "donations_review", "candidates_unpublished", "ban_failed",
+                    "background_tasks_failing", "data_integrity_issues", "communities_unmoderated", "events_in_blackout"],
                    ["people", "candidates", "content", "pvc", "membership", "donations"], True),
             "news": (["reports_review", "reports_urgent", "appeals_waiting", "news_pending"], ["content"], False),
             "pvc": (["pvc_pending"], ["pvc"], False),
             "mem": (["pvc_pending", "membership_approvals", "membership_payments_review"], ["pvc", "membership"], False),
             "fin": (["donations_review"], ["donations"], False),
-            "mod": (["reports_review", "reports_urgent", "appeals_waiting", "community_hidden_waiting"], [], False),  # 13 §4.9, 17 §15.2
+            "mod": (["reports_review", "reports_urgent", "appeals_waiting", "community_hidden_waiting", "events_reported",
+                     "events_hidden_waiting"], [], False),  # 13 §4.9, 17 §15.2, 18 §15.2
         }
         for who, (cards, groups, sys_sections) in expect.items():
             data = overview(getattr(self, who)).data
@@ -244,7 +245,7 @@ class CountTests(Base):
         cache.clear()
         with CaptureQueriesContext(connection) as ctx:
             client(self.sa).get(reverse("admin-overview"))
-        self.assertLess(len(ctx.captured_queries), 98)  # spec 17 adds the communities cards and two readiness lines
+        self.assertLess(len(ctx.captured_queries), 104)  # 17: communities cards and two readiness lines; 18: three event cards, two lines
 
 
 class ReadinessTests(Base):
@@ -524,6 +525,6 @@ class MeAreasTests(Base):
         self.assertEqual(admin_areas(self.mem), ["overview", "pvc", "membership"])
         self.assertEqual(admin_areas(self.fin), ["overview", "donations"])
         self.assertEqual(admin_areas(self.sa), ["overview", "candidates", "donations", "pvc", "membership", "moderation", "news", "privacy",
-                                                "announcements", "posts", "team", "audit", "integrations", "communities"])
+                                                "announcements", "posts", "team", "audit", "integrations", "communities", "events"])
         r = client(self.news).get(reverse("me"))
         self.assertEqual(r.data["admin_areas"], ["overview", "moderation", "news"])

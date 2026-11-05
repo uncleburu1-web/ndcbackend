@@ -32,6 +32,15 @@ def _public_posts():
     return CandidatePost.objects.visible().select_related("candidate")
 
 
+def _public_events():
+    from django.utils import timezone
+
+    from apps.events.models import EventStatus
+    from apps.events.services import public_events
+
+    return public_events().filter(status=EventStatus.PUBLISHED, ends_at__gt=timezone.now())
+
+
 def _candidate_entry(c):
     from apps.candidates.reference import POSITION_ORDER
 
@@ -61,11 +70,22 @@ def _post_entry(p):
     }
 
 
+def _event_entry(e):
+    organiser = e.organiser_label
+    return {
+        "title": e.title, "body_text": e.description[:BODY_MAX], "state": e.state or "", "position": "", "election_year": None,
+        "source": "", "published_at": e.published_at, "rank_order": 0,
+        "_weights": {"A": e.title, "B": f"{organiser} {e.get_type_display()}", "C": f"{place_words(e.state)} {e.lga_text}",
+                     "D": e.description[:BODY_MAX]},
+    }
+
+
 # kind → (public queryset factory, entry builder)
 SEARCHABLE = {
     Kind.CANDIDATE: (_public_candidates, _candidate_entry),
     Kind.ARTICLE: (_public_articles, _article_entry),
     Kind.POST: (_public_posts, _post_entry),
+    Kind.EVENT: (_public_events, _event_entry),
 }
 
 
@@ -109,6 +129,8 @@ def index_candidate(c):
     _sync(Kind.CANDIDATE, c)
     for p in c.posts.all():
         _sync(Kind.POST, p)
+    for e in c.events.all():  # spec 18: campaign events follow their candidate too
+        _sync(Kind.EVENT, e)
 
 
 def index_article(a):
@@ -117,6 +139,10 @@ def index_article(a):
 
 def index_post(p):
     _sync(Kind.POST, p)
+
+
+def sync_event(e):
+    _sync(Kind.EVENT, e)
 
 
 @transaction.atomic

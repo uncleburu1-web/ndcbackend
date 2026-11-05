@@ -56,7 +56,9 @@ INSTALLED_APPS = [
     "apps.integrations",  # spec 15: registry, HTTP client, webhook register
     "apps.media",  # spec 15 §7: Cloudinary / local images
     "apps.geo",  # spec 16 §8: INEC geography reference data
-    "apps.communities",  # spec 17
+    "apps.communities",
+    "apps.events",
+    "apps.volunteers",  # spec 17
 ]
 
 MIDDLEWARE = [
@@ -132,6 +134,10 @@ REST_FRAMEWORK = {
         "community_comment": "30/hour",
         "community_reaction": "120/hour",
         "community_write": "60/hour",
+        "event_write": "60/day",  # spec 18 §13.3 (per account)
+        "event_register": "30/hour",
+        "volunteer_apply": "10/day",
+        "campaign_update": "20/day",
         "admin_write": "60/hour",  # per admin: grants, revokes, deactivations, reveals (spec 11 §7)
         "admin_read": "300/hour",  # per admin: overview, user search, audit search (spec 11 §9)
         "search_public": "60/min",  # per IP (spec 12 §7)
@@ -159,7 +165,10 @@ SPECTACULAR_SETTINGS = {
     "SORT_OPERATIONS": False,
     "ENUM_NAME_OVERRIDES": {"IntegrationStateEnum": ["ok", "failing", "unavailable", "not_configured", "not_in_use"],
                             "NigerianStateEnum": "apps.candidates.reference.State",
-                            "NotificationKindEnum": "apps.notifications.models.Kind"},
+                            "NotificationKindEnum": "apps.notifications.models.Kind",
+                            "EventModeEnum": "apps.events.models.Mode",  # spec 18
+                            "EventStatusEnum": "apps.events.models.EventStatus",
+                            "EventRegistrationStatusEnum": "apps.events.models.RegistrationStatus"},
     "APPEND_COMPONENTS": {"securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "Clerk session JWT"}}},
     "POSTPROCESSING_HOOKS": ["drf_spectacular.hooks.postprocess_schema_enums", "apps.core.schema.postprocess"],
 }
@@ -289,6 +298,12 @@ _DEFAULT_BLACKOUTS = [
     {"positions": ["governor", "state_assembly"], "start": "2027-02-05T08:00+01:00", "end": "2027-02-06T23:59+01:00"},
 ]
 CAMPAIGN_BLACKOUTS = json.loads(config("CAMPAIGN_BLACKOUTS", default=json.dumps(_DEFAULT_BLACKOUTS)))
+# Spec 18 §4.4: campaign periods from INEC's 2027 timetable (Electoral Act 2026 s. 98). LGA offices: set per state (SIEC dates).
+_DEFAULT_CAMPAIGN_PERIODS = [
+    {"positions": ["president", "senator", "house_of_reps"], "start": "2026-08-19T00:00+01:00", "end": "2027-01-15T07:59+01:00"},
+    {"positions": ["governor", "state_assembly"], "start": "2026-09-09T00:00+01:00", "end": "2027-02-05T07:59+01:00"},
+]
+CAMPAIGN_PERIODS = json.loads(config("CAMPAIGN_PERIODS", default=json.dumps(_DEFAULT_CAMPAIGN_PERIODS)))
 NEWS_MAX_PENDING = 3
 NEWS_MAX_PINNED = 3
 NEWS_COMMUNITY_MIN_BODY = 100

@@ -37,10 +37,14 @@ NOTIFICATION = inline_serializer("Notification", {
     "community_post": inline_serializer("NotificationCommunityPost", {"id": S.UUIDField(), "count": S.IntegerField()}, required=False),
     "community": inline_serializer("NotificationCommunity", {"id": S.UUIDField(), "name": S.CharField(), "path": S.CharField()},
                                    required=False),
+    "event": inline_serializer("NotificationEvent", {"id": S.UUIDField(), "title": S.CharField(), "starts_at": S.DateTimeField(),
+                                                      "status": S.CharField(), "organiser": S.CharField()}, required=False),
+    "volunteer_update": inline_serializer("NotificationVolunteerUpdate", {"text": S.CharField()}, required=False),
 })
 NOTIFICATION_PAGE = inline_serializer("NotificationPage", {"count": S.IntegerField(), "next": S.CharField(allow_null=True),
                                                            "previous": S.CharField(allow_null=True), "results": S.ListField(child=NOTIFICATION)})
-PREFERENCES = inline_serializer("NotificationPreferences", {"announcements": S.BooleanField(), "community_replies": S.BooleanField()})
+PREFERENCES = inline_serializer("NotificationPreferences", {"announcements": S.BooleanField(), "community_replies": S.BooleanField(),
+                                                           "event_reminders": S.BooleanField(), "candidate_events": S.BooleanField()})
 
 
 class _Private(APIView):
@@ -93,6 +97,14 @@ def item(n, request=None):
         out["community"] = {"id": c.id, "name": c.name, "path": c.path}
     elif n.kind == "community_placed":
         out["community"] = None
+    if n.event_id:  # spec 18 §10: which event and a short word; never who else registered
+        e = n.event
+        out["event"] = {"id": e.id, "title": e.title, "starts_at": e.starts_at, "status": e.status, "organiser": e.organiser_label}
+    if n.candidate_id and n.kind in ("volunteer_decision", "volunteer_update"):
+        c = n.candidate
+        out["candidate"] = {"slug": c.slug, "full_name": c.full_name, "photo": None}
+    if n.volunteer_update_id:
+        out["volunteer_update"] = {"text": n.volunteer_update.text}
     return out
 
 
@@ -134,9 +146,10 @@ class Preferences(_Private):
     def get(self, request):
         return Response(services.preferences(request.user))
 
-    @extend_schema(summary="Turn announcement or community-reply notifications on or off", request=PREFERENCES, responses=PREFERENCES)
+    @extend_schema(summary="Turn announcement, community-reply, event-reminder or new-event notifications on or off", request=PREFERENCES, responses=PREFERENCES)
     def patch(self, request):
-        values = {k: request.data.get(k) for k in ("announcements", "community_replies") if k in request.data}
+        values = {k: request.data.get(k) for k in services.PREF_FIELDS if k in request.data}
         if not values or any(not isinstance(v, bool) for v in values.values()):
-            raise ServiceError("Send announcements or community_replies as true or false.", code="validation_error", status_code=400)
+            raise ServiceError("Send one of " + ", ".join(services.PREF_FIELDS) + " as true or false.", code="validation_error",
+                               status_code=400)
         return Response(services.set_preferences(request.user, **values))

@@ -159,8 +159,8 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 
 - `/admin` shows each admin role its own queues, weekly counts, readiness (gates and settings as set/not set, never values), background jobs and recent activity. Numbers are cached 30 seconds per role set.
 - Every scheduled command records a `JobRun` (shown under Background jobs; "Overdue" when it hasn't run in time). Suggested schedule:
-  - every 15 minutes: `sweep_payments` (or the alias `sweep_donations`) and `moderation_tick` (also raises community items hidden over 48 hours to urgent);
-  - daily: `check_donations`, `prune_pvc`, `prune_news`, `prune_notifications`, `prune_posts`, `prune_moderation`, `prune_communities`;
+  - every 15 minutes: `sweep_payments` (or the alias `sweep_donations`), `moderation_tick` (also raises community items hidden over 48 hours to urgent) and `events_tick` (event reminders, registration deadlines, blackout flags; spec 18);
+  - daily: `check_donations`, `prune_pvc`, `prune_news`, `prune_notifications`, `prune_posts`, `prune_moderation`, `prune_communities`, `prune_events`, `prune_volunteers`;
   - nightly: `sync_communities --placements` (spec 17);
   - hourly: `privacy_tick`;
   - weekly: `prune_jobruns` (job records older than 90 days), `verify_audit`, `prune_audit`, `check_integrity` (spec 16).
@@ -274,6 +274,26 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
   memberships per spec 17 §17.3).
 - **Checks:** `check_integrity` adds community checks (memberships missing their parent level, members of closed communities,
   count drift (fixed), items hidden over 48 hours).
+
+## Events and volunteering (spec 18)
+
+- **Who organises:** a candidate's linked campaign accounts (Admin → Candidates → Accounts) from `/campaign/<candidate>` → Events,
+  and system admins for party events (Admin → Events → Party events, optionally NDC members only). Every event shows its organiser.
+- **The law in the rules:** set `CAMPAIGN_PERIODS` from INEC's timetable (the defaults are the 2027 general election's). Rallies and
+  canvassing outside the office's period are refused; no campaign event may start inside a `CAMPAIGN_BLACKOUTS` window; places of
+  worship, police stations and public offices can't be venues; publishing needs the declarations (no inducements, lawful venue,
+  police told for public rallies). Readiness shows "Campaign periods" and "Events jobs".
+- **Registration:** signed-in adults with the "Events" consent; ticket codes; a waitlist when full (promoted in order, notified);
+  reminders 24 hours before (1 hour for online events). Organisers see counts, and short names with ticket codes only from 24 hours
+  before to 24 hours after the event (each opening audited, no export). Nobody else can see who registered.
+- **Volunteering:** off until the campaign opens it (`/campaign/<candidate>` → Volunteers). Campaigns see first name + last
+  initial, area, roles and note; full name and phone only after accepting someone who opted in (audited). Updates to accepted
+  volunteers, up to 5 a week.
+- **Moderation:** reports go to 13's cases (type Events, rule R11, reasons "inducement" and "banned venue"); moderators can hide while
+  deciding, then remove or restore.
+- **Schedule:** `events_tick` every 15 minutes; `prune_events` and `prune_volunteers` daily (spec 18 §17.2).
+- **Checks:** `check_integrity` adds event count drift, events over capacity, waitlists with free places and open volunteering for
+  unpublished candidates.
 
 ## Tests
 

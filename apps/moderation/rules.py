@@ -16,11 +16,13 @@ class Rule:
     law: str = ""
 
 
-RULES_VERSION = 2
+RULES_VERSION = 3
 RULES_UPDATED = date(2026, 11, 5)
 RULES_DRAFT = True  # spec 13 §15.1: until the wording is signed off
 CHANGES = [(date(2026, 11, 2), "First published: rules R1–R10."),
-           (date(2026, 11, 5), "R10 now covers communities: keep to politics and public life in that area.")]
+           (date(2026, 11, 5), "R10 now covers communities: keep to politics and public life in that area."),
+           (date(2026, 11, 5), "New R11 for events: no inducements, no campaigning at places of worship, police stations or public "
+                               "offices, and no misstating who organises an event.")]
 
 RULES = [
     Rule("R1", "No threats or incitement to violence",
@@ -64,6 +66,11 @@ RULES = [
          "In communities, keep to politics and public life in that area.",
          ("Opinion pieces presented as news", "Copied articles"),
          ""),
+    Rule("R11", "Lawful events and campaigning",
+         "Events can't offer money, gifts or goods for attending or voting (a \"transport refund\" counts), can't be held at places "
+         "of worship, police stations or public offices, and must say truthfully who organises them.",
+         ("\"₦2,000 for everyone who comes\"", "A campaign rally at a church or mosque", "An event claiming to be the party's when it isn't"),
+         "Electoral Act 2026 ss. 22, 96"),
 ]
 RULE_IDS = [r.id for r in RULES] + ["LEGAL"]
 LEGAL_TITLE = "Removed after a legal notice"
@@ -93,13 +100,17 @@ REASONS = {
     "impersonation": ("Impersonation", "R9", "high"),
     "other": ("Something else", "", "normal"),
 }
+# Spec 18 §8: events take 13's reasons plus two of their own (R11).
+EVENT_REASONS = {**{k: v for k, v in REASONS.items()},
+                 "inducement": ("Offers money or gifts to attend or vote", "R11", "high"),
+                 "banned_venue": ("At a place of worship, police station or public office", "R11", "high")}
 PROFILE_REASONS = {
     "profile_wrong": ("Wrong or out-of-date details", "", "normal"),
     "not_ndc": ("Not an NDC candidate", "", "normal"),
     "impersonation": ("Impersonation", "R9", "normal"),
     "other": ("Something else", "", "normal"),
 }
-ELECTION_URGENT = {"results", "violence"}  # always urgent in the election period (spec 13 §3.8)
+ELECTION_URGENT = {"results", "violence", "inducement", "banned_venue"}  # spec 18 §8: R1 and R11 too  # always urgent in the election period (spec 13 §3.8)
 LEGAL_DEADLINE_REASONS = {"ncii"}  # NITDA Code Part I: 48 hours
 
 PRIORITY_RANK = {"legal": 0, "urgent": 1, "high": 2, "normal": 3, "low": 4}
@@ -108,8 +119,8 @@ TARGET_HOURS = {"urgent": 24, "high": 48, "normal": 72, "low": 168, "legal": 48}
 
 
 def reason_label(reason: str, kind: str = "") -> str:
-    table = PROFILE_REASONS if kind == "candidate" else REASONS
-    return table.get(reason, REASONS.get(reason, ("Something else",)))[0]
+    table = PROFILE_REASONS if kind == "candidate" else EVENT_REASONS if kind == "event" else REASONS
+    return table.get(reason, EVENT_REASONS.get(reason, ("Something else",)))[0]
 
 
 def public_payload() -> dict:
@@ -118,5 +129,6 @@ def public_payload() -> dict:
         "rules": [asdict(r) | {"examples": list(r.examples)} for r in RULES],
         "changes": [{"date": d.isoformat(), "text": t} for d, t in CHANGES],
         "reasons": [{"reason": k, "label": v[0], "rule": v[1]} for k, v in REASONS.items()],
+        "event_reasons": [{"reason": k, "label": v[0], "rule": v[1]} for k, v in EVENT_REASONS.items()],
         "profile_reasons": [{"reason": k, "label": v[0]} for k, v in PROFILE_REASONS.items()],
     }

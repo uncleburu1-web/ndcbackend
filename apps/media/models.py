@@ -11,6 +11,7 @@ class Purpose(models.TextChoices):
     POST_IMAGE = "post_image", "Candidate post image"
     NEWS_IMAGE = "news_image", "Community news image"
     ANNOUNCEMENT_IMAGE = "announcement_image", "Announcement image"
+    EVENT_IMAGE = "event_image", "Event cover image"  # spec 18 §4.2
 
 
 class MediaAsset(models.Model):

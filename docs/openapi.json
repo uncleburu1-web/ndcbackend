@@ -5075,7 +5075,7 @@
             },
             "patch": {
                 "operationId": "my_notifications_preferences_patch",
-                "summary": "Turn announcement or community-reply notifications on or off",
+                "summary": "Turn announcement, community-reply, event-reminder or new-event notifications on or off",
                 "tags": [
                     "me:notifications"
                 ],
@@ -11765,10 +11765,3034 @@
                     "validation_error"
                 ]
             }
+        },
+        "/api/v1/events/": {
+            "get": {
+                "operationId": "events_get",
+                "summary": "Upcoming (or past) events, soonest first, 20 a page (spec 18 §5)",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "candidate",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "community",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "lga",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "mode",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "organiser",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "state",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "this_week",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "type",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "when",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "news_public",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/events/{id}/": {
+            "get": {
+                "operationId": "event_get",
+                "summary": "One event; the online link and a private address only via /events/{id}/me/",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventDetailSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "news_public",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/events/{id}/calendar.ics": {
+            "get": {
+                "operationId": "event_calendar_get",
+                "summary": "Calendar file (.ics): never the online link",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "news_public",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/events/{id}/me/": {
+            "get": {
+                "operationId": "event_me_get",
+                "summary": "Your registration, and the online link or private address if you're registered",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventMeSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable"
+                ]
+            }
+        },
+        "/api/v1/events/{id}/registration/": {
+            "post": {
+                "operationId": "event_registration_post",
+                "summary": "Register (or join the waitlist); consent `event_registration` first",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventMeSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_register",
+                        "rate": "30/hour",
+                        "key": "user"
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "event_registration_delete",
+                "summary": "Cancel your registration",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_register",
+                        "rate": "30/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/events/{id}/report/": {
+            "post": {
+                "operationId": "event_report_post",
+                "summary": "Report an event (13's reasons plus `inducement` and `banned_venue`)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventReportResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "news_report",
+                        "rate": "5/hour",
+                        "key": "user or ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/events/": {
+            "get": {
+                "operationId": "my_events_get",
+                "summary": "Your upcoming (or past, 90 days) registrations",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "when",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "past",
+                                "upcoming"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "me:events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MyEvents"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable"
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/events/": {
+            "get": {
+                "operationId": "campaign_events_get",
+                "summary": "Your campaign's events (drafts included)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "campaign_events_post",
+                "summary": "Create a draft event",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventWriteSchemaRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventWriteSchemaRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventWriteSchemaRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/events/{id}/": {
+            "get": {
+                "operationId": "campaign_event_get",
+                "summary": "One of your events with counts",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            },
+            "patch": {
+                "operationId": "campaign_event_patch",
+                "summary": "Edit (until it starts; date, time, venue or link changes notify registrants)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedEventPatchSchemaRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedEventPatchSchemaRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedEventPatchSchemaRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "campaign_event_delete",
+                "summary": "Delete a draft (published events are cancelled instead)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Response (untyped; see docs/api.md)"
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/events/{id}/publish/": {
+            "post": {
+                "operationId": "campaign_event_publish_post",
+                "summary": "publish (with declarations), cancel (with reason), close-registration, updates (with text)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/events/{id}/cancel/": {
+            "post": {
+                "operationId": "campaign_event_cancel_post",
+                "summary": "publish (with declarations), cancel (with reason), close-registration, updates (with text)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/events/{id}/close-registration/": {
+            "post": {
+                "operationId": "campaign_event_close_registration_post",
+                "summary": "publish (with declarations), cancel (with reason), close-registration, updates (with text)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/events/{id}/updates/": {
+            "post": {
+                "operationId": "campaign_event_updates_post",
+                "summary": "publish (with declarations), cancel (with reason), close-registration, updates (with text)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    },
+                    {
+                        "scope": "campaign_update",
+                        "rate": "20/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/events/{id}/checkin/": {
+            "get": {
+                "operationId": "campaign_event_checkin_get",
+                "summary": "The check-in list: short names and ticket codes, 24 h before to 24 h after (audited)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventCheckin"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "campaign_event_checkin_post",
+                "summary": "Check someone in by ticket code",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CheckinRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CheckinRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CheckinRequestRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CheckinResult"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/events/{id}/image/": {
+            "put": {
+                "operationId": "campaign_event_image_put",
+                "summary": "Set the cover image (rights checkbox required)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": {}
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": {}
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "campaign_event_image_delete",
+                "summary": "Remove the cover image",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/events/": {
+            "get": {
+                "operationId": "admin_events_get",
+                "summary": "All events (counts only), newest first; ?status=&state=",
+                "tags": [
+                    "admin:events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminEventList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable"
+                ]
+            }
+        },
+        "/api/v1/admin/events/party/": {
+            "get": {
+                "operationId": "admin_party_events_get",
+                "summary": "Your campaign's events (drafts included)",
+                "tags": [
+                    "admin:events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "admin_party_events_post",
+                "summary": "Create a draft event",
+                "tags": [
+                    "admin:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventWriteSchemaRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventWriteSchemaRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventWriteSchemaRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/events/party/{id}/": {
+            "get": {
+                "operationId": "admin_party_event_get",
+                "summary": "One of your events with counts",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            },
+            "patch": {
+                "operationId": "admin_party_event_patch",
+                "summary": "Edit (until it starts; date, time, venue or link changes notify registrants)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedEventPatchSchemaRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedEventPatchSchemaRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedEventPatchSchemaRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "admin_party_event_delete",
+                "summary": "Delete a draft (published events are cancelled instead)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Response (untyped; see docs/api.md)"
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/events/party/{id}/publish/": {
+            "post": {
+                "operationId": "admin_party_event_publish_post",
+                "summary": "publish (with declarations), cancel (with reason), close-registration, updates (with text)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/events/party/{id}/cancel/": {
+            "post": {
+                "operationId": "admin_party_event_cancel_post",
+                "summary": "publish (with declarations), cancel (with reason), close-registration, updates (with text)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/events/party/{id}/close-registration/": {
+            "post": {
+                "operationId": "admin_party_event_close_registration_post",
+                "summary": "publish (with declarations), cancel (with reason), close-registration, updates (with text)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/events/party/{id}/updates/": {
+            "post": {
+                "operationId": "admin_party_event_updates_post",
+                "summary": "publish (with declarations), cancel (with reason), close-registration, updates (with text)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventActionRequestRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    },
+                    {
+                        "scope": "campaign_update",
+                        "rate": "20/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/events/party/{id}/checkin/": {
+            "get": {
+                "operationId": "admin_party_event_checkin_get",
+                "summary": "The check-in list: short names and ticket codes, 24 h before to 24 h after (audited)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventCheckin"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "admin_party_event_checkin_post",
+                "summary": "Check someone in by ticket code",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CheckinRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CheckinRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CheckinRequestRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CheckinResult"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/events/party/{id}/image/": {
+            "put": {
+                "operationId": "admin_party_event_image_put",
+                "summary": "Set the cover image (rights checkbox required)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": {}
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": {}
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": {}
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganiserEventSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "admin_party_event_image_delete",
+                "summary": "Remove the cover image",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:events"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "event_write",
+                        "rate": "60/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/candidates/{slug}/volunteering/": {
+            "get": {
+                "operationId": "candidate_volunteering_get",
+                "summary": "A campaign's volunteer opening (intro, roles, states, open)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "slug",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "candidates"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VolunteerOpening"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_found",
+                    "server_error"
+                ]
+            }
+        },
+        "/api/v1/candidates/{slug}/volunteering/apply/": {
+            "post": {
+                "operationId": "candidate_volunteering_apply_post",
+                "summary": "Apply to volunteer; consent `volunteering` first",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "slug",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "candidates"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VolunteerApplyRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VolunteerApplyRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VolunteerApplyRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VolunteerApplicationMine"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "volunteer_apply",
+                        "rate": "10/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/volunteering/": {
+            "get": {
+                "operationId": "my_volunteering_get",
+                "summary": "Your applications, decisions and the updates campaigns sent you",
+                "tags": [
+                    "me:volunteering"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MyVolunteering"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error"
+                ]
+            }
+        },
+        "/api/v1/me/volunteering/{id}/withdraw/": {
+            "post": {
+                "operationId": "my_volunteering_withdraw_post",
+                "summary": "Withdraw an application (contact details disappear at once)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "me:volunteering"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VolunteerApplicationMine"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/volunteering/": {
+            "get": {
+                "operationId": "campaign_volunteering_get",
+                "summary": "Your campaign's volunteer opening",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:volunteering"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VolunteerOpening"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error"
+                ]
+            },
+            "patch": {
+                "operationId": "campaign_volunteering_patch",
+                "summary": "Change the opening (open, intro, roles, states)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:volunteering"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedVolunteerOpeningWriteRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedVolunteerOpeningWriteRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedVolunteerOpeningWriteRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VolunteerOpening"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/volunteers/": {
+            "get": {
+                "operationId": "campaign_volunteers_get",
+                "summary": "Applications to your campaign (short names only)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "role",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "state",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "campaign:volunteers"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VolunteerApplicationRows"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error"
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/volunteers/updates/": {
+            "get": {
+                "operationId": "campaign_volunteer_updates_get",
+                "summary": "Updates sent to your accepted volunteers",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:volunteers"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VolunteerUpdates"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "throttled"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "campaign_update",
+                        "rate": "20/day",
+                        "key": "user"
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "campaign_volunteer_updates_post",
+                "summary": "Send an update to accepted volunteers (all, or one role)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:volunteers"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VolunteerUpdateWriteRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VolunteerUpdateWriteRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VolunteerUpdateWriteRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VolunteerUpdateSent"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "campaign_update",
+                        "rate": "20/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/volunteers/{id}/decide/": {
+            "post": {
+                "operationId": "campaign_volunteer_decide_post",
+                "summary": "Accept or decline (reason optional, shown to the person)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:volunteers"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VolunteerDecideRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VolunteerDecideRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VolunteerDecideRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VolunteerApplicationRow"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/campaign/{candidate_id}/volunteers/{id}/contact/": {
+            "get": {
+                "operationId": "campaign_volunteer_contact_get",
+                "summary": "An accepted volunteer's full name, and phone if they chose to share it (audited)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "candidate_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "campaign:volunteers"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VolunteerContact"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error"
+                ]
+            }
         }
     },
     "components": {
         "schemas": {
+            "AddressVisibilityEnum": {
+                "enum": [
+                    "public",
+                    "registered"
+                ],
+                "type": "string"
+            },
             "AdminCommunitySchema": {
                 "type": "object",
                 "properties": {
@@ -11855,6 +14879,25 @@
                     "state"
                 ]
             },
+            "AdminEventList": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/EventCardSchema"
+                        }
+                    },
+                    "counts": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    }
+                },
+                "required": [
+                    "counts",
+                    "results"
+                ]
+            },
             "AuthorSchema": {
                 "type": "object",
                 "properties": {
@@ -11883,6 +14926,19 @@
                     "verified"
                 ]
             },
+            "AvailabilityEnum": {
+                "enum": [
+                    "weekdays",
+                    "weekday_evenings",
+                    "weekends"
+                ],
+                "type": "string"
+            },
+            "BlankEnum": {
+                "enum": [
+                    ""
+                ]
+            },
             "BlockSchema": {
                 "type": "object",
                 "properties": {
@@ -11909,6 +14965,37 @@
                         "minLength": 1
                     }
                 }
+            },
+            "CheckinRequestRequest": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "code"
+                ]
+            },
+            "CheckinResult": {
+                "type": "object",
+                "properties": {
+                    "ticket_code": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "checked_in": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "checked_in",
+                    "name",
+                    "ticket_code"
+                ]
             },
             "ChooseStateRequest": {
                 "type": "object",
@@ -12221,12 +15308,596 @@
                     "state"
                 ]
             },
+            "CountsSchema": {
+                "type": "object",
+                "properties": {
+                    "registered": {
+                        "type": "integer"
+                    },
+                    "waitlisted": {
+                        "type": "integer"
+                    },
+                    "checked_in": {
+                        "type": "integer"
+                    },
+                    "cancelled": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "cancelled",
+                    "checked_in",
+                    "registered",
+                    "waitlisted"
+                ]
+            },
             "DatabaseEnum": {
                 "enum": [
                     "ok",
                     "unavailable"
                 ],
                 "type": "string"
+            },
+            "EventActionRequestRequest": {
+                "type": "object",
+                "properties": {
+                    "declarations": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    },
+                    "reason": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "text": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "EventCardSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/TypeEnum"
+                    },
+                    "type_label": {
+                        "type": "string"
+                    },
+                    "mode": {
+                        "$ref": "#/components/schemas/EventModeEnum"
+                    },
+                    "mode_label": {
+                        "type": "string"
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "state_label": {
+                        "type": "string"
+                    },
+                    "lga": {
+                        "type": "string"
+                    },
+                    "place": {
+                        "type": "string",
+                        "description": "Venue name, 'Online', or 'Address shown when you register'"
+                    },
+                    "organiser": {
+                        "$ref": "#/components/schemas/OrganiserSchema"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/EventStatusEnum"
+                    },
+                    "going": {
+                        "type": "string",
+                        "description": "Banded below 10 (spec 18 rule 7)"
+                    },
+                    "full": {
+                        "type": "boolean"
+                    },
+                    "registration": {
+                        "$ref": "#/components/schemas/RegistrationEnum"
+                    },
+                    "cover": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ImageSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "ended": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "cover",
+                    "ended",
+                    "ends_at",
+                    "full",
+                    "going",
+                    "id",
+                    "lga",
+                    "mode",
+                    "mode_label",
+                    "organiser",
+                    "place",
+                    "registration",
+                    "starts_at",
+                    "state",
+                    "state_label",
+                    "status",
+                    "title",
+                    "type",
+                    "type_label"
+                ]
+            },
+            "EventCheckin": {
+                "type": "object",
+                "properties": {
+                    "counts": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {}
+                        }
+                    }
+                },
+                "required": [
+                    "counts",
+                    "results"
+                ]
+            },
+            "EventDetailSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/TypeEnum"
+                    },
+                    "type_label": {
+                        "type": "string"
+                    },
+                    "mode": {
+                        "$ref": "#/components/schemas/EventModeEnum"
+                    },
+                    "mode_label": {
+                        "type": "string"
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "state_label": {
+                        "type": "string"
+                    },
+                    "lga": {
+                        "type": "string"
+                    },
+                    "place": {
+                        "type": "string",
+                        "description": "Venue name, 'Online', or 'Address shown when you register'"
+                    },
+                    "organiser": {
+                        "$ref": "#/components/schemas/OrganiserSchema"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/EventStatusEnum"
+                    },
+                    "going": {
+                        "type": "string",
+                        "description": "Banded below 10 (spec 18 rule 7)"
+                    },
+                    "full": {
+                        "type": "boolean"
+                    },
+                    "registration": {
+                        "$ref": "#/components/schemas/RegistrationEnum"
+                    },
+                    "cover": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ImageSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "ended": {
+                        "type": "boolean"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "venue_name": {
+                        "type": "string"
+                    },
+                    "venue_address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Null when only registered people may see it"
+                    },
+                    "venue_type": {
+                        "type": "string"
+                    },
+                    "venue_type_label": {
+                        "type": "string"
+                    },
+                    "address_visibility": {
+                        "$ref": "#/components/schemas/AddressVisibilityEnum"
+                    },
+                    "online_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Only for registered people and the organiser"
+                    },
+                    "accessibility_notes": {
+                        "type": "string"
+                    },
+                    "capacity": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "places_left": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "registration_closes_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "members_only": {
+                        "type": "boolean"
+                    },
+                    "cancelled_reason": {
+                        "type": "string"
+                    },
+                    "material_change": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/MaterialChangeSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "removed": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/RemovedSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "updates": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UpdateSchema"
+                        },
+                        "description": "Organiser updates; only for registered people and the organiser"
+                    },
+                    "can_register": {
+                        "type": "boolean"
+                    },
+                    "register_block": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/RegisterBlockSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "calendar_url": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "accessibility_notes",
+                    "address_visibility",
+                    "calendar_url",
+                    "can_register",
+                    "cancelled_reason",
+                    "capacity",
+                    "cover",
+                    "description",
+                    "ended",
+                    "ends_at",
+                    "full",
+                    "going",
+                    "id",
+                    "lga",
+                    "material_change",
+                    "members_only",
+                    "mode",
+                    "mode_label",
+                    "online_url",
+                    "organiser",
+                    "place",
+                    "places_left",
+                    "register_block",
+                    "registration",
+                    "registration_closes_at",
+                    "removed",
+                    "starts_at",
+                    "state",
+                    "state_label",
+                    "status",
+                    "title",
+                    "type",
+                    "type_label",
+                    "updates",
+                    "venue_address",
+                    "venue_name",
+                    "venue_type",
+                    "venue_type_label"
+                ]
+            },
+            "EventList": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/EventCardSchema"
+                        }
+                    },
+                    "next": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "previous": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "next",
+                    "previous",
+                    "results"
+                ]
+            },
+            "EventMeSchema": {
+                "type": "object",
+                "properties": {
+                    "registration": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/MyRegistrationSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "is_organiser": {
+                        "type": "boolean"
+                    },
+                    "online_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "venue_address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "updates": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UpdateSchema"
+                        }
+                    },
+                    "can_register": {
+                        "type": "boolean"
+                    },
+                    "register_block": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/RegisterBlockSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "is_organiser",
+                    "online_url",
+                    "registration",
+                    "updates",
+                    "venue_address"
+                ]
+            },
+            "EventModeEnum": {
+                "enum": [
+                    "in_person",
+                    "online",
+                    "hybrid"
+                ],
+                "type": "string"
+            },
+            "EventRegistrationStatusEnum": {
+                "enum": [
+                    "registered",
+                    "waitlisted",
+                    "cancelled"
+                ],
+                "type": "string"
+            },
+            "EventReportResponse": {
+                "type": "object",
+                "properties": {
+                    "reference": {
+                        "type": "string"
+                    },
+                    "route": {
+                        "type": "string"
+                    }
+                }
+            },
+            "EventStatusEnum": {
+                "enum": [
+                    "draft",
+                    "published",
+                    "hidden",
+                    "cancelled",
+                    "removed"
+                ],
+                "type": "string"
+            },
+            "EventWriteSchemaRequest": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/TypeEnum"
+                    },
+                    "mode": {
+                        "$ref": "#/components/schemas/EventModeEnum"
+                    },
+                    "title": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120
+                    },
+                    "description": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "venue_name": {
+                        "type": "string"
+                    },
+                    "venue_address": {
+                        "type": "string"
+                    },
+                    "venue_type": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/VenueTypeEnum"
+                            },
+                            {
+                                "$ref": "#/components/schemas/BlankEnum"
+                            }
+                        ]
+                    },
+                    "address_visibility": {
+                        "$ref": "#/components/schemas/AddressVisibilityEnum"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "lga_text": {
+                        "type": "string"
+                    },
+                    "geo_lga": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    },
+                    "online_url": {
+                        "type": "string"
+                    },
+                    "accessibility_notes": {
+                        "type": "string"
+                    },
+                    "capacity": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "registration": {
+                        "$ref": "#/components/schemas/RegistrationEnum"
+                    },
+                    "registration_closes_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "members_only": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "description",
+                    "ends_at",
+                    "mode",
+                    "starts_at",
+                    "title",
+                    "type"
+                ]
             },
             "FeedSchema": {
                 "type": "object",
@@ -12284,6 +15955,28 @@
                     "degraded"
                 ],
                 "type": "string"
+            },
+            "ImageSchema": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string"
+                    },
+                    "url_thumb": {
+                        "type": "string"
+                    },
+                    "srcset": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "srcset",
+                    "url",
+                    "url_thumb"
+                ]
             },
             "IntegrationService": {
                 "type": "object",
@@ -12414,6 +16107,36 @@
                     "updated"
                 ]
             },
+            "MaterialChangeSchema": {
+                "type": "object",
+                "properties": {
+                    "at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/MaterialChangeSchemaKindEnum"
+                    },
+                    "words": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "at",
+                    "kind",
+                    "words"
+                ]
+            },
+            "MaterialChangeSchemaKindEnum": {
+                "enum": [
+                    "time",
+                    "venue",
+                    "mode",
+                    "link",
+                    "postponed"
+                ],
+                "type": "string"
+            },
             "MembershipSchema": {
                 "type": "object",
                 "properties": {
@@ -12437,13 +16160,6 @@
                     "joined_at",
                     "notify_new_posts"
                 ]
-            },
-            "ModeEnum": {
-                "enum": [
-                    "direct",
-                    "server"
-                ],
-                "type": "string"
             },
             "MyCommunitiesSchema": {
                 "type": "object",
@@ -12491,6 +16207,42 @@
                     "verified"
                 ]
             },
+            "MyEventSchema": {
+                "type": "object",
+                "properties": {
+                    "event": {
+                        "$ref": "#/components/schemas/EventCardSchema"
+                    },
+                    "registration": {
+                        "$ref": "#/components/schemas/MyRegistrationSchema"
+                    },
+                    "online_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "event",
+                    "online_url",
+                    "registration"
+                ]
+            },
+            "MyEvents": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MyEventSchema"
+                        }
+                    }
+                },
+                "required": [
+                    "results"
+                ]
+            },
             "MyMembershipSchema": {
                 "type": "object",
                 "properties": {
@@ -12521,6 +16273,54 @@
                     "joined_at",
                     "level",
                     "notify_new_posts"
+                ]
+            },
+            "MyRegistrationSchema": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "$ref": "#/components/schemas/EventRegistrationStatusEnum"
+                    },
+                    "ticket_code": {
+                        "type": "string"
+                    },
+                    "waitlist_position": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "checked_in": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "checked_in",
+                    "status",
+                    "ticket_code",
+                    "waitlist_position"
+                ]
+            },
+            "MyVolunteering": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/VolunteerApplicationMine"
+                        }
+                    },
+                    "updates": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {}
+                        }
+                    }
+                },
+                "required": [
+                    "results",
+                    "updates"
                 ]
             },
             "NigerianStateEnum": {
@@ -12663,6 +16463,12 @@
                     },
                     "community": {
                         "$ref": "#/components/schemas/NotificationCommunity"
+                    },
+                    "event": {
+                        "$ref": "#/components/schemas/NotificationEvent"
+                    },
+                    "volunteer_update": {
+                        "$ref": "#/components/schemas/NotificationVolunteerUpdate"
                     }
                 },
                 "required": [
@@ -12830,6 +16636,35 @@
                     "reference"
                 ]
             },
+            "NotificationEvent": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "organiser": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "organiser",
+                    "starts_at",
+                    "status",
+                    "title"
+                ]
+            },
             "NotificationKindEnum": {
                 "enum": [
                     "announcement",
@@ -12847,7 +16682,13 @@
                     "donation_receipt",
                     "community_reply",
                     "community_post",
-                    "community_placed"
+                    "community_placed",
+                    "event_update",
+                    "event_reminder",
+                    "event_waitlist",
+                    "candidate_event",
+                    "volunteer_decision",
+                    "volunteer_update"
                 ],
                 "type": "string"
             },
@@ -12926,11 +16767,19 @@
                     },
                     "community_replies": {
                         "type": "boolean"
+                    },
+                    "event_reminders": {
+                        "type": "boolean"
+                    },
+                    "candidate_events": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
                     "announcements",
-                    "community_replies"
+                    "candidate_events",
+                    "community_replies",
+                    "event_reminders"
                 ]
             },
             "NotificationPrivacyRequest": {
@@ -12971,6 +16820,17 @@
                     "text"
                 ]
             },
+            "NotificationVolunteerUpdate": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "text"
+                ]
+            },
             "Ok": {
                 "type": "object",
                 "properties": {
@@ -12981,6 +16841,332 @@
                 "required": [
                     "ok"
                 ]
+            },
+            "OrganiserCandidateSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "full_name": {
+                        "type": "string"
+                    },
+                    "position_label": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "full_name",
+                    "id",
+                    "position_label",
+                    "slug"
+                ]
+            },
+            "OrganiserEventList": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganiserEventSchema"
+                        }
+                    }
+                },
+                "required": [
+                    "results"
+                ]
+            },
+            "OrganiserEventSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/TypeEnum"
+                    },
+                    "type_label": {
+                        "type": "string"
+                    },
+                    "mode": {
+                        "$ref": "#/components/schemas/EventModeEnum"
+                    },
+                    "mode_label": {
+                        "type": "string"
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "state_label": {
+                        "type": "string"
+                    },
+                    "lga": {
+                        "type": "string"
+                    },
+                    "place": {
+                        "type": "string",
+                        "description": "Venue name, 'Online', or 'Address shown when you register'"
+                    },
+                    "organiser": {
+                        "$ref": "#/components/schemas/OrganiserSchema"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/EventStatusEnum"
+                    },
+                    "going": {
+                        "type": "string",
+                        "description": "Banded below 10 (spec 18 rule 7)"
+                    },
+                    "full": {
+                        "type": "boolean"
+                    },
+                    "registration": {
+                        "$ref": "#/components/schemas/RegistrationEnum"
+                    },
+                    "cover": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ImageSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "ended": {
+                        "type": "boolean"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "venue_name": {
+                        "type": "string"
+                    },
+                    "venue_address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Null when only registered people may see it"
+                    },
+                    "venue_type": {
+                        "type": "string"
+                    },
+                    "venue_type_label": {
+                        "type": "string"
+                    },
+                    "address_visibility": {
+                        "$ref": "#/components/schemas/AddressVisibilityEnum"
+                    },
+                    "online_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Only for registered people and the organiser"
+                    },
+                    "accessibility_notes": {
+                        "type": "string"
+                    },
+                    "capacity": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "places_left": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "registration_closes_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "members_only": {
+                        "type": "boolean"
+                    },
+                    "cancelled_reason": {
+                        "type": "string"
+                    },
+                    "material_change": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/MaterialChangeSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "removed": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/RemovedSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "updates": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UpdateSchema"
+                        },
+                        "description": "Organiser updates; only for registered people and the organiser"
+                    },
+                    "can_register": {
+                        "type": "boolean"
+                    },
+                    "register_block": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/RegisterBlockSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "calendar_url": {
+                        "type": "string"
+                    },
+                    "counts": {
+                        "$ref": "#/components/schemas/CountsSchema"
+                    },
+                    "declarations_needed": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "declarations": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    },
+                    "checkin_open": {
+                        "type": "boolean"
+                    },
+                    "blackout_flagged": {
+                        "type": "boolean"
+                    },
+                    "geo_lga": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    },
+                    "online_url_value": {
+                        "type": "string"
+                    },
+                    "venue_address_value": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "accessibility_notes",
+                    "address_visibility",
+                    "blackout_flagged",
+                    "calendar_url",
+                    "can_register",
+                    "cancelled_reason",
+                    "capacity",
+                    "checkin_open",
+                    "counts",
+                    "cover",
+                    "declarations",
+                    "declarations_needed",
+                    "description",
+                    "ended",
+                    "ends_at",
+                    "full",
+                    "geo_lga",
+                    "going",
+                    "id",
+                    "lga",
+                    "material_change",
+                    "members_only",
+                    "mode",
+                    "mode_label",
+                    "online_url",
+                    "online_url_value",
+                    "organiser",
+                    "place",
+                    "places_left",
+                    "register_block",
+                    "registration",
+                    "registration_closes_at",
+                    "removed",
+                    "starts_at",
+                    "state",
+                    "state_label",
+                    "status",
+                    "title",
+                    "type",
+                    "type_label",
+                    "updates",
+                    "venue_address",
+                    "venue_address_value",
+                    "venue_name",
+                    "venue_type",
+                    "venue_type_label"
+                ]
+            },
+            "OrganiserSchema": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "$ref": "#/components/schemas/OrganiserSchemaKindEnum"
+                    },
+                    "label": {
+                        "type": "string",
+                        "description": "'NDC' or '<candidate>'s campaign'"
+                    },
+                    "candidate": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/OrganiserCandidateSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "candidate",
+                    "kind",
+                    "label"
+                ]
+            },
+            "OrganiserSchemaKindEnum": {
+                "enum": [
+                    "campaign",
+                    "party"
+                ],
+                "type": "string"
             },
             "OutboxJob": {
                 "type": "object",
@@ -13180,6 +17366,92 @@
                     }
                 }
             },
+            "PatchedEventPatchSchemaRequest": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/TypeEnum"
+                    },
+                    "mode": {
+                        "$ref": "#/components/schemas/EventModeEnum"
+                    },
+                    "title": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120
+                    },
+                    "description": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "venue_name": {
+                        "type": "string"
+                    },
+                    "venue_address": {
+                        "type": "string"
+                    },
+                    "venue_type": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/VenueTypeEnum"
+                            },
+                            {
+                                "$ref": "#/components/schemas/BlankEnum"
+                            }
+                        ]
+                    },
+                    "address_visibility": {
+                        "$ref": "#/components/schemas/AddressVisibilityEnum"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "lga_text": {
+                        "type": "string"
+                    },
+                    "geo_lga": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    },
+                    "online_url": {
+                        "type": "string"
+                    },
+                    "accessibility_notes": {
+                        "type": "string"
+                    },
+                    "capacity": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "registration": {
+                        "$ref": "#/components/schemas/RegistrationEnum"
+                    },
+                    "registration_closes_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "members_only": {
+                        "type": "boolean"
+                    }
+                }
+            },
             "PatchedNotificationPreferencesRequest": {
                 "type": "object",
                 "properties": {
@@ -13188,6 +17460,38 @@
                     },
                     "community_replies": {
                         "type": "boolean"
+                    },
+                    "event_reminders": {
+                        "type": "boolean"
+                    },
+                    "candidate_events": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "PatchedVolunteerOpeningWriteRequest": {
+                "type": "object",
+                "properties": {
+                    "open": {
+                        "type": "boolean"
+                    },
+                    "intro": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    },
+                    "states": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1
+                        }
                     }
                 }
             },
@@ -13495,7 +17799,8 @@
                     "candidate_photo",
                     "post_image",
                     "news_image",
-                    "announcement_image"
+                    "announcement_image",
+                    "event_image"
                 ],
                 "type": "string"
             },
@@ -13550,6 +17855,29 @@
                 ],
                 "type": "string"
             },
+            "RegisterBlockSchema": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "code",
+                    "message"
+                ]
+            },
+            "RegistrationEnum": {
+                "enum": [
+                    "open",
+                    "closed",
+                    "none"
+                ],
+                "type": "string"
+            },
             "RejoinLevelRequest": {
                 "type": "object",
                 "properties": {
@@ -13560,6 +17888,21 @@
                 },
                 "required": [
                     "level"
+                ]
+            },
+            "RemovedSchema": {
+                "type": "object",
+                "properties": {
+                    "rule": {
+                        "type": "string"
+                    },
+                    "rule_title": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "rule",
+                    "rule_title"
                 ]
             },
             "ReportRequest": {
@@ -13583,6 +17926,31 @@
                     "reason"
                 ]
             },
+            "RolesEnum": {
+                "enum": [
+                    "canvassing",
+                    "events",
+                    "social_media",
+                    "logistics",
+                    "data_and_tech",
+                    "outreach_youth",
+                    "outreach_women",
+                    "outreach_disability",
+                    "other"
+                ],
+                "type": "string"
+            },
+            "TypeEnum": {
+                "enum": [
+                    "rally",
+                    "canvass",
+                    "town_hall",
+                    "meeting",
+                    "training",
+                    "other"
+                ],
+                "type": "string"
+            },
             "UnreadCount": {
                 "type": "object",
                 "properties": {
@@ -13594,13 +17962,29 @@
                     "unread"
                 ]
             },
+            "UpdateSchema": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "text"
+                ]
+            },
             "UploadSignature": {
                 "type": "object",
                 "properties": {
                     "mode": {
                         "allOf": [
                             {
-                                "$ref": "#/components/schemas/ModeEnum"
+                                "$ref": "#/components/schemas/UploadSignatureModeEnum"
                             }
                         ],
                         "description": "server: send the file to the image endpoint as multipart instead."
@@ -13637,6 +18021,13 @@
                     "mode"
                 ]
             },
+            "UploadSignatureModeEnum": {
+                "enum": [
+                    "direct",
+                    "server"
+                ],
+                "type": "string"
+            },
             "UploadSignatureRequestRequest": {
                 "type": "object",
                 "properties": {
@@ -13652,6 +18043,361 @@
                 "required": [
                     "purpose",
                     "target_id"
+                ]
+            },
+            "VenueTypeEnum": {
+                "enum": [
+                    "open_ground",
+                    "hall",
+                    "hotel",
+                    "school",
+                    "market",
+                    "street",
+                    "private_premises",
+                    "online"
+                ],
+                "type": "string"
+            },
+            "VolunteerApplicationMine": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "candidate": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "lga": {
+                        "type": "string"
+                    },
+                    "availability": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "note": {
+                        "type": "string"
+                    },
+                    "share_phone": {
+                        "type": "boolean"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "status_label": {
+                        "type": "string"
+                    },
+                    "decline_reason": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "decided_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "availability",
+                    "candidate",
+                    "created_at",
+                    "decided_at",
+                    "decline_reason",
+                    "id",
+                    "lga",
+                    "note",
+                    "roles",
+                    "share_phone",
+                    "state",
+                    "status",
+                    "status_label"
+                ]
+            },
+            "VolunteerApplicationRow": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "state_label": {
+                        "type": "string"
+                    },
+                    "lga": {
+                        "type": "string"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "availability": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "note": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "status_label": {
+                        "type": "string"
+                    },
+                    "can_share_phone": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "decided_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "availability",
+                    "can_share_phone",
+                    "created_at",
+                    "decided_at",
+                    "id",
+                    "lga",
+                    "name",
+                    "note",
+                    "roles",
+                    "state",
+                    "state_label",
+                    "status",
+                    "status_label"
+                ]
+            },
+            "VolunteerApplicationRows": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/VolunteerApplicationRow"
+                        }
+                    },
+                    "counts": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    }
+                },
+                "required": [
+                    "counts",
+                    "results"
+                ]
+            },
+            "VolunteerApplyRequest": {
+                "type": "object",
+                "properties": {
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RolesEnum"
+                        }
+                    },
+                    "state": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "lga_text": {
+                        "type": "string"
+                    },
+                    "geo_lga": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    },
+                    "availability": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AvailabilityEnum"
+                        }
+                    },
+                    "note": {
+                        "type": "string"
+                    },
+                    "share_phone": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "roles",
+                    "state"
+                ]
+            },
+            "VolunteerContact": {
+                "type": "object",
+                "properties": {
+                    "full_name": {
+                        "type": "string"
+                    },
+                    "phone_number": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "full_name",
+                    "phone_number"
+                ]
+            },
+            "VolunteerDecideRequest": {
+                "type": "object",
+                "properties": {
+                    "accept": {
+                        "type": "boolean"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "accept"
+                ]
+            },
+            "VolunteerOpening": {
+                "type": "object",
+                "properties": {
+                    "open": {
+                        "type": "boolean"
+                    },
+                    "intro": {
+                        "type": "string"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {}
+                        }
+                    },
+                    "states": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "all_roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {}
+                        }
+                    },
+                    "availability": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {}
+                        }
+                    },
+                    "candidate": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    }
+                },
+                "required": [
+                    "all_roles",
+                    "availability",
+                    "candidate",
+                    "intro",
+                    "open",
+                    "roles",
+                    "states"
+                ]
+            },
+            "VolunteerUpdateSent": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "role",
+                    "text"
+                ]
+            },
+            "VolunteerUpdateWriteRequest": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "role": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "text"
+                ]
+            },
+            "VolunteerUpdates": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {}
+                        }
+                    },
+                    "left_this_week": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "left_this_week",
+                    "results"
                 ]
             },
             "WebhookCounts": {
@@ -13853,6 +18599,16 @@
             "meaning": "The account was deactivated by an administrator.",
             "web_handling": true
         },
+        "already_applied": {
+            "status": 409,
+            "meaning": "You already have an open application for this campaign.",
+            "web_handling": false
+        },
+        "already_registered": {
+            "status": 409,
+            "meaning": "You're already registered for this event.",
+            "web_handling": false
+        },
         "amount_out_of_range": {
             "status": 400,
             "meaning": "The amount is below the minimum or above the limit.",
@@ -13888,6 +18644,16 @@
             "meaning": "That candidate can't be chosen here.",
             "web_handling": false
         },
+        "capacity_below_registrations": {
+            "status": 409,
+            "meaning": "Capacity can't go below the number already registered.",
+            "web_handling": false
+        },
+        "checkin_window_closed": {
+            "status": 409,
+            "meaning": "The check-in list is open from 24 hours before to 24 hours after the event.",
+            "web_handling": false
+        },
         "community_closed": {
             "status": 409,
             "meaning": "The community has closed (its geography was deactivated).",
@@ -13897,6 +18663,11 @@
             "status": 403,
             "meaning": "Consent for this purpose is needed; carries `purpose`, `version`, `text`.",
             "web_handling": true
+        },
+        "declaration_required": {
+            "status": 400,
+            "meaning": "Every declaration must be confirmed to publish; see `missing`.",
+            "web_handling": false
         },
         "donations_unavailable": {
             "status": 503,
@@ -13916,6 +18687,11 @@
         "error": {
             "status": 400,
             "meaning": "Generic fallback when no specific code applies.",
+            "web_handling": false
+        },
+        "event_not_open": {
+            "status": 409,
+            "meaning": "The event is cancelled, hidden, removed, started or ended.",
             "web_handling": false
         },
         "export_limit": {
@@ -13988,6 +18764,11 @@
             "meaning": "The image service is unavailable right now.",
             "web_handling": true
         },
+        "members_only": {
+            "status": 403,
+            "meaning": "The event is for NDC members only.",
+            "web_handling": false
+        },
         "membership_unavailable": {
             "status": 503,
             "meaning": "Membership isn't open.",
@@ -14043,6 +18824,11 @@
             "meaning": "A security notice was already sent for this incident version.",
             "web_handling": false
         },
+        "outside_campaign_period": {
+            "status": 409,
+            "meaning": "Rallies and canvassing must fall inside the office's campaign period; see `period_start`, `period_end`.",
+            "web_handling": false
+        },
         "over_limit": {
             "status": 400,
             "meaning": "The donation would pass a legal or configured limit.",
@@ -14085,7 +18871,7 @@
         },
         "publishing_paused": {
             "status": 403,
-            "meaning": "Publishing is paused for the election blackout; see `until`.",
+            "meaning": "Publishing is paused for the election blackout; see `until` (409 for communities and events).",
             "web_handling": true
         },
         "pvc_not_verified": {
@@ -14106,6 +18892,11 @@
         "reference_unavailable": {
             "status": 503,
             "meaning": "A unique reference couldn't be created; try again.",
+            "web_handling": false
+        },
+        "registration_closed": {
+            "status": 409,
+            "meaning": "Registration for the event has closed or is full.",
             "web_handling": false
         },
         "removed": {
@@ -14203,6 +18994,11 @@
             "meaning": "Only 3 announcements can be pinned.",
             "web_handling": false
         },
+        "too_many_registrations": {
+            "status": 409,
+            "meaning": "At most 20 upcoming registrations, and 3 re-registrations per event.",
+            "web_handling": false
+        },
         "too_soon": {
             "status": 403,
             "meaning": "New accounts can post 24 hours after finishing their profile; see `until`.",
@@ -14216,6 +19012,11 @@
         "unsupported_media_type": {
             "status": 415,
             "meaning": "Send JSON (or multipart for uploads).",
+            "web_handling": false
+        },
+        "update_limit": {
+            "status": 409,
+            "meaning": "Too many updates (3 per event; 5 volunteer updates a week).",
             "web_handling": false
         },
         "user_inactive": {
@@ -14238,6 +19039,11 @@
             "meaning": "LGA, ward and polling-unit communities need a verified PVC.",
             "web_handling": true
         },
+        "volunteering_closed": {
+            "status": 409,
+            "meaning": "The campaign isn't taking volunteers.",
+            "web_handling": false
+        },
         "webhook_not_configured": {
             "status": 503,
             "meaning": "The webhook's signing secret isn't set.",
@@ -14254,6 +19060,11 @@
             "key": "user",
             "purpose": "Admin changes: grants, revokes, deactivations, retries (11)",
             "rate": "60/hour"
+        },
+        "campaign_update": {
+            "key": "user",
+            "purpose": "Event and volunteer updates: 20 a day (18)",
+            "rate": "20/day"
         },
         "candidates_public": {
             "key": "ip",
@@ -14304,6 +19115,16 @@
             "key": "ip and user",
             "purpose": "Starting a donation (05)",
             "rate": "10/hour"
+        },
+        "event_register": {
+            "key": "user",
+            "purpose": "Registering for and cancelling events: 30 an hour (18)",
+            "rate": "30/hour"
+        },
+        "event_write": {
+            "key": "user",
+            "purpose": "Creating and changing events: 60 a day (18)",
+            "rate": "60/day"
         },
         "finance_public": {
             "key": "ip",
@@ -14389,6 +19210,11 @@
             "key": "ip",
             "purpose": "Search (12)",
             "rate": "60/min"
+        },
+        "volunteer_apply": {
+            "key": "user",
+            "purpose": "Volunteer applications: 10 a day (18)",
+            "rate": "10/day"
         }
     }
 }

@@ -6,9 +6,25 @@ from .models import TargetKind
 
 
 COMMUNITY_KINDS = (TargetKind.COMMUNITY_POST, TargetKind.COMMUNITY_COMMENT)
+HIDEABLE_KINDS = COMMUNITY_KINDS + (TargetKind.EVENT,)  # spec 18 §8: hide while deciding; the owning app changes the item
+
+
+def service(kind):
+    """The owning app's hide/unhide/remove/restore functions for a hideable kind."""
+    if kind == TargetKind.EVENT:
+        from apps.events import services
+
+        return services
+    from apps.communities import services
+
+    return services
 
 
 def model_for(kind):
+    if kind == TargetKind.EVENT:
+        from apps.events.models import Event
+
+        return Event
     if kind == TargetKind.COMMUNITY_POST:
         from apps.communities.models import CommunityPost
 
@@ -40,6 +56,8 @@ def load(kind, target_id):
         qs = qs.select_related("author", "community", "campaign_candidate")
     if kind == TargetKind.COMMUNITY_COMMENT:
         qs = qs.select_related("author", "post__community", "campaign_candidate")
+    if kind == TargetKind.EVENT:
+        qs = qs.select_related("candidate", "created_by")
     return qs.filter(pk=target_id).first()
 
 
@@ -55,6 +73,10 @@ def is_public(kind, obj) -> bool:
         return False
     if kind in COMMUNITY_KINDS:
         return obj.status == "published" and community_of(kind, obj).active
+    if kind == TargetKind.EVENT:
+        from apps.events.services import is_public as event_public
+
+        return event_public(obj)
     if kind == TargetKind.ARTICLE:
         return obj.status == "successful"
     if kind == TargetKind.POST:
@@ -75,6 +97,8 @@ def state(kind, obj) -> str:
         return ""
     if kind == TargetKind.POST:
         return obj.candidate.state or ""
+    if kind == TargetKind.EVENT:
+        return obj.state or ""
     if kind in COMMUNITY_KINDS:
         return community_of(kind, obj).state or ""
     return getattr(obj, "state", "") or ""
@@ -97,6 +121,10 @@ def owner_ids(kind, obj) -> set:
         return {obj.author_id} if obj.author_id and obj.source == "community" else set()
     if kind == TargetKind.POST:
         return set(_linked(obj.candidate_id))
+    if kind == TargetKind.EVENT:  # spec 18 §8: linked accounts of its candidate, or the admin who created a party event
+        from apps.events.services import organiser_ids
+
+        return organiser_ids(obj)
     if kind in COMMUNITY_KINDS:  # the author, and accounts linked to the campaign it was posted for (spec 17 §8.2)
         return ({obj.author_id} if obj.author_id else set()) | (set(_linked(obj.campaign_candidate_id)) if obj.campaign_candidate_id else set())
     return set(_linked(obj.pk))
@@ -123,6 +151,8 @@ def public_url(kind, obj) -> str:
         return f"/communities/{obj.community.path}/posts/{obj.pk}"
     if kind == TargetKind.COMMUNITY_COMMENT:
         return f"/communities/{obj.post.community.path}/posts/{obj.post_id}#comment-{obj.pk}"
+    if kind == TargetKind.EVENT:
+        return f"/events/{obj.pk}"
     return f"/candidates/{obj.slug}"
 
 
@@ -135,6 +165,8 @@ def admin_url(kind, obj) -> str:
         return f"/admin/posts/{obj.pk}"
     if kind in COMMUNITY_KINDS:
         return public_url(kind, obj)
+    if kind == TargetKind.EVENT:
+        return f"/admin/events/party/{obj.pk}" if obj.organiser_kind == "party" else f"/events/{obj.pk}"
     return f"/admin/candidates/{obj.pk}"
 
 
@@ -145,6 +177,8 @@ def kind_words(kind, obj=None) -> str:
         return "community post"
     if kind == TargetKind.COMMUNITY_COMMENT:
         return "community comment"
+    if kind == TargetKind.EVENT:
+        return "event"
     return "post" if kind == TargetKind.POST else "candidate profile"
 
 
@@ -157,6 +191,9 @@ def parse_url(value: str):
     m = re.search(r"/news/(?:official|community)/([0-9a-f-]{36})", v)
     if m:
         return TargetKind.ARTICLE, load(TargetKind.ARTICLE, m.group(1))
+    m = re.search(r"/events/([0-9a-f-]{36})", v)
+    if m:
+        return TargetKind.EVENT, load(TargetKind.EVENT, m.group(1))
     m = re.search(r"/communities/.+/posts/([0-9a-f-]{36})#comment-([0-9a-f-]{36})", v)
     if m:
         return TargetKind.COMMUNITY_COMMENT, load(TargetKind.COMMUNITY_COMMENT, m.group(2))
@@ -175,7 +212,8 @@ def parse_url(value: str):
         u = _uuid.UUID(v)
     except ValueError:
         return None, None
-    for k in (TargetKind.ARTICLE, TargetKind.POST, TargetKind.CANDIDATE, TargetKind.COMMUNITY_POST, TargetKind.COMMUNITY_COMMENT):
+    for k in (TargetKind.ARTICLE, TargetKind.POST, TargetKind.CANDIDATE, TargetKind.COMMUNITY_POST, TargetKind.COMMUNITY_COMMENT,
+              TargetKind.EVENT):
         obj = load(k, u)
         if obj is not None:
             return k, obj

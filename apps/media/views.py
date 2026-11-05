@@ -10,6 +10,7 @@ from apps.access.permissions import IsSignedIn
 from apps.core.exceptions import ServiceError
 
 from . import services
+from .models import Purpose
 
 
 class SignatureThrottle(UserRateThrottle):
@@ -17,7 +18,7 @@ class SignatureThrottle(UserRateThrottle):
 
 
 SIGN_REQUEST = inline_serializer("UploadSignatureRequest", {
-    "purpose": S.ChoiceField(["candidate_photo", "post_image", "news_image", "announcement_image"]),
+    "purpose": S.ChoiceField(Purpose.values),  # every image purpose (event_image: spec 18)
     "target_id": S.CharField(help_text="The candidate, post or article the image is for.")})
 SIGN_RESPONSE = inline_serializer("UploadSignature", {
     "mode": S.ChoiceField(["direct", "server"], help_text="server: send the file to the image endpoint as multipart instead."),

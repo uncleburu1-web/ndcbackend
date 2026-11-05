@@ -129,6 +129,12 @@ def mark_deleted(clerk_user_id: str) -> Optional[User]:
         from apps.communities.services import erase_for_deleted_user as erase_communities
 
         erase_communities(user)
+        # Event registrations and volunteer applications deleted; events they created stay with no creator (spec 18 §17.4).
+        from apps.events.services import erase_for_deleted_user as erase_events
+        from apps.volunteers.services import erase_for_deleted_user as erase_volunteering
+
+        erase_events(user)
+        erase_volunteering(user)
         # Privacy requests keep what was asked, detached from the account (spec 14 §10). Consents stay on the anonymised row.
         from apps.privacy.models import DataRequest
 

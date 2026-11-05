@@ -107,7 +107,9 @@ class ReportingTests(Base):
             self.assertIn(priority, list(R.TARGET_HOURS) + ["route"], key)
         for key, (label, rule_id, priority) in R.PROFILE_REASONS.items():
             self.assertEqual(priority, "normal", key)
-        self.assertEqual([r.id for r in R.RULES], [f"R{i}" for i in range(1, 11)])
+        self.assertEqual([r.id for r in R.RULES], [f"R{i}" for i in range(1, 12)])  # R11: spec 18
+        for key, (label, rule_id, priority) in R.EVENT_REASONS.items():
+            self.assertTrue(rule_id in ids or priority == "route" or key == "other", key)
 
     def test_priority_mapping_and_due(self):
         self.report("article", self.article, "spam")
@@ -560,8 +562,11 @@ class MigrationTests(TransactionTestCase):
         # media's backfill (spec 15) depends on the newer news/posts migrations, so it is rolled back to 0001 with them
         # core 0005 (spec 16 triggers) depends on the newer news/posts/moderation migrations too
         # communities 0002 (spec 17) needs core 0005; news 0006 needs communities
-        others = [n for n in leaves if n[0] not in {"moderation", "news", "posts", "notifications", "media", "core", "communities"}] + [
-            ("media", "0001_initial"), ("core", "0004_outbox_constraints_prune_index"), ("communities", "0001_initial")]
+        # events and volunteers 0002 (spec 18 history triggers) need core 0005 too
+        others = [n for n in leaves if n[0] not in {"moderation", "news", "posts", "notifications", "media", "core", "communities", "events",
+                                                    "volunteers"}] + [
+            ("media", "0001_initial"), ("core", "0004_outbox_constraints_prune_index"), ("communities", "0001_initial"),
+            ("events", "0001_initial"), ("volunteers", "0001_initial")]
         old = MigrationExecutor(connection).loader.project_state(before + others).apps
         U, Art, Cand, Post = (old.get_model("accounts", "User"), old.get_model("news", "Article"), old.get_model("candidates", "Candidate"),
                               old.get_model("posts", "CandidatePost"))

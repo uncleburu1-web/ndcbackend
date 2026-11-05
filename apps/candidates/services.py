@@ -90,6 +90,7 @@ def update_candidate(*, candidate: Candidate, data: dict, actor, request=None) -
     if unverified:
         record(A.CANDIDATE_UNVERIFIED, target=c, actor=actor, request=request, reason=why, fields=identity_changed)
     if unpublished:
+        _end_activities(c)
         record(A.CANDIDATE_UNPUBLISHED, target=c, actor=actor, request=request, reason=why, fields=identity_changed)
     return c, unpublished
 
@@ -135,6 +136,15 @@ def publish(*, candidate, actor, request=None):
     return c
 
 
+def _end_activities(c):
+    """Spec 18 §18: an unlisted candidate's upcoming events stop taking registrations and volunteering ends."""
+    from apps.events.services import end_for_candidate as close_events
+    from apps.volunteers.services import end_for_candidate as end_volunteering
+
+    close_events(c)
+    end_volunteering(c)
+
+
 @transaction.atomic
 def unpublish(*, candidate, reason, actor, request=None):
     c = _lock(candidate)
@@ -143,6 +153,7 @@ def unpublish(*, candidate, reason, actor, request=None):
     reason = _require(reason, "reason", "Give a reason for unpublishing.")
     c.status, c.updated_by = S.UNPUBLISHED, actor
     c.save()
+    _end_activities(c)
     record(A.CANDIDATE_UNPUBLISHED, target=c, actor=actor, request=request, reason=reason)
     return c
 
@@ -154,8 +165,11 @@ def archive(*, candidate, reason, actor, request=None):
     if c.status == S.ARCHIVED:
         raise _conflict("This candidate is already archived.")
     reason = _require(reason, "reason", "Give a reason for archiving.")
+    was_published = c.status == S.PUBLISHED
     c.status, c.updated_by = S.ARCHIVED, actor
     c.save()
+    if was_published:
+        _end_activities(c)
     revoked = 0
     for a in _active_links(c):
         revoke_role(assignment=a, actor=actor, reason=f"Candidate archived: {reason}")

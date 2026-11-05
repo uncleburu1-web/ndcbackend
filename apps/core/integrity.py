@@ -149,6 +149,51 @@ def _community_hidden_overdue(now):
             + CommunityComment.objects.filter(status="hidden", hidden_at__lt=cutoff).count())
 
 
+def _event_counts_drift():
+    """Recount registrations; fix the stored counts in place and report how many events were wrong (spec 18 §12.5)."""
+    from django.db.models import Count, F, Q
+
+    from apps.events.models import Event
+
+    n = 0
+    qs = Event.objects.annotate(r=Count("registrations", filter=Q(registrations__status="registered")),
+                                w=Count("registrations", filter=Q(registrations__status="waitlisted")),
+                                c=Count("registrations", filter=Q(registrations__checked_in_at__isnull=False)))
+    for e in qs.filter(~Q(registered_count=F("r")) | ~Q(waitlist_count=F("w")) | ~Q(checked_in_count=F("c"))):
+        Event.objects.filter(pk=e.pk).update(registered_count=e.r, waitlist_count=e.w, checked_in_count=e.c)
+        n += 1
+    return n
+
+
+def _events_over_capacity():
+    from django.db.models import Count, F, Q
+
+    from apps.events.models import Event
+
+    return Event.objects.filter(capacity__isnull=False).annotate(
+        r=Count("registrations", filter=Q(registrations__status="registered"))).filter(r__gt=F("capacity")).count()
+
+
+def _waitlist_with_free_places(now):
+    from django.db.models import Count, F, Q
+
+    from apps.events.models import Event
+
+    qs = Event.objects.filter(status="published", starts_at__gt=now).annotate(
+        r=Count("registrations", filter=Q(registrations__status="registered")),
+        w=Count("registrations", filter=Q(registrations__status="waitlisted")))
+    return qs.filter(w__gt=0).filter(Q(capacity__isnull=True) | Q(r__lt=F("capacity"))).count()
+
+
+def _volunteers_unpublished():
+    from django.db.models import Q
+
+    from apps.volunteers.models import VolunteerApplication
+
+    return VolunteerApplication.objects.filter(status__in=["pending", "accepted"]).filter(
+        ~Q(candidate__status="published") | Q(candidate__verified_at__isnull=True)).count()
+
+
 CHECKS = [
     ("orphan_case_targets", "Open moderation cases or reports pointing at missing items", lambda now: _orphan_targets()),
     ("search_not_public", "Search entries for items that aren't public", lambda now: _search_not_public()),
@@ -163,6 +208,10 @@ CHECKS = [
     ("community_inactive_members", "Members still in closed communities", lambda now: _community_inactive_members()),
     ("community_counts_drift", "Community counts that were wrong (now fixed)", lambda now: _community_counts_drift()),
     ("community_hidden_overdue", "Community items hidden for over 48 hours", _community_hidden_overdue),
+    ("event_counts_drift", "Event registration counts that were wrong (now fixed)", lambda now: _event_counts_drift()),
+    ("events_over_capacity", "Events with more people registered than their capacity", lambda now: _events_over_capacity()),
+    ("event_waitlist_with_places", "Waitlisted people on events with free places", _waitlist_with_free_places),
+    ("volunteers_unpublished_candidates", "Open volunteer applications for unlisted candidates", lambda now: _volunteers_unpublished()),
 ]
 
 

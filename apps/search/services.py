@@ -24,7 +24,7 @@ SIMILAR = 0.35  # strict word similarity; calibrated on Nigerian name variants (
 SUGGEST = 0.2
 SNIPPET = 200
 TIMEOUT_MS = 2000
-TYPES = {"candidates": Kind.CANDIDATE, "news": Kind.ARTICLE, "posts": Kind.POST}
+TYPES = {"candidates": Kind.CANDIDATE, "news": Kind.ARTICLE, "posts": Kind.POST, "events": Kind.EVENT}  # events: spec 18
 SINCE = {"week": 7, "month": 30, "year": 365}
 SOURCES = {"official", "community"}
 
@@ -187,7 +187,7 @@ def suggest(q):
 
     def go():
         cands = list(_base(Kind.CANDIDATE, q, year=year)[:5])
-        titles = list(_base(Kind.ARTICLE, q)[:3]) + list(_base(Kind.POST, q)[:3])
+        titles = list(_base(Kind.ARTICLE, q)[:3]) + list(_base(Kind.POST, q)[:3]) + list(_base(Kind.EVENT, q)[:3])
         titles.sort(key=lambda e: -float(e.score or 0))
         return cands, titles[:3]
 

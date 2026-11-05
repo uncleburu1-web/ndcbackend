@@ -106,6 +106,67 @@ def deliver_community_post(post) -> int:
         return cur.rowcount
 
 
+# spec 18 §7, §10: registered and waitlisted people (reminders: registered only, not within 2 h of registering). Folded: one
+# row per person per event per kind per hour.
+EVENT_SQL = """
+INSERT INTO notifications_notification (id, recipient_id, kind, event_id, decision, count, created_at)
+SELECT gen_random_uuid(), r.user_id, %(kind)s, %(event)s, %(decision)s, 1, now()
+FROM events_eventregistration r JOIN accounts_user u ON u.id = r.user_id
+LEFT JOIN notifications_notificationpreference p ON p.user_id = u.id
+WHERE r.event_id = %(event)s AND r.status = ANY(%(statuses)s) AND u.is_active AND u.clerk_deleted_at IS NULL
+  AND (%(kind)s <> 'event_reminder' OR (COALESCE(p.event_reminders, TRUE) AND r.updated_at <= now() - interval '2 hours'))
+  AND NOT EXISTS (SELECT 1 FROM notifications_notification n WHERE n.recipient_id = r.user_id AND n.event_id = %(event)s
+                  AND n.kind = %(kind)s AND n.decision = %(decision)s AND n.created_at > now() - interval '1 hour')
+"""
+
+CANDIDATE_EVENT_SQL = """
+INSERT INTO notifications_notification (id, recipient_id, kind, event_id, decision, count, created_at)
+SELECT gen_random_uuid(), f.user_id, 'candidate_event', %(event)s, '', 1, now()
+FROM follows_candidatefollow f JOIN accounts_user u ON u.id = f.user_id
+LEFT JOIN notifications_notificationpreference p ON p.user_id = u.id
+WHERE f.candidate_id = %(candidate)s AND f.notify AND f.notify_changed_at <= %(published_at)s AND COALESCE(p.candidate_events, TRUE)
+  AND u.is_active AND u.clerk_deleted_at IS NULL
+ON CONFLICT DO NOTHING
+"""
+
+VOLUNTEER_UPDATE_SQL = """
+INSERT INTO notifications_notification (id, recipient_id, kind, volunteer_update_id, candidate_id, decision, count, created_at)
+SELECT gen_random_uuid(), a.user_id, 'volunteer_update', %(update)s, %(candidate)s, '', 1, now()
+FROM volunteers_volunteerapplication a JOIN accounts_user u ON u.id = a.user_id
+WHERE a.candidate_id = %(candidate)s AND a.status = 'accepted' AND (%(role)s = '' OR a.roles @> to_jsonb(ARRAY[%(role)s]::text[]))
+  AND u.is_active AND u.clerk_deleted_at IS NULL
+ON CONFLICT DO NOTHING
+"""
+
+
+def deliver_event(event, kind, decision="") -> int:
+    """event_update to registered and waitlisted people; event_reminder to registered people. IDs and a word only."""
+    statuses = ["registered"] if kind == Kind.EVENT_REMINDER else ["registered", "waitlisted"]
+    with connection.cursor() as cur:
+        cur.execute(EVENT_SQL, {"kind": kind, "event": event.pk, "decision": (decision or "")[:10], "statuses": statuses})
+        return cur.rowcount
+
+
+def deliver_candidate_event(event) -> int:
+    """Spec 18 §7: bell-on followers of a published candidate, like 09's posts; never inside a blackout window. Not audited."""
+    from apps.core import blackouts
+    from apps.events.services import candidate_published
+
+    if event.status != "published" or not candidate_published(event.candidate):
+        return 0
+    if blackouts.active_window(positions=[event.candidate.position]):
+        return 0
+    with connection.cursor() as cur:
+        cur.execute(CANDIDATE_EVENT_SQL, {"event": event.pk, "candidate": event.candidate_id, "published_at": event.published_at})
+        return cur.rowcount
+
+
+def deliver_volunteer_update(update) -> int:
+    with connection.cursor() as cur:
+        cur.execute(VOLUNTEER_UPDATE_SQL, {"update": update.pk, "candidate": update.candidate_id, "role": update.role or ""})
+        return cur.rowcount
+
+
 def deliver_post_on_commit(post):
     from apps.core import outbox
 
@@ -125,6 +186,8 @@ TARGET_FIELD = {
     Kind.APPEAL_DECISION: "appeal", Kind.SECURITY_NOTICE: "incident", Kind.PRIVACY_REQUEST_UPDATE: "data_request",
     Kind.MEMBERSHIP_DECISION: "membership", Kind.DONATION_RECEIPT: "donation",
     Kind.COMMUNITY_REPLY: "community_post", Kind.COMMUNITY_POST: "community_post", Kind.COMMUNITY_PLACED: None,  # spec 17 §10
+    Kind.EVENT_UPDATE: "event", Kind.EVENT_REMINDER: "event", Kind.EVENT_WAITLIST: "event", Kind.CANDIDATE_EVENT: "event",  # spec 18
+    Kind.VOLUNTEER_DECISION: "candidate", Kind.VOLUNTEER_UPDATE: "volunteer_update",
 }
 
 
@@ -146,7 +209,7 @@ def notify(recipient, kind: str, *, target=None, decision: str = "", **links):
     if target is not None and field:
         fields[field] = target
     unknown = set(fields) - {"article", "candidate_post", "case", "appeal", "data_request", "incident", "membership", "donation",
-                             "community_post", "community"}
+                             "community_post", "community", "event", "candidate", "volunteer_update"}
     if unknown:
         raise ValueError(f"Unknown notification target {unknown}")
     if kind == Kind.DONATION_RECEIPT and Notification.objects.filter(recipient=recipient, kind=kind, donation=fields.get("donation")).exists():
@@ -193,18 +256,22 @@ def notify_donation_receipt(donation):
 
 def visible(user):
     """Announcements only while their article is public; decisions about your own requests always."""
-    from .models import MODERATION_KINDS, OWN_RECORD_KINDS, PRIVACY_KINDS
+    from .models import MODERATION_KINDS, OWN_RECORD_KINDS, PRIVACY_KINDS, VOLUNTEER_KINDS
 
     return (Notification.objects.filter(recipient=user)
             .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION, Kind.COMMUNITY_PLACED, *MODERATION_KINDS, *PRIVACY_KINDS,
                                 *OWN_RECORD_KINDS])
                     | Q(kind__in=[Kind.COMMUNITY_REPLY, Kind.COMMUNITY_POST], community_post__status="published",
                         community_post__community__active=True)
+                    | Q(kind__in=VOLUNTEER_KINDS)
+                    | Q(kind__in=[Kind.EVENT_UPDATE, Kind.EVENT_REMINDER, Kind.EVENT_WAITLIST, Kind.CANDIDATE_EVENT],
+                        event__status__in=["published", "cancelled", "removed"])
                     | Q(kind=Kind.ANNOUNCEMENT, article__status="successful")
                     | Q(kind=Kind.CANDIDATE_POST, candidate_post__status="published", candidate_post__candidate__status="published",
                         candidate_post__candidate__verified_at__isnull=False))
             .select_related("article", "candidate_post__candidate", "case", "appeal__case", "data_request", "incident", "membership",
-                            "donation", "community_post__community", "community"))
+                            "donation", "community_post__community", "community", "event__candidate", "candidate",
+                            "volunteer_update"))
 
 
 def unread_count(user) -> int:
@@ -219,13 +286,18 @@ def mark_all_read(user) -> int:
     return Notification.objects.filter(recipient=user, read_at__isnull=True).update(read_at=timezone.now())
 
 
+PREF_FIELDS = ("announcements", "community_replies", "event_reminders", "candidate_events")
+
+
 def preferences(user) -> dict:
     p = NotificationPreference.objects.filter(user=user).first()
-    return {"announcements": p.announcements if p else True, "community_replies": p.community_replies if p else True}
+    return {k: getattr(p, k) if p else True for k in PREF_FIELDS}
 
 
-def set_preferences(user, announcements=None, community_replies=None) -> dict:
-    values = {k: bool(v) for k, v in (("announcements", announcements), ("community_replies", community_replies)) if v is not None}
+def set_preferences(user, announcements=None, community_replies=None, event_reminders=None, candidate_events=None) -> dict:
+    given = {"announcements": announcements, "community_replies": community_replies, "event_reminders": event_reminders,
+             "candidate_events": candidate_events}
+    values = {k: bool(v) for k, v in given.items() if v is not None}
     NotificationPreference.objects.update_or_create(user=user, defaults=values)
     return preferences(user)
 

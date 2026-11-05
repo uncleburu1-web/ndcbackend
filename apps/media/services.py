@@ -139,6 +139,14 @@ def authorise(user, purpose: str, target_id):
             if not is_system_admin(user):
                 raise deny()
             return Article.objects.get(pk=target_id, source="official")
+        if purpose == Purpose.EVENT_IMAGE:  # spec 18 §4.2: the event's organisers
+            from apps.events.models import Event, Organiser
+            from apps.events.services import can_organise
+
+            e = Event.objects.select_related("candidate").get(pk=target_id)
+            if not can_organise(user, None if e.organiser_kind == Organiser.PARTY else e.candidate):
+                raise deny()
+            return e
         if purpose == Purpose.NEWS_IMAGE:
             from apps.news.models import Article
             from apps.news.services import EDITABLE

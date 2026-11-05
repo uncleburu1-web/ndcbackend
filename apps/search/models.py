@@ -15,6 +15,7 @@ class Kind(models.TextChoices):
     CANDIDATE = "candidate", "Candidate"
     ARTICLE = "article", "News"
     POST = "post", "Candidate post"
+    EVENT = "event", "Event"  # spec 18 §5: published, not-yet-ended events
 
 
 class SearchEntry(models.Model):

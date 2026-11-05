@@ -79,7 +79,7 @@ Data register: Security and audit records.
 | `id` | uuid |  | primary key |
 | `actor_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
 | `actor_label` | varchar(32) |  |  |
-| `action` | varchar(48) |  | one of 100 values; indexed |
+| `action` | varchar(48) |  | one of 106 values; indexed |
 | `target_type` | varchar(64) |  |  |
 | `target_id` | varchar(64) |  | indexed |
 | `metadata` | jsonb |  | per-action details from an allow-list; displayed, never joined |
@@ -640,7 +640,7 @@ Data register: Reports and moderation.
 | Column | Type | Null | Notes |
 |---|---|---|---|
 | `id` | uuid |  | primary key |
-| `target_kind` | varchar(20) |  | one of article, post, candidate, community_post, community_comment |
+| `target_kind` | varchar(20) |  | one of article, post, candidate, community_post, community_comment, event |
 | `target_id` | uuid |  |  |
 | `source` | varchar(20) |  | one of user_report, agency_notice, court_order, copyright_notice, proactive |
 | `status` | varchar(10) |  | one of open, escalated, closed |
@@ -762,7 +762,7 @@ Data register: Reports and moderation.
 |---|---|---|---|
 | `id` | uuid |  | primary key |
 | `reference` | varchar(12) |  | unique |
-| `target_kind` | varchar(20) |  | one of article, post, candidate, community_post, community_comment |
+| `target_kind` | varchar(20) |  | one of article, post, candidate, community_post, community_comment, event |
 | `target_id` | uuid |  |  |
 | `case_id` | → |  | → `moderation.Case`, on delete CASCADE (reports are grouped by their case and pruned with it) |
 | `reason` | varchar(16) |  |  |
@@ -821,7 +821,7 @@ Data register: Notifications.
 |---|---|---|---|
 | `id` | uuid |  | primary key |
 | `recipient_id` | → |  | → `accounts.User`, on delete CASCADE (owner of private data; erased through the owning service) |
-| `kind` | varchar(32) |  | one of 16 values |
+| `kind` | varchar(32) |  | one of 22 values |
 | `article_id` | → | yes | → `news.Article`, on delete CASCADE (a notice about deleted content is meaningless) |
 | `candidate_post_id` | → | yes | → `posts.CandidatePost`, on delete CASCADE (a notice about deleted content is meaningless) |
 | `case_id` | → | yes | → `moderation.Case`, on delete CASCADE (a notice about deleted content is meaningless) |
@@ -832,6 +832,9 @@ Data register: Notifications.
 | `donation_id` | → | yes | → `donations.Donation`, on delete SET_NULL (a receipt survives an erased record as 'your donation') |
 | `community_post_id` | → | yes | → `communities.CommunityPost`, on delete CASCADE (a notice about deleted content is meaningless) |
 | `community_id` | → | yes | → `communities.Community`, on delete CASCADE (a notice about deleted content is meaningless) |
+| `event_id` | → | yes | → `events.Event`, on delete CASCADE (a notice about deleted content is meaningless) |
+| `candidate_id` | → | yes | → `candidates.Candidate`, on delete PROTECT (candidates are archived, never deleted) |
+| `volunteer_update_id` | → | yes | → `volunteers.VolunteerUpdate`, on delete CASCADE (a notice about deleted content is meaningless) |
 | `count` | integer ≥ 0 |  |  |
 | `decision` | varchar(10) |  |  |
 | `created_at` | timestamptz |  |  |
@@ -842,7 +845,9 @@ Constraints:
 - `notif_one_announcement`: unique (recipient, article) where kind = 'announcement'
 - `notif_one_candidate_post`: unique (recipient, candidate_post) where kind = 'candidate_post'
 - `notif_one_donation_receipt`: unique (recipient, donation) where kind = 'donation_receipt'
-- `notif_target_by_kind`: check (article is not null and candidate_post is null and kind in (announcement, news_decision)) or (article is null and candidate_post is null and kind = 'pvc_decision') or (article is null and candidate_post is not null and kind = 'candidate_post') or (article is null and candidate_post is null and kind in (report_outcome, content_removed, account_warning, submissions_paused, appeal_decision)) or (article is null and candidate_post is null and kind in (security_notice, privacy_request_update)) or (article is null and candidate_post is null and kind in (membership_decision, donation_receipt)) or (article is null and candidate_post is null and community_post is not null and kind in (community_reply, community_post)) or (article is null and candidate_post is null and community_post is null and kind = 'community_placed')
+- `notif_target_by_kind`: check (article is not null and candidate_post is null and kind in (announcement, news_decision)) or (article is null and candidate_post is null and kind = 'pvc_decision') or (article is null and candidate_post is not null and kind = 'candidate_post') or (article is null and candidate_post is null and kind in (report_outcome, content_removed, account_warning, submissions_paused, appeal_decision)) or (article is null and candidate_post is null and kind in (security_notice, privacy_request_update)) or (article is null and candidate_post is null and kind in (membership_decision, donation_receipt)) or (article is null and candidate_post is null and community_post is not null and kind in (community_reply, community_post)) or (article is null and candidate_post is null and community_post is null and kind = 'community_placed') or (article is null and candidate_post is null and event is not null and kind in (event_update, event_reminder, event_waitlist, candidate_event)) or (article is null and candidate is not null and candidate_post is null and kind = 'volunteer_decision') or (article is null and candidate is not null and candidate_post is null and kind = 'volunteer_update' and volunteer_update is not null)
+- `notif_one_candidate_event`: unique (recipient, event) where kind = 'candidate_event'
+- `notif_one_volunteer_update`: unique (recipient, volunteer_update) where kind = 'volunteer_update'
 - `notif_one_community_post`: unique (recipient, community_post) where kind = 'community_post'
 
 Indexes:
@@ -862,6 +867,8 @@ Data register: Notifications.
 | `user_id` | → (one) |  | → `accounts.User`, on delete CASCADE (owner of private data; erased through the owning service); unique |
 | `announcements` | boolean |  |  |
 | `community_replies` | boolean |  |  |
+| `event_reminders` | boolean |  |  |
+| `candidate_events` | boolean |  |  |
 | `updated_at` | timestamptz |  |  |
 
 ## Privacy and security
@@ -903,7 +910,7 @@ Data register: Your privacy choices and requests.
 |---|---|---|---|
 | `id` | uuid |  | primary key |
 | `user_id` | → |  | → `accounts.User`, on delete CASCADE (owner of private data; erased through the owning service) |
-| `purpose` | varchar(24) |  | one of political_following, membership, pvc_check, verified_badge, community_membership |
+| `purpose` | varchar(24) |  | one of political_following, membership, pvc_check, verified_badge, community_membership, event_registration, volunteering |
 | `version` | smallint ≥ 0 |  |  |
 | `method` | varchar(16) |  | one of dialog, form, before_records |
 | `granted_at` | timestamptz |  |  |
@@ -1218,7 +1225,7 @@ Data register: Images.
 | `bytes` | integer ≥ 0 |  |  |
 | `width` | integer ≥ 0 | yes |  |
 | `height` | integer ≥ 0 | yes |  |
-| `purpose` | varchar(24) |  | one of candidate_photo, post_image, news_image, announcement_image |
+| `purpose` | varchar(24) |  | one of candidate_photo, post_image, news_image, announcement_image, event_image |
 | `local_files` | jsonb |  | variant → storage name for local files; read only by the media service |
 | `checksum` | varchar(64) |  |  |
 | `delivery` | varchar(10) |  | one of public, hidden, deleted |
@@ -1243,7 +1250,7 @@ Data register: Not personal.
 | Column | Type | Null | Notes |
 |---|---|---|---|
 | `id` | uuid |  | primary key |
-| `kind` | varchar(12) |  | one of candidate, article, post; indexed |
+| `kind` | varchar(12) |  | one of candidate, article, post, event; indexed |
 | `object_id` | uuid |  |  |
 | `title` | varchar(200) |  |  |
 | `folded_title` | varchar(200) |  |  |

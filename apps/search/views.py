@@ -16,7 +16,7 @@ from apps.news.serializers import PublicArticleSerializer
 from apps.posts.serializers import FeedPostSerializer
 
 from . import services
-from .index import _public_articles, _public_candidates, _public_posts
+from .index import _public_articles, _public_candidates, _public_events, _public_posts
 from .models import Kind
 from .services import snippet, words_for
 
@@ -72,11 +72,24 @@ def _posts(entries, words, request):
     return out
 
 
+def _events(entries, words, request):
+    from apps.events.serializers import card
+
+    objs = _by_ids(_public_events(), [e.object_id for e in entries])
+    out = []
+    for ev in objs:
+        snip, ms = snippet(ev.description, words)
+        out.append({**card(ev), "snippet": snip, "matches": ms, "title_matches": services._matches(ev.title, words), "url": f"/events/{ev.id}"})
+    return out
+
+
 def _render(kind, entries, words, request):
     if kind == Kind.CANDIDATE:
         return _candidates(entries, request)
     if kind == Kind.ARTICLE:
         return _articles(entries, words, request)
+    if kind == Kind.EVENT:
+        return _events(entries, words, request)
     return _posts(entries, words, request)
 
 
@@ -119,6 +132,10 @@ class SuggestView(_Public):
                 a = _public_articles().filter(pk=e.object_id).first()
                 if a:
                     out_titles.append({"type": "news", "title": a.title, "url": f"/news/{a.source}/{a.id}"})
+            elif e.kind == Kind.EVENT:
+                ev = _public_events().filter(pk=e.object_id).first()
+                if ev:
+                    out_titles.append({"type": "event", "title": ev.title, "url": f"/events/{ev.id}"})
             else:
                 p = _public_posts().filter(pk=e.object_id).first()
                 if p:
@@ -147,6 +164,9 @@ class StateDetailView(_Public):
     GROUP = 6
 
     def get(self, request, state):
+        from apps.events.serializers import card
+        from apps.events.services import upcoming
+
         if state not in State.values:
             raise Http404
         year = services.current_year()
@@ -171,4 +191,5 @@ class StateDetailView(_Public):
             "state": state, "label": State(state).label, "election_year": year, "groups": groups,
             "news": PublicArticleSerializer(news, many=True, context={"request": request}).data,
             "posts": FeedPostSerializer(posts, many=True, context={"request": request}).data,
+            "events": [card(e) for e in upcoming(state=state, limit=5)],  # spec 18 §5
         })

@@ -27,11 +27,20 @@ class Kind(models.TextChoices):
     COMMUNITY_REPLY = "community_reply", "Reply to your community post"
     COMMUNITY_POST = "community_post", "New community post"
     COMMUNITY_PLACED = "community_placed", "Communities joined"
+    # spec 18 §10
+    EVENT_UPDATE = "event_update", "Event update"
+    EVENT_REMINDER = "event_reminder", "Event reminder"
+    EVENT_WAITLIST = "event_waitlist", "Place at an event"
+    CANDIDATE_EVENT = "candidate_event", "New event from a candidate you follow"
+    VOLUNTEER_DECISION = "volunteer_decision", "Volunteer application"
+    VOLUNTEER_UPDATE = "volunteer_update", "Update from a campaign you volunteer for"
 
 
 MODERATION_KINDS = ["report_outcome", "content_removed", "account_warning", "submissions_paused", "appeal_decision"]
 PRIVACY_KINDS = ["security_notice", "privacy_request_update"]
 OWN_RECORD_KINDS = ["membership_decision", "donation_receipt"]
+EVENT_KINDS = ["event_update", "event_reminder", "event_waitlist", "candidate_event"]  # spec 18: IDs and a short word only
+VOLUNTEER_KINDS = ["volunteer_decision", "volunteer_update"]
 COMMUNITY_KINDS = ["community_reply", "community_post", "community_placed"]  # spec 17: IDs only, never post text  # spec 15: about the person's own record; no amounts in the row
 
 
@@ -51,6 +60,9 @@ class Notification(models.Model):
     donation = models.ForeignKey("donations.Donation", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     community_post = models.ForeignKey("communities.CommunityPost", null=True, blank=True, on_delete=models.CASCADE, related_name="+")
     community = models.ForeignKey("communities.Community", null=True, blank=True, on_delete=models.CASCADE, related_name="+")
+    event = models.ForeignKey("events.Event", null=True, blank=True, on_delete=models.CASCADE, related_name="+")  # spec 18
+    candidate = models.ForeignKey("candidates.Candidate", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    volunteer_update = models.ForeignKey("volunteers.VolunteerUpdate", null=True, blank=True, on_delete=models.CASCADE, related_name="+")
     count = models.PositiveIntegerField(default=1, db_default=1)  # community_reply: comments folded into one notice
     decision = models.CharField(max_length=10, blank=True)  # approved | rejected (news) · verified | rejected (pvc)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -75,7 +87,15 @@ class Notification(models.Model):
                                               | Q(kind__in=["community_reply", "community_post"], community_post__isnull=False, article__isnull=True,
                                                   candidate_post__isnull=True)
                                               | Q(kind="community_placed", community_post__isnull=True, article__isnull=True,
-                                                  candidate_post__isnull=True))),
+                                                  candidate_post__isnull=True)
+                                              | Q(kind__in=EVENT_KINDS, event__isnull=False, article__isnull=True, candidate_post__isnull=True)
+                                              | Q(kind="volunteer_decision", candidate__isnull=False, article__isnull=True,
+                                                  candidate_post__isnull=True)
+                                              | Q(kind="volunteer_update", volunteer_update__isnull=False, candidate__isnull=False,
+                                                  article__isnull=True, candidate_post__isnull=True))),
+            models.UniqueConstraint(fields=["recipient", "event"], name="notif_one_candidate_event", condition=Q(kind="candidate_event")),
+            models.UniqueConstraint(fields=["recipient", "volunteer_update"], name="notif_one_volunteer_update",
+                                    condition=Q(kind="volunteer_update")),
             models.UniqueConstraint(fields=["recipient", "community_post"], name="notif_one_community_post",
                                     condition=Q(kind="community_post")),
         ]
@@ -91,4 +111,6 @@ class NotificationPreference(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notification_preference")
     announcements = models.BooleanField(default=True)
     community_replies = models.BooleanField(default=True)  # spec 17 §10
+    event_reminders = models.BooleanField(default=True)  # spec 18 §7
+    candidate_events = models.BooleanField(default=True)  # spec 18 §7 (follows the candidate-post bell)
     updated_at = models.DateTimeField(auto_now=True)

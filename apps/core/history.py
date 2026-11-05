@@ -18,7 +18,8 @@ HISTORY_TABLES = [
     "audit_auditlog",
 ]
 # Added after core 0005 by the owning app's own migration (the 0005 copy stays frozen):
-LATER_TABLES = ["communities_communityevent"]  # communities 0002 (spec 17)
+LATER_TABLES = ["communities_communityevent",  # communities 0002 (spec 17)
+                "events_eventchange", "volunteers_volunteerchange"]  # events 0002, volunteers 0002 (spec 18)
 
 FUNCTION_SQL = r"""
 CREATE OR REPLACE FUNCTION ndc_append_only() RETURNS trigger AS $$

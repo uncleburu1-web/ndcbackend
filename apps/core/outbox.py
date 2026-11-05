@@ -46,6 +46,8 @@ def _load():
 
     for mod in ("apps.notifications.outbox_handlers", "apps.media.outbox_handlers", "apps.integrations.outbox_handlers",
                 "apps.communities.outbox_handlers",
+                "apps.events.outbox_handlers",
+                "apps.volunteers.outbox_handlers",
                 "apps.accounts.outbox_handlers"):
         try:
             importlib.import_module(mod)

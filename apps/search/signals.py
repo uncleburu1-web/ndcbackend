@@ -8,6 +8,7 @@ from .models import Kind
 
 def _connect():
     from apps.candidates.models import Candidate
+    from apps.events.models import Event
     from apps.news.models import Article
     from apps.posts.models import CandidatePost
 
@@ -26,7 +27,12 @@ def _connect():
         if not raw:
             index.index_post(instance)
 
-    for model, kind in ((Candidate, Kind.CANDIDATE), (Article, Kind.ARTICLE), (CandidatePost, Kind.POST)):
+    @receiver(post_save, sender=Event, weak=False, dispatch_uid="search_event_save")
+    def _e(sender, instance, raw=False, **kw):
+        if not raw:
+            index.sync_event(instance)
+
+    for model, kind in ((Candidate, Kind.CANDIDATE), (Article, Kind.ARTICLE), (CandidatePost, Kind.POST), (Event, Kind.EVENT)):
         post_delete.connect(lambda sender, instance, _k=kind, **kw: index.remove(_k, instance.pk), sender=model, weak=False,
                             dispatch_uid=f"search_{kind}_delete")
 

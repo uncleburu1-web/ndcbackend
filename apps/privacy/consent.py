@@ -77,6 +77,16 @@ def _undo(user, purpose, options=None) -> str:
         from apps.communities.services import withdraw as leave_all
 
         return leave_all(user, delete_content=bool(options.get("delete_content")))
+    if purpose == "event_registration":  # spec 18 §17.1
+        from apps.events.services import cancel_upcoming_for
+
+        n = cancel_upcoming_for(user)
+        return f"{n} upcoming registration{'s' if n != 1 else ''} cancelled"
+    if purpose == "volunteering":
+        from apps.volunteers.services import withdraw_all
+
+        n = withdraw_all(user)
+        return f"{n} volunteer application{'s' if n != 1 else ''} withdrawn"
     if purpose == "political_following":
         from apps.follows.services import remove_all_for_user
 

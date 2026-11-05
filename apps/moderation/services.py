@@ -93,7 +93,7 @@ def _open_case(kind, obj, source=CaseSource.USER_REPORT, priority="normal", acto
 # --------------------------------------------------------------------------- reporting
 def report(kind, obj, reason, details="", *, user=None, contact_email="", ip="") -> dict:
     """Spec 13 §6.1. Returns {"reference"} or {"route"} for copyright."""
-    table = R.PROFILE_REASONS if kind == TargetKind.CANDIDATE else R.REASONS
+    table = R.PROFILE_REASONS if kind == TargetKind.CANDIDATE else R.EVENT_REASONS if kind == TargetKind.EVENT else R.REASONS
     if reason not in table:
         raise _err("Choose a reason.", "validation_error")
     if not T.is_public(kind, obj):
@@ -176,6 +176,8 @@ def can_view(user, case, obj=None) -> bool:
         from apps.communities.services import moderates
 
         return moderates(user, T.community_of(case.target_kind, obj))
+    if case.target_kind == TargetKind.EVENT:  # spec 18 §8: platform-wide moderators
+        return r["mod"]
     if case.target_kind == TargetKind.CANDIDATE or T.is_official(case.target_kind, obj):
         return False
     if case.target_kind == TargetKind.ARTICLE:
@@ -194,7 +196,7 @@ def visible_cases(user):
     community = Article.objects.filter(source="community").values("pk")
     allowed = Q(target_kind=TargetKind.ARTICLE, target_id__in=community) if (r["mod"] or r["news"]) else Q(pk__in=[])
     if r["mod"]:
-        allowed |= Q(target_kind=TargetKind.POST) | Q(target_kind__in=T.COMMUNITY_KINDS)
+        allowed |= Q(target_kind=TargetKind.POST) | Q(target_kind__in=T.COMMUNITY_KINDS) | Q(target_kind=TargetKind.EVENT)
     else:  # a community-scoped moderator: items in their communities and every level below (spec 17 §8.2)
         from apps.communities.models import CommunityComment, CommunityPost
         from apps.communities.services import scope_paths, under_paths
@@ -307,10 +309,8 @@ def keep(case, user, note="", request=None):
             raise _err("This case is already closed.", "invalid_transition", 409)
         _close(c, Decision.KEPT, user, internal_note=note)
         _event(c, E.KEPT, user, note)
-        if c.target_kind in T.COMMUNITY_KINDS and obj is not None and obj.status == "hidden":
-            from apps.communities import services as communities
-
-            communities.unhide(obj, user, "kept")  # spec 17 §8.3: keeping a hidden item shows it again
+        if c.target_kind in T.HIDEABLE_KINDS and obj is not None and obj.status == "hidden":
+            T.service(c.target_kind).unhide(obj, user, "kept")  # spec 17 §8.3: keeping a hidden item shows it again
         _notify_reporters(c, "kept")
     record(A.MODERATION_KEPT, target=c, actor=user, request=request)
     return c
@@ -321,16 +321,14 @@ def hide(case, user, note="", request=None):
     with transaction.atomic():
         c = _locked(case.pk)
         obj = T.load(c.target_kind, c.target_id)
-        if c.target_kind not in T.COMMUNITY_KINDS:
-            raise _err("Only community posts and comments can be hidden.", "invalid_transition", 409)
+        if c.target_kind not in T.HIDEABLE_KINDS:
+            raise _err("Only community posts, comments and events can be hidden.", "invalid_transition", 409)
         _check(user, c, obj)
         if c.status == CaseStatus.CLOSED:
             raise _err("This case is already closed.", "invalid_transition", 409)
         if c.assigned_to_id != user.pk:
             raise _err("Take the case first.", "not_your_case", 403)
-        from apps.communities import services as communities
-
-        communities.hide(obj, user, note)
+        T.service(c.target_kind).hide(obj, user, note)
         _event(c, E.HIDDEN, user, note)
     record(A.MODERATION_HIDDEN, target=c, actor=user, request=request, kind=c.target_kind)
     return c
@@ -340,12 +338,10 @@ def unhide(case, user, note="", request=None):
     with transaction.atomic():
         c = _locked(case.pk)
         obj = T.load(c.target_kind, c.target_id)
-        if c.target_kind not in T.COMMUNITY_KINDS:
-            raise _err("Only community posts and comments can be hidden.", "invalid_transition", 409)
+        if c.target_kind not in T.HIDEABLE_KINDS:
+            raise _err("Only community posts, comments and events can be hidden.", "invalid_transition", 409)
         _check(user, c, obj)
-        from apps.communities import services as communities
-
-        communities.unhide(obj, user, note)
+        T.service(c.target_kind).unhide(obj, user, note)
         _event(c, E.UNHIDDEN, user, note)
     record(A.MODERATION_UNHIDDEN, target=c, actor=user, request=request, kind=c.target_kind)
     return c
@@ -357,10 +353,13 @@ def hidden_overdue(now=None):
 
     now = now or timezone.now()
     cutoff = now - timedelta(hours=48)
+    from apps.events.models import Event
+
     ids = (list(CommunityPost.objects.filter(status="hidden", hidden_at__lt=cutoff).values_list("pk", flat=True))
-           + list(CommunityComment.objects.filter(status="hidden", hidden_at__lt=cutoff).values_list("pk", flat=True)))
+           + list(CommunityComment.objects.filter(status="hidden", hidden_at__lt=cutoff).values_list("pk", flat=True))
+           + list(Event.objects.filter(status="hidden", hidden_at__lt=cutoff).values_list("pk", flat=True)))  # spec 18 §8
     n = 0
-    for c in Case.objects.filter(target_kind__in=T.COMMUNITY_KINDS, target_id__in=ids).exclude(status=CaseStatus.CLOSED).exclude(
+    for c in Case.objects.filter(target_kind__in=T.HIDEABLE_KINDS, target_id__in=ids).exclude(status=CaseStatus.CLOSED).exclude(
             priority__in=["urgent", "legal"]):
         _set_priority(c, "urgent", now)
         c.save(update_fields=["priority", "priority_rank", "due_at"])
@@ -412,10 +411,8 @@ def remove(case, user, rule_id, note_to_author="", internal_note="", warn=False,
             from apps.posts import services as posts
 
             posts.remove_post(obj, user, reason, request=request, rule=rule_id, note_to_author=note, internal_note=internal_note)
-        elif c.target_kind in T.COMMUNITY_KINDS:
-            from apps.communities import services as communities
-
-            communities.remove(obj, user, rule=rule_id, note_to_author=note, internal_note=internal_note)
+        elif c.target_kind in T.HIDEABLE_KINDS:
+            T.service(c.target_kind).remove(obj, user, rule=rule_id, note_to_author=note, internal_note=internal_note)
         else:
             raise _err("Candidate profiles aren't removed: correct the profile, then close the case with Keep.", "invalid_transition", 409)
         if warn:
@@ -467,10 +464,8 @@ def _restore_target(c, obj, user, note, request=None):
         from apps.news import services as news
 
         news.restore(obj, user, request=request, note=note)
-    elif c.target_kind in T.COMMUNITY_KINDS:
-        from apps.communities import services as communities
-
-        communities.restore(obj, user, note)
+    elif c.target_kind in T.HIDEABLE_KINDS:
+        T.service(c.target_kind).restore(obj, user, note)
     else:
         from apps.posts import services as posts
 
@@ -750,10 +745,8 @@ def set_item_outcome(item, by, outcome, reason="", request=None):
 
                     news.remove(obj, by, f"{R.rule_title(rule_id)} ({n.reference})", request=request, rule=rule_id, source=c.source,
                                 note_to_author=reason)
-                elif c.target_kind in T.COMMUNITY_KINDS:
-                    from apps.communities import services as communities
-
-                    communities.remove(obj, by, rule=rule_id, note_to_author=reason, source=c.source)
+                elif c.target_kind in T.HIDEABLE_KINDS:
+                    T.service(c.target_kind).remove(obj, by, rule=rule_id, note_to_author=reason, source=c.source)
                 else:
                     from apps.posts import services as posts
 
@@ -928,9 +921,13 @@ def _owned_case_ids(user):
     posts = CandidatePost.objects.filter(candidate__in=linked_candidates(user)).values_list("pk", flat=True)
     cposts = CommunityPost.objects.filter(author=user).values_list("pk", flat=True)
     ccomments = CommunityComment.objects.filter(author=user).values_list("pk", flat=True)
+    from apps.events.models import Event  # spec 18: events of a linked campaign, or party events the person created
+
+    events = Event.objects.filter(Q(candidate__in=linked_candidates(user)) | Q(organiser_kind="party", created_by=user)).values_list("pk", flat=True)
     return Case.objects.filter(Q(target_kind=TargetKind.ARTICLE, target_id__in=news) | Q(target_kind=TargetKind.POST, target_id__in=posts)
                                | Q(target_kind=TargetKind.COMMUNITY_POST, target_id__in=cposts)
-                               | Q(target_kind=TargetKind.COMMUNITY_COMMENT, target_id__in=ccomments))
+                               | Q(target_kind=TargetKind.COMMUNITY_COMMENT, target_id__in=ccomments)
+                               | Q(target_kind=TargetKind.EVENT, target_id__in=events))
 
 
 def _appeal_payload(a):
