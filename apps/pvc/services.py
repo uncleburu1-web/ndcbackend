@@ -48,6 +48,38 @@ def public_badge(user) -> bool:
     return PvcVerification.objects.filter(user=user, status=PvcStatus.SUCCESSFUL, show_badge=True).exists()
 
 
+def community_badge(user) -> bool:
+    """The badge on community posts and comments: as `public_badge`, plus version 2 of the badge consent (spec 17 §17.1)."""
+    if not public_badge(user):
+        return False
+    from apps.privacy.consent import active
+
+    rec = active(user, "verified_badge")
+    return bool(rec and rec.version >= 2)
+
+
+def verified_location(user):
+    """Spec 17 §5.2, keeping 08's boundary: (state, geo_lga_id, geo_ward_id, geo_polling_unit_id) for a successful check, else None.
+    The ward comes from the polling unit when the record has no ward link of its own. Never returns PVC details."""
+    if user is None or not getattr(user, "pk", None):
+        return None
+    rec = (PvcVerification.objects.filter(user=user, status=PvcStatus.SUCCESSFUL)
+           .select_related("geo_polling_unit__ward__lga").only("state", "geo_lga_id", "geo_ward_id", "geo_polling_unit").first())
+    if rec is None or not rec.state:
+        return None
+    pu = rec.geo_polling_unit
+    ward_id = rec.geo_ward_id or (pu.ward_id if pu else None)
+    lga_id = rec.geo_lga_id or (pu.ward.lga_id if pu else None)
+    return rec.state, lga_id, ward_id, pu.pk if pu else None
+
+
+def _placement_changed(user):
+    """Tell communities a PVC result changed (spec 17 §5.2): an outbox job with the user ID only."""
+    from apps.core import outbox
+
+    outbox.enqueue("communities_place", {"user": str(user.pk)}, dedupe_key=f"communities_place:{user.pk}")
+
+
 def _event(user, kind, actor=None, note=""):
     PvcEvent.objects.create(user=user, kind=kind, actor=actor, note=note[:300])
 
@@ -68,12 +100,15 @@ def submit(user, *, vin: str, surname: str, state: str, lga: str, polling_unit: 
         rec.vin_last4 = vin[-4:]
         rec.surname = " ".join(surname.split())[:80]
         rec.state, rec.lga, rec.polling_unit = state, " ".join(lga.split())[:120], polling_unit.strip()[:160]
+        rec.geo_lga, rec.geo_ward, rec.geo_polling_unit = None, None, None  # new details: match_geography links them again (spec 17)
         rec.status = PvcStatus.PENDING  # new details always need a fresh check (clears a past verification)
         rec.reviewed_by, rec.reviewed_at, rec.reason = None, None, ""
         rec.show_badge = False  # a new check switches the public badge off (spec 08 §5.1)
         rec.consent_at = timezone.now()
         rec.save()
         _event(user, kind)
+        if existing:
+            _placement_changed(user)  # a past verification is cleared: verified community memberships end (spec 17 §5.2)
     record(AuditLog.Action.PVC_SUBMITTED, target=rec, actor=user, request=request, changed=bool(existing))
     return rec
 
@@ -104,6 +139,7 @@ def _decide(rec_id, officer, to, reason, request):
         _event(rec.user, PvcEvent.Kind.VERIFIED if to == PvcStatus.SUCCESSFUL else PvcEvent.Kind.REJECTED, officer, reason)
         # Same transaction: the decision and the user's notification commit together (spec 08 §11).
         notify_pvc_decision(rec.user, "verified" if to == PvcStatus.SUCCESSFUL else "rejected")
+        _placement_changed(rec.user)  # spec 17 §5.2
     action = AuditLog.Action.PVC_VERIFIED if to == PvcStatus.SUCCESSFUL else AuditLog.Action.PVC_REJECTED
     record(action, target=rec, actor=officer, request=request, reason=reason[:300])
     return rec
@@ -179,6 +215,9 @@ def erase_for_withdrawn_consent(user) -> bool:
     n, _ = PvcVerification.objects.filter(user=user).delete()
     if n:
         _event(user, PvcEvent.Kind.WITHDRAWN, user, "consent withdrawn")
+        from apps.communities.services import end_verified
+
+        end_verified(user)  # same transaction: verified community memberships end at once (spec 17 §5.2)
     return bool(n)
 
 

@@ -97,6 +97,58 @@ def _not_valid_constraints():
         return cur.fetchone()[0]
 
 
+def _community_chain_broken():
+    """Spec 17 §12.4: an active lower-level membership without the matching active parent memberships."""
+    with connection.cursor() as cur:
+        cur.execute("""
+            SELECT count(*) FROM communities_communitymembership m JOIN communities_community c ON c.id = m.community_id
+            WHERE m.status = 'active' AND m.level IN ('lga', 'ward', 'polling_unit') AND NOT EXISTS (
+              SELECT 1 FROM communities_communitymembership p WHERE p.user_id = m.user_id AND p.status = 'active'
+              AND p.community_id = c.parent_id)""")
+        return cur.fetchone()[0]
+
+
+def _community_inactive_members():
+    from apps.communities.models import CommunityMembership
+
+    return CommunityMembership.objects.filter(status="active", community__active=False).count()
+
+
+def _community_counts_drift():
+    """Recount members, posts, comments and likes; fix the stored counts in place and report how many were wrong."""
+    from django.db.models import Count, F, OuterRef, Q, Subquery
+    from django.db.models.functions import Coalesce
+
+    from apps.communities.models import Community, CommunityPost
+
+    def sub(model, fk, extra):
+        return Coalesce(Subquery(model.objects.filter(**{fk: OuterRef("pk")}, **extra).order_by().values(fk)
+                                 .annotate(n=Count("pk")).values("n")[:1]), 0)
+
+    from apps.communities.models import CommunityComment, CommunityMembership, CommunityReaction
+
+    n = 0
+    comms = Community.objects.annotate(m=sub(CommunityMembership, "community", {"status": "active"}),
+                                       p=sub(CommunityPost, "community", {"status": "published"}))
+    for c in comms.filter(~Q(member_count=F("m")) | ~Q(post_count=F("p"))):
+        Community.objects.filter(pk=c.pk).update(member_count=c.m, post_count=c.p)
+        n += 1
+    posts = CommunityPost.objects.annotate(cm=sub(CommunityComment, "post", {"status": "published"}),
+                                           r=sub(CommunityReaction, "post", {}))
+    for p in posts.filter(~Q(comment_count=F("cm")) | ~Q(reaction_count=F("r"))):
+        CommunityPost.objects.filter(pk=p.pk).update(comment_count=p.cm, reaction_count=p.r)
+        n += 1
+    return n
+
+
+def _community_hidden_overdue(now):
+    from apps.communities.models import CommunityComment, CommunityPost
+
+    cutoff = now - timedelta(hours=48)
+    return (CommunityPost.objects.filter(status="hidden", hidden_at__lt=cutoff).count()
+            + CommunityComment.objects.filter(status="hidden", hidden_at__lt=cutoff).count())
+
+
 CHECKS = [
     ("orphan_case_targets", "Open moderation cases or reports pointing at missing items", lambda now: _orphan_targets()),
     ("search_not_public", "Search entries for items that aren't public", lambda now: _search_not_public()),
@@ -107,6 +159,10 @@ CHECKS = [
     ("usable_passwords", "Accounts with a usable password (Clerk signs everyone in)", lambda now: _usable_passwords()),
     ("extra_settings_rows", "Extra settings rows", lambda now: _extra_settings_rows()),
     ("not_valid_constraints", "Constraints not yet validated", lambda now: _not_valid_constraints()),
+    ("community_chain_broken", "Community memberships without their parent levels", lambda now: _community_chain_broken()),
+    ("community_inactive_members", "Members still in closed communities", lambda now: _community_inactive_members()),
+    ("community_counts_drift", "Community counts that were wrong (now fixed)", lambda now: _community_counts_drift()),
+    ("community_hidden_overdue", "Community items hidden for over 48 hours", _community_hidden_overdue),
 ]
 
 

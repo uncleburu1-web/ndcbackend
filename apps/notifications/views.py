@@ -34,10 +34,13 @@ NOTIFICATION = inline_serializer("Notification", {
                                          required=False),
     "membership": inline_serializer("NotificationMembership", {"status": S.CharField()}, required=False),
     "donation": inline_serializer("NotificationDonation", {"reference": S.CharField()}, required=False, allow_null=True),
+    "community_post": inline_serializer("NotificationCommunityPost", {"id": S.UUIDField(), "count": S.IntegerField()}, required=False),
+    "community": inline_serializer("NotificationCommunity", {"id": S.UUIDField(), "name": S.CharField(), "path": S.CharField()},
+                                   required=False),
 })
 NOTIFICATION_PAGE = inline_serializer("NotificationPage", {"count": S.IntegerField(), "next": S.CharField(allow_null=True),
                                                            "previous": S.CharField(allow_null=True), "results": S.ListField(child=NOTIFICATION)})
-PREFERENCES = inline_serializer("NotificationPreferences", {"announcements": S.BooleanField()})
+PREFERENCES = inline_serializer("NotificationPreferences", {"announcements": S.BooleanField(), "community_replies": S.BooleanField()})
 
 
 class _Private(APIView):
@@ -84,6 +87,12 @@ def item(n, request=None):
         out["membership"] = {"status": n.membership.status if n.membership_id else ""}
     if n.kind == "donation_receipt":  # the person's own receipt link; no amount in the row
         out["donation"] = {"reference": n.donation.reference} if n.donation_id else None
+    if n.community_post_id:  # spec 17 §10: where to go; never the post's text
+        out["community_post"] = {"id": n.community_post_id, "count": n.count}
+        c = n.community_post.community
+        out["community"] = {"id": c.id, "name": c.name, "path": c.path}
+    elif n.kind == "community_placed":
+        out["community"] = None
     return out
 
 
@@ -125,9 +134,9 @@ class Preferences(_Private):
     def get(self, request):
         return Response(services.preferences(request.user))
 
-    @extend_schema(summary="Turn announcement notifications on or off", request=PREFERENCES, responses=PREFERENCES)
+    @extend_schema(summary="Turn announcement or community-reply notifications on or off", request=PREFERENCES, responses=PREFERENCES)
     def patch(self, request):
-        value = request.data.get("announcements")
-        if not isinstance(value, bool):
-            raise ServiceError("announcements must be true or false.", code="validation_error", status_code=400)
-        return Response(services.set_preferences(request.user, value))
+        values = {k: request.data.get(k) for k in ("announcements", "community_replies") if k in request.data}
+        if not values or any(not isinstance(v, bool) for v in values.values()):
+            raise ServiceError("Send announcements or community_replies as true or false.", code="validation_error", status_code=400)
+        return Response(services.set_preferences(request.user, **values))

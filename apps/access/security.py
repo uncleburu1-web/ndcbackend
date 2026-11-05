@@ -54,7 +54,8 @@ def is_admin(user) -> bool:
     key = f"sec:is-admin:{user.pk}"
     hit = cache.get(key)
     if hit is None:
-        hit = RoleAssignment.objects.filter(user=user, is_active=True, scope_type=ScopeType.GLOBAL, role__in=ADMIN_ROLES).exists()
+        hit = (RoleAssignment.objects.filter(user=user, is_active=True, scope_type=ScopeType.GLOBAL, role__in=ADMIN_ROLES).exists()
+               or RoleAssignment.objects.filter(user=user, is_active=True, role="moderator", scope_type=ScopeType.COMMUNITY).exists())
         cache.set(key, hit, 30)
     return hit
 

@@ -108,6 +108,11 @@ class AuditLog(models.Model):
         # Spec 15
         SECURITY_WEBHOOK_SIGNATURE_FAILURES = "security.webhook_signature_failures"
         INTEGRATION_JOB_RETRIED = "integration.job_retried"
+        # Spec 17: communities (posting, commenting and liking are never audited: political-opinion data)
+        MODERATION_HIDDEN = "moderation.hidden"
+        MODERATION_UNHIDDEN = "moderation.unhidden"
+        COMMUNITY_SETTINGS_CHANGED = "community.settings_changed"
+        COMMUNITY_COUNTS_VIEWED = "community.counts_viewed"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

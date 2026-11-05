@@ -314,7 +314,7 @@ class NotificationTests(Base):
         self.as_(self.admin).post(reverse("admin-announcement-unpublish", kwargs={"pk": a.pk}), {"reason": "x"}, format="json")
         self.assertEqual(self.client.get(reverse("my-notifications")).data["count"], 0)  # hidden once not public
         self.assertEqual(self.client.patch(reverse("my-notifications-preferences"), {"announcements": False}, format="json").data,
-                         {"announcements": False})
+                         {"announcements": False, "community_replies": True})
         self.client.post(reverse("my-notifications-read-all"))
         self.assertFalse(AuditLog.objects.filter(action__startswith="notification").exists())
 

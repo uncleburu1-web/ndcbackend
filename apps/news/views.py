@@ -131,7 +131,7 @@ class NewsDetail(APIView):
     throttle_classes = [PublicThrottle]
 
     def get(self, request, pk):
-        a = Article.objects.public().select_related("author").filter(pk=pk).first()
+        a = Article.objects.public().select_related("author", "audience_community").filter(pk=pk).first()
         if a is None:
             moderation.raise_if_removed("article", Article.objects.filter(pk=pk, status=ArticleStatus.REMOVED).first())
             raise ServiceError("Not found.", code="not_found", status_code=404)
@@ -227,7 +227,7 @@ class MyNewsWithdraw(_Private):
 
 # ---------------------------------------------------------------- reviewer
 def _admin_qs():
-    return Article.objects.select_related("author").annotate(open_reports=moderation.open_reports_subquery("article"))
+    return Article.objects.select_related("author", "audience_community").annotate(open_reports=moderation.open_reports_subquery("article"))
 
 
 class AdminNewsList(_Private):

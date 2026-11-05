@@ -5,7 +5,18 @@ from apps.access.models import RoleAssignment
 from .models import TargetKind
 
 
+COMMUNITY_KINDS = (TargetKind.COMMUNITY_POST, TargetKind.COMMUNITY_COMMENT)
+
+
 def model_for(kind):
+    if kind == TargetKind.COMMUNITY_POST:
+        from apps.communities.models import CommunityPost
+
+        return CommunityPost
+    if kind == TargetKind.COMMUNITY_COMMENT:
+        from apps.communities.models import CommunityComment
+
+        return CommunityComment
     if kind == TargetKind.ARTICLE:
         from apps.news.models import Article
 
@@ -25,12 +36,25 @@ def load(kind, target_id):
         qs = qs.select_related("candidate")
     if kind == TargetKind.ARTICLE:
         qs = qs.select_related("author")
+    if kind == TargetKind.COMMUNITY_POST:
+        qs = qs.select_related("author", "community", "campaign_candidate")
+    if kind == TargetKind.COMMUNITY_COMMENT:
+        qs = qs.select_related("author", "post__community", "campaign_candidate")
     return qs.filter(pk=target_id).first()
 
 
+def community_of(kind, obj):
+    if obj is None:
+        return None
+    return obj.community if kind == TargetKind.COMMUNITY_POST else obj.post.community
+
+
 def is_public(kind, obj) -> bool:
+    """For community items: visible to the community's readers (they are never public to guests, spec 17 §6)."""
     if obj is None:
         return False
+    if kind in COMMUNITY_KINDS:
+        return obj.status == "published" and community_of(kind, obj).active
     if kind == TargetKind.ARTICLE:
         return obj.status == "successful"
     if kind == TargetKind.POST:
@@ -41,6 +65,8 @@ def is_public(kind, obj) -> bool:
 def title(kind, obj) -> str:
     if obj is None:
         return ""
+    if kind in COMMUNITY_KINDS:
+        return " ".join((obj.body or "").split())[:80]
     return (obj.full_name if kind == TargetKind.CANDIDATE else obj.title)[:200]
 
 
@@ -49,6 +75,8 @@ def state(kind, obj) -> str:
         return ""
     if kind == TargetKind.POST:
         return obj.candidate.state or ""
+    if kind in COMMUNITY_KINDS:
+        return community_of(kind, obj).state or ""
     return getattr(obj, "state", "") or ""
 
 
@@ -69,6 +97,8 @@ def owner_ids(kind, obj) -> set:
         return {obj.author_id} if obj.author_id and obj.source == "community" else set()
     if kind == TargetKind.POST:
         return set(_linked(obj.candidate_id))
+    if kind in COMMUNITY_KINDS:  # the author, and accounts linked to the campaign it was posted for (spec 17 §8.2)
+        return ({obj.author_id} if obj.author_id else set()) | (set(_linked(obj.campaign_candidate_id)) if obj.campaign_candidate_id else set())
     return set(_linked(obj.pk))
 
 
@@ -77,6 +107,8 @@ def authors(kind, obj):
     from apps.accounts.models import User
 
     ids = owner_ids(kind, obj) if kind != TargetKind.CANDIDATE else set()
+    if kind in COMMUNITY_KINDS:
+        ids = {obj.author_id} if obj is not None and obj.author_id else set()
     return list(User.objects.filter(pk__in=ids, is_active=True, clerk_deleted_at__isnull=True))
 
 
@@ -87,6 +119,10 @@ def public_url(kind, obj) -> str:
         return f"/news/{obj.source}/{obj.pk}"
     if kind == TargetKind.POST:
         return f"/candidates/{obj.candidate.slug}/posts/{obj.pk}"
+    if kind == TargetKind.COMMUNITY_POST:
+        return f"/communities/{obj.community.path}/posts/{obj.pk}"
+    if kind == TargetKind.COMMUNITY_COMMENT:
+        return f"/communities/{obj.post.community.path}/posts/{obj.post_id}#comment-{obj.pk}"
     return f"/candidates/{obj.slug}"
 
 
@@ -97,12 +133,18 @@ def admin_url(kind, obj) -> str:
         return f"/admin/announcements/{obj.pk}" if obj.source == "official" else f"/admin/news/{obj.pk}"
     if kind == TargetKind.POST:
         return f"/admin/posts/{obj.pk}"
+    if kind in COMMUNITY_KINDS:
+        return public_url(kind, obj)
     return f"/admin/candidates/{obj.pk}"
 
 
 def kind_words(kind, obj=None) -> str:
     if kind == TargetKind.ARTICLE:
         return "official announcement" if is_official(kind, obj) else "news story"
+    if kind == TargetKind.COMMUNITY_POST:
+        return "community post"
+    if kind == TargetKind.COMMUNITY_COMMENT:
+        return "community comment"
     return "post" if kind == TargetKind.POST else "candidate profile"
 
 
@@ -115,6 +157,12 @@ def parse_url(value: str):
     m = re.search(r"/news/(?:official|community)/([0-9a-f-]{36})", v)
     if m:
         return TargetKind.ARTICLE, load(TargetKind.ARTICLE, m.group(1))
+    m = re.search(r"/communities/.+/posts/([0-9a-f-]{36})#comment-([0-9a-f-]{36})", v)
+    if m:
+        return TargetKind.COMMUNITY_COMMENT, load(TargetKind.COMMUNITY_COMMENT, m.group(2))
+    m = re.search(r"/communities/.+/posts/([0-9a-f-]{36})", v)
+    if m:
+        return TargetKind.COMMUNITY_POST, load(TargetKind.COMMUNITY_POST, m.group(1))
     m = re.search(r"/candidates/[^/]+/posts/([0-9a-f-]{36})", v)
     if m:
         return TargetKind.POST, load(TargetKind.POST, m.group(1))
@@ -127,7 +175,7 @@ def parse_url(value: str):
         u = _uuid.UUID(v)
     except ValueError:
         return None, None
-    for k in (TargetKind.ARTICLE, TargetKind.POST, TargetKind.CANDIDATE):
+    for k in (TargetKind.ARTICLE, TargetKind.POST, TargetKind.CANDIDATE, TargetKind.COMMUNITY_POST, TargetKind.COMMUNITY_COMMENT):
         obj = load(k, u)
         if obj is not None:
             return k, obj

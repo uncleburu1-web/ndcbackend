@@ -83,8 +83,8 @@ ACTIONS: dict[str, tuple[str, tuple[str, ...]]] = {
     A.MODERATION_RESTORED: ("restored removed content", ("kind",)),
     A.MODERATION_ESCALATED: ("escalated a case to system administrators", ()),
     A.MODERATION_WARNED: ("warned an author", ("rule",)),
-    A.MODERATION_PAUSED: ("paused an author's community news", ("days", "rule")),
-    A.MODERATION_PAUSE_LIFTED: ("lifted a community news pause", ()),
+    A.MODERATION_PAUSED: ("paused an author's community news or community posting", ("days", "rule", "kind")),
+    A.MODERATION_PAUSE_LIFTED: ("lifted a pause", ()),
     A.MODERATION_APPEAL_DECIDED: ("decided an appeal", ("upheld",)),
     A.MODERATION_REPORTER_VIEWED: ("revealed who filed a report", ()),
     A.MODERATION_LEGAL_NOTICE_LOGGED: ("logged a legal notice", ("kind", "items")),
@@ -108,6 +108,10 @@ ACTIONS: dict[str, tuple[str, tuple[str, ...]]] = {
     A.SECURITY_RESTORE_DRILL: ("recorded a restore test", ("notes",)),
     A.SECURITY_WEBHOOK_SIGNATURE_FAILURES: ("saw repeated webhook signature failures", ("provider", "count", "window")),
     A.INTEGRATION_JOB_RETRIED: ("retried a background task", ("kind", "attempts")),
+    A.MODERATION_HIDDEN: ("hid a community item while deciding", ("kind",)),
+    A.MODERATION_UNHIDDEN: ("unhid a community item", ("kind",)),
+    A.COMMUNITY_SETTINGS_CHANGED: ("changed a community's settings", ("fields",)),
+    A.COMMUNITY_COUNTS_VIEWED: ("viewed community member counts", ()),
 }
 
 # area → (words, action prefixes)
@@ -121,6 +125,7 @@ AREAS: dict[str, tuple[str, tuple[str, ...]]] = {
     "announcements": ("Announcements", ("announcement.",)),
     "posts": ("Candidate posts", ("post.",)),
     "moderation": ("Moderation", ("moderation.",)),
+    "communities": ("Communities", ("community.",)),
     "privacy": ("Privacy", ("privacy.",)),
     "security": ("Security", ("security.",)),
     "audit": ("Audit views", ("audit.",)),
@@ -141,6 +146,7 @@ TARGET_WORDS = {
     "moderation.restriction": "Author restriction",
     "moderation.appeal": "Appeal",
     "moderation.legalnotice": "Legal notice",
+    "communities.community": "Community",
     "moderation.report": "Report",
     "privacy.datarequest": "Privacy request",
     "privacy.incident": "Incident",

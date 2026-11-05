@@ -21,9 +21,29 @@ from .models import Kind, Notification, NotificationPreference
 logger = logging.getLogger(__name__)
 UNREAD_CAP = 100
 
+# spec 17 §9: an announcement aimed at a community goes to its members and the members of every community below it
+AUDIENCE_SQL = """
+INSERT INTO notifications_notification (id, recipient_id, kind, article_id, decision, count, created_at)
+SELECT gen_random_uuid(), m.user_id, 'announcement', %(article)s, '', 1, now()
+FROM (SELECT DISTINCT cm.user_id FROM communities_communitymembership cm JOIN communities_community c ON c.id = cm.community_id
+      WHERE cm.status = 'active' AND (c.path = %(path)s OR c.path LIKE %(prefix)s)) m
+JOIN accounts_user u ON u.id = m.user_id LEFT JOIN notifications_notificationpreference p ON p.user_id = u.id
+WHERE u.is_active AND u.clerk_deleted_at IS NULL AND COALESCE(p.announcements, TRUE)
+ON CONFLICT DO NOTHING
+"""
+
+COMMUNITY_POST_SQL = """
+INSERT INTO notifications_notification (id, recipient_id, kind, community_post_id, community_id, decision, count, created_at)
+SELECT gen_random_uuid(), cm.user_id, 'community_post', %(post)s, %(community)s, '', 1, now()
+FROM communities_communitymembership cm JOIN accounts_user u ON u.id = cm.user_id
+WHERE cm.community_id = %(community)s AND cm.status = 'active' AND cm.notify_new_posts AND cm.user_id <> %(author)s
+  AND u.is_active AND u.clerk_deleted_at IS NULL
+ON CONFLICT DO NOTHING
+"""
+
 ANNOUNCEMENT_SQL = """
-INSERT INTO notifications_notification (id, recipient_id, kind, article_id, decision, created_at)
-SELECT gen_random_uuid(), u.id, 'announcement', %(article)s, '', now()
+INSERT INTO notifications_notification (id, recipient_id, kind, article_id, decision, count, created_at)
+SELECT gen_random_uuid(), u.id, 'announcement', %(article)s, '', 1, now()
 FROM accounts_user u LEFT JOIN notifications_notificationpreference p ON p.user_id = u.id
 WHERE u.is_active AND u.clerk_deleted_at IS NULL AND COALESCE(p.announcements, TRUE)
 ON CONFLICT DO NOTHING
@@ -38,8 +58,12 @@ def eligible_for_announcements():
 
 def deliver_announcement(article) -> int:
     """One idempotent statement for any number of users (no job queue needed)."""
+    aud = getattr(article, "audience_community", None)
     with connection.cursor() as cur:
-        cur.execute(ANNOUNCEMENT_SQL, {"article": article.pk})
+        if aud is not None and aud.level != "national":
+            cur.execute(AUDIENCE_SQL, {"article": article.pk, "path": aud.path, "prefix": aud.path.replace("%", r"\%") + "/%"})
+        else:
+            cur.execute(ANNOUNCEMENT_SQL, {"article": article.pk})
         n = cur.rowcount
     record(AuditLog.Action.ANNOUNCEMENT_DELIVERED, target=article, actor_label="system:notifications", delivered=n)
     return n
@@ -75,6 +99,13 @@ def deliver_post(post) -> int:
     return n
 
 
+def deliver_community_post(post) -> int:
+    """Spec 17 §10: members of an LGA, ward or polling-unit community who turned its bell on. IDs only."""
+    with connection.cursor() as cur:
+        cur.execute(COMMUNITY_POST_SQL, {"post": post.pk, "community": post.community_id, "author": post.author_id})
+        return cur.rowcount
+
+
 def deliver_post_on_commit(post):
     from apps.core import outbox
 
@@ -93,6 +124,7 @@ TARGET_FIELD = {
     Kind.REPORT_OUTCOME: "case", Kind.CONTENT_REMOVED: "case", Kind.ACCOUNT_WARNING: "case", Kind.SUBMISSIONS_PAUSED: "case",
     Kind.APPEAL_DECISION: "appeal", Kind.SECURITY_NOTICE: "incident", Kind.PRIVACY_REQUEST_UPDATE: "data_request",
     Kind.MEMBERSHIP_DECISION: "membership", Kind.DONATION_RECEIPT: "donation",
+    Kind.COMMUNITY_REPLY: "community_post", Kind.COMMUNITY_POST: "community_post", Kind.COMMUNITY_PLACED: None,  # spec 17 §10
 }
 
 
@@ -113,7 +145,8 @@ def notify(recipient, kind: str, *, target=None, decision: str = "", **links):
     fields = dict(links)
     if target is not None and field:
         fields[field] = target
-    unknown = set(fields) - {"article", "candidate_post", "case", "appeal", "data_request", "incident", "membership", "donation"}
+    unknown = set(fields) - {"article", "candidate_post", "case", "appeal", "data_request", "incident", "membership", "donation",
+                             "community_post", "community"}
     if unknown:
         raise ValueError(f"Unknown notification target {unknown}")
     if kind == Kind.DONATION_RECEIPT and Notification.objects.filter(recipient=recipient, kind=kind, donation=fields.get("donation")).exists():
@@ -163,12 +196,15 @@ def visible(user):
     from .models import MODERATION_KINDS, OWN_RECORD_KINDS, PRIVACY_KINDS
 
     return (Notification.objects.filter(recipient=user)
-            .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION, *MODERATION_KINDS, *PRIVACY_KINDS, *OWN_RECORD_KINDS])
+            .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION, Kind.COMMUNITY_PLACED, *MODERATION_KINDS, *PRIVACY_KINDS,
+                                *OWN_RECORD_KINDS])
+                    | Q(kind__in=[Kind.COMMUNITY_REPLY, Kind.COMMUNITY_POST], community_post__status="published",
+                        community_post__community__active=True)
                     | Q(kind=Kind.ANNOUNCEMENT, article__status="successful")
                     | Q(kind=Kind.CANDIDATE_POST, candidate_post__status="published", candidate_post__candidate__status="published",
                         candidate_post__candidate__verified_at__isnull=False))
             .select_related("article", "candidate_post__candidate", "case", "appeal__case", "data_request", "incident", "membership",
-                            "donation"))
+                            "donation", "community_post__community", "community"))
 
 
 def unread_count(user) -> int:
@@ -185,11 +221,12 @@ def mark_all_read(user) -> int:
 
 def preferences(user) -> dict:
     p = NotificationPreference.objects.filter(user=user).first()
-    return {"announcements": p.announcements if p else True}
+    return {"announcements": p.announcements if p else True, "community_replies": p.community_replies if p else True}
 
 
-def set_preferences(user, announcements: bool) -> dict:
-    NotificationPreference.objects.update_or_create(user=user, defaults={"announcements": bool(announcements)})
+def set_preferences(user, announcements=None, community_replies=None) -> dict:
+    values = {k: bool(v) for k, v in (("announcements", announcements), ("community_replies", community_replies)) if v is not None}
+    NotificationPreference.objects.update_or_create(user=user, defaults=values)
     return preferences(user)
 
 

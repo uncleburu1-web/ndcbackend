@@ -12,7 +12,27 @@ from .models import Article, ArticleEvent, ArticleStatus as S, Category, Source
 from .services import _event, _locked, clean_text, require_not_paused, validate_source_url
 
 A = AuditLog.Action
-CONTENT = ("category", "title", "body", "state", "source_name", "source_url")
+CONTENT = ("category", "title", "body", "state", "source_name", "source_url", "audience_community")
+
+
+def _audience(data):
+    """Spec 17 §9: the audience community (an ID in, a Community out); Community Announcements need one."""
+    if "audience_community" not in data:
+        return
+    pk = data["audience_community"]
+    if pk is None:
+        return
+    from apps.communities.models import Community
+
+    c = Community.objects.filter(pk=pk, active=True).first()
+    if c is None:
+        raise serializers.ValidationError({"audience_community": ["Choose an open community."]})
+    data["audience_community"] = c
+
+
+def _audience_rule(category, audience):
+    if category == Category.COMMUNITY and audience is None:
+        raise serializers.ValidationError({"audience_community": ["Community Announcements need a community to show in."]})
 
 
 def _validate(data: dict, partial=False):
@@ -47,6 +67,8 @@ def publish(admin, data: dict, *, notify=False, request=None) -> Article:
     data = {**data, "title": data.get("title", "").strip(), "body": clean_text(data.get("body", ""))}
     _validate(data)
     _source_rule(data["category"], data.get("source_name", ""), data.get("source_url", ""))
+    _audience(data)
+    _audience_rule(data["category"], data.get("audience_community"))
     if data["category"] == Category.CAMPAIGN:
         require_not_paused("Publishing campaign announcements")
     with transaction.atomic():
@@ -54,7 +76,7 @@ def publish(admin, data: dict, *, notify=False, request=None) -> Article:
         a = Article.objects.create(
             source=Source.OFFICIAL, status=S.SUCCESSFUL, category=data["category"], title=data["title"], body=data["body"],
             state=data.get("state", ""), source_name=data.get("source_name", "").strip(), source_url=data.get("source_url", ""),
-            author=admin, important=bool(notify), published_at=now)
+            author=admin, important=bool(notify), published_at=now, audience_community=data.get("audience_community"))
         _event(a, ArticleEvent.Kind.PUBLISHED, admin, "notify everyone" if notify else "")
         if notify:
             from apps.notifications.services import deliver_announcement_on_commit
@@ -73,12 +95,17 @@ def update(article, admin, data: dict, *, request=None) -> Article:
     if "source_name" in content:
         content["source_name"] = content["source_name"].strip()
     _validate(content, partial=True)
+    _audience(content)
     with transaction.atomic():
         a = _locked(article)
         if a.source != Source.OFFICIAL:
             raise ServiceError("Article not found.", code="not_found", status_code=404)
         merged = {k: content.get(k, getattr(a, k)) for k in CONTENT}
         _source_rule(merged["category"], merged["source_name"], merged["source_url"])
+        if "category" in content and content["category"] != a.category:  # older Community Announcements keep no audience (§9)
+            _audience_rule(merged["category"], merged["audience_community"])
+        elif "audience_community" in content and a.category == Category.COMMUNITY and content["audience_community"] is None:
+            _audience_rule(a.category, None)
         if Category.CAMPAIGN in (a.category, merged["category"]):
             require_not_paused("Editing campaign announcements")
         changed = [k for k, v in content.items() if getattr(a, k) != v]

@@ -16,10 +16,11 @@ class Rule:
     law: str = ""
 
 
-RULES_VERSION = 1
-RULES_UPDATED = date(2026, 11, 2)
+RULES_VERSION = 2
+RULES_UPDATED = date(2026, 11, 5)
 RULES_DRAFT = True  # spec 13 §15.1: until the wording is signed off
-CHANGES = [(date(2026, 11, 2), "First published: rules R1–R10.")]
+CHANGES = [(date(2026, 11, 2), "First published: rules R1–R10."),
+           (date(2026, 11, 5), "R10 now covers communities: keep to politics and public life in that area.")]
 
 RULES = [
     Rule("R1", "No threats or incitement to violence",
@@ -58,8 +59,9 @@ RULES = [
          "Don't pretend to be another person, a candidate, the party or an official body.",
          ("Posting as if you were INEC", "A fake statement 'from' a candidate"),
          "Cybercrimes Act"),
-    Rule("R10", "Stay on topic and follow the news rules",
-         "Community news must be real, local, sourced and written by you (see the news rules).",
+    Rule("R10", "Stay on topic and follow the news and community rules",
+         "Community news must be real, local, sourced and written by you (see the news rules). "
+         "In communities, keep to politics and public life in that area.",
          ("Opinion pieces presented as news", "Copied articles"),
          ""),
 ]

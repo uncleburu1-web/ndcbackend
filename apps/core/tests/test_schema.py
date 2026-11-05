@@ -21,7 +21,7 @@ from apps.candidates.models import Candidate
 from apps.core import integrity
 from apps.core.fields import StateField
 from apps.core.hashing import ip_hash
-from apps.core.history import HISTORY_TABLES, allow_history_delete
+from apps.core.history import HISTORY_TABLES, LATER_TABLES, allow_history_delete
 from apps.core.migration_ops import AddConstraintChecked, ConstraintViolated
 from apps.core.models import OutboxJob
 from apps.core.schema_policy import EXCEPTIONS, JSON_REASONS, check_model
@@ -151,7 +151,7 @@ class HistoryTests(TestCase):
     def test_every_history_table_has_the_guard(self):
         with connection.cursor() as cur:
             cur.execute("SELECT c.relname FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid WHERE t.tgname = 'ndc_append_only'")
-            self.assertEqual({r[0] for r in cur.fetchall()}, set(HISTORY_TABLES))
+            self.assertEqual({r[0] for r in cur.fetchall()}, set(HISTORY_TABLES) | set(LATER_TABLES))
 
     def test_update_refused_delete_only_in_prune(self):
         d = mk_donation()

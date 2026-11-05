@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "apps.integrations",  # spec 15: registry, HTTP client, webhook register
     "apps.media",  # spec 15 §7: Cloudinary / local images
     "apps.geo",  # spec 16 §8: INEC geography reference data
+    "apps.communities",  # spec 17
 ]
 
 MIDDLEWARE = [
@@ -114,6 +115,11 @@ REST_FRAMEWORK = {
         "news_write": "30/hour",  # per user: edits, images, withdrawals, bylines
         "news_report": "5/hour",  # per user, or per IP for guests (also used for candidate-post reports, spec 09)
         "posts_write": "30/hour",  # per user: candidate post writes (spec 09 §7.2)
+        "community_post_hour": "5/hour",  # spec 17 §7.4
+        "community_post_day": "20/day",
+        "community_comment": "30/hour",
+        "community_reaction": "120/hour",
+        "community_write": "60/hour",
         "admin_write": "60/hour",  # per admin: grants, revokes, deactivations, reveals (spec 11 §7)
         "admin_read": "300/hour",  # per admin: overview, user search, audit search (spec 11 §9)
         "search_public": "60/min",  # per IP (spec 12 §7)

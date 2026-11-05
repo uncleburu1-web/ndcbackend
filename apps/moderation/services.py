@@ -152,9 +152,17 @@ def report_status(reference) -> dict | None:
 def _roles(user):
     return {
         "sys": is_system_admin(user),
-        "mod": has_role(user, Role.MODERATOR),
+        "mod": has_role(user, Role.MODERATOR),  # a global moderator
         "news": has_role(user, Role.NEWS_REVIEWER),
     }
+
+
+def is_moderation_staff(user) -> bool:
+    """System admins, moderators (global or for a community, spec 17 §8.2) and news reviewers."""
+    from apps.access.models import RoleAssignment
+
+    return bool(is_system_admin(user) or has_role(user, Role.NEWS_REVIEWER)
+                or RoleAssignment.objects.filter(user=user, role=Role.MODERATOR, is_active=True, user__is_active=True).exists())
 
 
 def can_view(user, case, obj=None) -> bool:
@@ -162,6 +170,12 @@ def can_view(user, case, obj=None) -> bool:
     if r["sys"]:
         return True
     obj = obj if obj is not None else T.load(case.target_kind, case.target_id)
+    if case.target_kind in T.COMMUNITY_KINDS:  # spec 17 §8.2: global moderators, or one covering the item's community
+        if obj is None:
+            return r["mod"]
+        from apps.communities.services import moderates
+
+        return moderates(user, T.community_of(case.target_kind, obj))
     if case.target_kind == TargetKind.CANDIDATE or T.is_official(case.target_kind, obj):
         return False
     if case.target_kind == TargetKind.ARTICLE:
@@ -180,7 +194,17 @@ def visible_cases(user):
     community = Article.objects.filter(source="community").values("pk")
     allowed = Q(target_kind=TargetKind.ARTICLE, target_id__in=community) if (r["mod"] or r["news"]) else Q(pk__in=[])
     if r["mod"]:
-        allowed |= Q(target_kind=TargetKind.POST)
+        allowed |= Q(target_kind=TargetKind.POST) | Q(target_kind__in=T.COMMUNITY_KINDS)
+    else:  # a community-scoped moderator: items in their communities and every level below (spec 17 §8.2)
+        from apps.communities.models import CommunityComment, CommunityPost
+        from apps.communities.services import scope_paths, under_paths
+
+        paths = scope_paths(user) or []
+        if paths:
+            posts = CommunityPost.objects.filter(under_paths(paths, "community__path")).values("pk")
+            comments = CommunityComment.objects.filter(under_paths(paths, "post__community__path")).values("pk")
+            allowed |= Q(target_kind=TargetKind.COMMUNITY_POST, target_id__in=posts) | Q(target_kind=TargetKind.COMMUNITY_COMMENT,
+                                                                                            target_id__in=comments)
     return qs.filter(allowed)
 
 
@@ -283,9 +307,65 @@ def keep(case, user, note="", request=None):
             raise _err("This case is already closed.", "invalid_transition", 409)
         _close(c, Decision.KEPT, user, internal_note=note)
         _event(c, E.KEPT, user, note)
+        if c.target_kind in T.COMMUNITY_KINDS and obj is not None and obj.status == "hidden":
+            from apps.communities import services as communities
+
+            communities.unhide(obj, user, "kept")  # spec 17 §8.3: keeping a hidden item shows it again
         _notify_reporters(c, "kept")
     record(A.MODERATION_KEPT, target=c, actor=user, request=request)
     return c
+
+
+def hide(case, user, note="", request=None):
+    """Spec 17 §8.3: hide a community item while deciding. Must be followed by Remove (with a rule), Restore or Keep."""
+    with transaction.atomic():
+        c = _locked(case.pk)
+        obj = T.load(c.target_kind, c.target_id)
+        if c.target_kind not in T.COMMUNITY_KINDS:
+            raise _err("Only community posts and comments can be hidden.", "invalid_transition", 409)
+        _check(user, c, obj)
+        if c.status == CaseStatus.CLOSED:
+            raise _err("This case is already closed.", "invalid_transition", 409)
+        if c.assigned_to_id != user.pk:
+            raise _err("Take the case first.", "not_your_case", 403)
+        from apps.communities import services as communities
+
+        communities.hide(obj, user, note)
+        _event(c, E.HIDDEN, user, note)
+    record(A.MODERATION_HIDDEN, target=c, actor=user, request=request, kind=c.target_kind)
+    return c
+
+
+def unhide(case, user, note="", request=None):
+    with transaction.atomic():
+        c = _locked(case.pk)
+        obj = T.load(c.target_kind, c.target_id)
+        if c.target_kind not in T.COMMUNITY_KINDS:
+            raise _err("Only community posts and comments can be hidden.", "invalid_transition", 409)
+        _check(user, c, obj)
+        from apps.communities import services as communities
+
+        communities.unhide(obj, user, note)
+        _event(c, E.UNHIDDEN, user, note)
+    record(A.MODERATION_UNHIDDEN, target=c, actor=user, request=request, kind=c.target_kind)
+    return c
+
+
+def hidden_overdue(now=None):
+    """Hidden community items still undecided after 48 hours become urgent (spec 17 §8.3). Run by moderation_tick."""
+    from apps.communities.models import CommunityComment, CommunityPost
+
+    now = now or timezone.now()
+    cutoff = now - timedelta(hours=48)
+    ids = (list(CommunityPost.objects.filter(status="hidden", hidden_at__lt=cutoff).values_list("pk", flat=True))
+           + list(CommunityComment.objects.filter(status="hidden", hidden_at__lt=cutoff).values_list("pk", flat=True)))
+    n = 0
+    for c in Case.objects.filter(target_kind__in=T.COMMUNITY_KINDS, target_id__in=ids).exclude(status=CaseStatus.CLOSED).exclude(
+            priority__in=["urgent", "legal"]):
+        _set_priority(c, "urgent", now)
+        c.save(update_fields=["priority", "priority_rank", "due_at"])
+        n += 1
+    return n
 
 
 def dismiss_report(report_obj, user, note="", request=None):
@@ -332,6 +412,10 @@ def remove(case, user, rule_id, note_to_author="", internal_note="", warn=False,
             from apps.posts import services as posts
 
             posts.remove_post(obj, user, reason, request=request, rule=rule_id, note_to_author=note, internal_note=internal_note)
+        elif c.target_kind in T.COMMUNITY_KINDS:
+            from apps.communities import services as communities
+
+            communities.remove(obj, user, rule=rule_id, note_to_author=note, internal_note=internal_note)
         else:
             raise _err("Candidate profiles aren't removed: correct the profile, then close the case with Keep.", "invalid_transition", 409)
         if warn:
@@ -383,6 +467,10 @@ def _restore_target(c, obj, user, note, request=None):
         from apps.news import services as news
 
         news.restore(obj, user, request=request, note=note)
+    elif c.target_kind in T.COMMUNITY_KINDS:
+        from apps.communities import services as communities
+
+        communities.restore(obj, user, note)
     else:
         from apps.posts import services as posts
 
@@ -442,6 +530,32 @@ def lift_pause(restriction, by, note="", request=None):
         if r.case_id:
             _event(r.case, E.PAUSE_LIFTED, by, note)
     record(A.MODERATION_PAUSE_LIFTED, target=r, actor=by, request=request)
+    return r
+
+
+def pause_community(case, by, days, rule_id, reason="", scope="community", request=None):
+    """Spec 17 §8.4: pause an author's community posting for 1, 7 or 30 days, in the item's community (and below) or everywhere."""
+    _validate_rule(rule_id)
+    from apps.communities import services as communities
+
+    with transaction.atomic():
+        c = _locked(case.pk)
+        obj = T.load(c.target_kind, c.target_id)
+        _check(by, c, obj)
+        if c.target_kind not in T.COMMUNITY_KINDS or obj is None or not obj.author_id:
+            raise _err("Community pauses apply to community authors.", "invalid_transition", 409)
+        if scope == "all":
+            if communities.moderator_scopes(by) is not None:
+                raise _err("Only moderators for every community can pause posting everywhere.", "permission_denied", 403)
+            community = None
+        else:
+            community = T.community_of(c.target_kind, obj)
+        r = communities.pause(obj.author, by, days, rule_id, reason, community=community, case=c)
+        _event(c, E.PAUSED, by, f"{days} days · {rule_id} · {'all communities' if community is None else community.name}")
+        from apps.notifications.services import notify_moderation
+
+        notify_moderation(obj.author, "submissions_paused", case=c, decision="paused")
+    record(A.MODERATION_PAUSED, target=r, actor=by, request=request, days=days, rule=rule_id, kind="community")
     return r
 
 
@@ -636,6 +750,10 @@ def set_item_outcome(item, by, outcome, reason="", request=None):
 
                     news.remove(obj, by, f"{R.rule_title(rule_id)} ({n.reference})", request=request, rule=rule_id, source=c.source,
                                 note_to_author=reason)
+                elif c.target_kind in T.COMMUNITY_KINDS:
+                    from apps.communities import services as communities
+
+                    communities.remove(obj, by, rule=rule_id, note_to_author=reason, source=c.source)
                 else:
                     from apps.posts import services as posts
 
@@ -721,7 +839,8 @@ def tick(now=None) -> dict:
     now = now or timezone.now()
     released = Case.objects.filter(assigned_at__lt=now - timedelta(minutes=CLAIM_MINUTES)).exclude(status=CaseStatus.CLOSED).update(
         assigned_to=None, assigned_at=None)
-    return {"claims_released": released, "restorable": refresh_restorable(now), "bursts": recompute_bursts(now)}
+    return {"claims_released": released, "restorable": refresh_restorable(now), "bursts": recompute_bursts(now),
+            "hidden_overdue": hidden_overdue(now)}
 
 
 def erase_for_deleted_user(user) -> dict:
@@ -803,9 +922,15 @@ def _owned_case_ids(user):
     from apps.posts.models import CandidatePost
     from apps.posts.services import linked_candidates
 
+    from apps.communities.models import CommunityComment, CommunityPost
+
     news = Article.objects.filter(author=user, source="community").values_list("pk", flat=True)
     posts = CandidatePost.objects.filter(candidate__in=linked_candidates(user)).values_list("pk", flat=True)
-    return Case.objects.filter(Q(target_kind=TargetKind.ARTICLE, target_id__in=news) | Q(target_kind=TargetKind.POST, target_id__in=posts))
+    cposts = CommunityPost.objects.filter(author=user).values_list("pk", flat=True)
+    ccomments = CommunityComment.objects.filter(author=user).values_list("pk", flat=True)
+    return Case.objects.filter(Q(target_kind=TargetKind.ARTICLE, target_id__in=news) | Q(target_kind=TargetKind.POST, target_id__in=posts)
+                               | Q(target_kind=TargetKind.COMMUNITY_POST, target_id__in=cposts)
+                               | Q(target_kind=TargetKind.COMMUNITY_COMMENT, target_id__in=ccomments))
 
 
 def _appeal_payload(a):
@@ -901,6 +1026,10 @@ def _compute(year) -> dict:
         if rule_id in harmful:
             harmful[rule_id] += 1
     figures["harmful"] = sum(harmful.values())
+    by_kind = {k: 0 for k in TargetKind.values}  # spec 17 §8.1: community items split out
+    for ev in removals:
+        by_kind[ev.case.target_kind] = by_kind.get(ev.case.target_kind, 0) + 1
+    figures["removed_by_kind"] = by_kind
     figures["harmful_by_rule"] = harmful
     figures["restored"] = CaseEvent.objects.filter(event=E.RESTORED, created_at__gte=start, created_at__lt=end).count()
     figures["complaints"] = (Report.objects.filter(created_at__gte=start, created_at__lt=end).count()
@@ -928,7 +1057,8 @@ def compliance_report(year: int) -> dict:
             cache.set(key, figures, 600)
     items = [{"key": k, "label": label, "value": figures.get(k, 0), "definition": d} for k, (label, d) in DEFINITIONS.items()]
     return {"year": year, "frozen": bool(frozen), "registered_users": figures.get("registered_users", 0),
-            "harmful_by_rule": figures.get("harmful_by_rule", {}), "safety_statement": settings.COMPLIANCE_SAFETY_STATEMENT, "items": items}
+            "harmful_by_rule": figures.get("harmful_by_rule", {}), "removed_by_kind": figures.get("removed_by_kind", {}),
+            "safety_statement": settings.COMPLIANCE_SAFETY_STATEMENT, "items": items}
 
 
 def compliance_csv(year: int) -> str:
@@ -943,6 +1073,8 @@ def compliance_csv(year: int) -> str:
         w.writerow([year, it["label"], it["value"], it["definition"]])
     for rule_id, n in rep["harmful_by_rule"].items():
         w.writerow([year, f"Removals under {rule_id}: {R.rule_title(rule_id)}", n, "Part of the harmful-content figure."])
+    for kind, n in rep["removed_by_kind"].items():
+        w.writerow([year, f"Removals of {TargetKind(kind).label.lower()}s", n, "Removals split by kind of item (spec 17)."])
     w.writerow([year, "Safety statement", rep["safety_statement"], "From settings (COMPLIANCE_SAFETY_STATEMENT)."])
     return buf.getvalue()
 

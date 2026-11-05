@@ -5075,7 +5075,7 @@
             },
             "patch": {
                 "operationId": "my_notifications_preferences_patch",
-                "summary": "Turn announcement notifications on or off",
+                "summary": "Turn announcement or community-reply notifications on or off",
                 "tags": [
                     "me:notifications"
                 ],
@@ -7665,6 +7665,146 @@
                 "x-untyped": true
             }
         },
+        "/api/v1/admin/moderation/cases/{id}/hide/": {
+            "post": {
+                "operationId": "admin_moderation_case_hide_post",
+                "summary": "Hide or unhide a community post or comment while deciding (spec 17 §8.3)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:moderation"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CaseHideRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CaseHideRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CaseHideRequestRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {}
+                                }
+                            }
+                        },
+                        "description": "The case, as GET /admin/moderation/cases/{id}/ returns it"
+                    }
+                },
+                "x-permissions": [
+                    "is moderation staff"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "invalid_transition",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/admin/moderation/cases/{id}/unhide/": {
+            "post": {
+                "operationId": "admin_moderation_case_unhide_post",
+                "summary": "Hide or unhide a community post or comment while deciding (spec 17 §8.3)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:moderation"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CaseHideRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CaseHideRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CaseHideRequestRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {}
+                                }
+                            }
+                        },
+                        "description": "The case, as GET /admin/moderation/cases/{id}/ returns it"
+                    }
+                },
+                "x-permissions": [
+                    "is moderation staff"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "invalid_transition",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
         "/api/v1/admin/moderation/cases/{id}/reports/{report_id}/reporter/": {
             "post": {
                 "operationId": "admin_moderation_reporter_post",
@@ -10116,16 +10256,2012 @@
                     }
                 ]
             }
+        },
+        "/api/v1/communities/": {
+            "get": {
+                "operationId": "communities_get",
+                "summary": "Communities: Nigeria and the 37 states, or ?parent=<id> for the level below",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "parent",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "A community ID"
+                    }
+                ],
+                "tags": [
+                    "communities"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CommunitySchema"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "news_public",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/communities/lookup/": {
+            "get": {
+                "operationId": "community_lookup_get",
+                "summary": "Find a community by its path (national, lagos, lagos/ikeja, …)",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "communities"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CommunityDetailSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "news_public",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/communities/{id}/": {
+            "get": {
+                "operationId": "community_get",
+                "summary": "One community: breadcrumb, what you can do here, your membership",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "communities"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CommunityDetailSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "news_public",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/communities/{id}/posts/": {
+            "get": {
+                "operationId": "community_posts_get",
+                "summary": "Pinned announcements, then posts, newest first (cursor pages of 20)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "communities"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FeedSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_post_hour",
+                        "rate": "5/hour",
+                        "key": "user"
+                    },
+                    {
+                        "scope": "community_post_day",
+                        "rate": "20/day",
+                        "key": "user"
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "community_posts_post",
+                "summary": "Post in this community",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "communities"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WritePostSchemaRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WritePostSchemaRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WritePostSchemaRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PostSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_post_hour",
+                        "rate": "5/hour",
+                        "key": "user"
+                    },
+                    {
+                        "scope": "community_post_day",
+                        "rate": "20/day",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/community-posts/{id}/": {
+            "get": {
+                "operationId": "community_post_get",
+                "summary": "One community post",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "community-posts"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PostSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            },
+            "patch": {
+                "operationId": "community_post_patch",
+                "summary": "Edit your post (30 minutes, unless reported)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "community-posts"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedWritePostSchemaRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedWritePostSchemaRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedWritePostSchemaRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PostSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "community_post_delete",
+                "summary": "Delete your post",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "community-posts"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/community-posts/{id}/comments/": {
+            "get": {
+                "operationId": "community_post_comments_get",
+                "summary": "Comments on a post, oldest first (50 a page)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "community-posts"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CommunityCommentPage"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_comment",
+                        "rate": "30/hour",
+                        "key": "user"
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "community_post_comments_post",
+                "summary": "Comment on a post",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "community-posts"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WritePostSchemaRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WritePostSchemaRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WritePostSchemaRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CommentSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_comment",
+                        "rate": "30/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/community-posts/{id}/reaction/": {
+            "put": {
+                "operationId": "community_post_reaction_put",
+                "summary": "Like a post",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "community-posts"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReactionSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_reaction",
+                        "rate": "120/hour",
+                        "key": "user"
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "community_post_reaction_delete",
+                "summary": "Remove your like",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "community-posts"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_reaction",
+                        "rate": "120/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/community-posts/{id}/report/": {
+            "post": {
+                "operationId": "community_post_report_post",
+                "summary": "Report a community post (13's reasons)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "community-posts"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CommunityReportResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "news_report",
+                        "rate": "5/hour",
+                        "key": "user or ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/community-comments/{id}/": {
+            "patch": {
+                "operationId": "community_comment_patch",
+                "summary": "Edit your comment (30 minutes, unless reported)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "community-comments"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedWritePostSchemaRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedWritePostSchemaRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedWritePostSchemaRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CommentSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "community_comment_delete",
+                "summary": "Delete your comment",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "community-comments"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/community-comments/{id}/report/": {
+            "post": {
+                "operationId": "community_comment_report_post",
+                "summary": "Report a community comment (13's reasons)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "community-comments"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReportRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CommunityReportResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "news_report",
+                        "rate": "5/hour",
+                        "key": "user or ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/communities/": {
+            "get": {
+                "operationId": "my_communities_get",
+                "summary": "Your communities and what's available to you",
+                "tags": [
+                    "me:communities"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MyCommunitiesSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/me/communities/join/": {
+            "post": {
+                "operationId": "my_communities_join_post",
+                "summary": "Join communities: asks for the communities consent, then places you from your verified PVC (§5.2)",
+                "tags": [
+                    "me:communities"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MyCommunitiesSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/communities/state/": {
+            "post": {
+                "operationId": "my_communities_state_post",
+                "summary": "Choose your state community (not yet verified; once every 30 days)",
+                "tags": [
+                    "me:communities"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChooseStateRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChooseStateRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChooseStateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MyCommunitiesSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/communities/rejoin/": {
+            "post": {
+                "operationId": "my_communities_rejoin_post",
+                "summary": "Rejoin a level you left",
+                "tags": [
+                    "me:communities"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RejoinLevelRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RejoinLevelRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RejoinLevelRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MyCommunitiesSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/communities/{id}/": {
+            "patch": {
+                "operationId": "my_community_patch",
+                "summary": "Turn new-post notifications on or off (LGA, ward and polling unit)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "me:communities"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCommunityBellRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCommunityBellRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCommunityBellRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MyCommunitiesSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "my_community_delete",
+                "summary": "Leave a community (leaving the state also leaves the levels below)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "me:communities"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "profile_incomplete",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "community_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/communities/": {
+            "get": {
+                "operationId": "admin_communities_get",
+                "summary": "Communities tree for admins (?parent=<id>)",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "parent",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin:communities"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AdminCommunitySchema"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "profile_incomplete",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/admin/communities/{id}/": {
+            "get": {
+                "operationId": "admin_community_get",
+                "summary": "One community: settings, counts, moderators, open cases (audited)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:communities"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminCommunitySchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "profile_incomplete",
+                    "server_error",
+                    "validation_error"
+                ]
+            },
+            "patch": {
+                "operationId": "admin_community_patch",
+                "summary": "Change a community's settings",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:communities"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCommunitySettingsChangeRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCommunitySettingsChangeRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCommunitySettingsChangeRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminCommunitySchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "profile_incomplete",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
         }
     },
     "components": {
         "schemas": {
+            "AdminCommunitySchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "level": {
+                        "$ref": "#/components/schemas/LevelEnum"
+                    },
+                    "level_label": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "parent_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "members": {
+                        "type": "string",
+                        "description": "Banded: 'Fewer than 10', '10–99', '100–999', '1,000+' (spec 17 §4.4)"
+                    },
+                    "post_count": {
+                        "type": "integer"
+                    },
+                    "has_children": {
+                        "type": "boolean"
+                    },
+                    "member_count": {
+                        "type": "string",
+                        "description": "Exact for national, state and LGA; banded below (§4.4)"
+                    },
+                    "read_scope": {
+                        "type": "string"
+                    },
+                    "posting_open": {
+                        "type": "boolean"
+                    },
+                    "ndc_members_only": {
+                        "type": "boolean"
+                    },
+                    "open_cases": {
+                        "type": "integer"
+                    },
+                    "moderators": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Emails of moderators scoped to this community"
+                    }
+                },
+                "required": [
+                    "active",
+                    "has_children",
+                    "id",
+                    "level",
+                    "level_label",
+                    "member_count",
+                    "members",
+                    "moderators",
+                    "name",
+                    "ndc_members_only",
+                    "open_cases",
+                    "parent_id",
+                    "path",
+                    "post_count",
+                    "posting_open",
+                    "read_scope",
+                    "state"
+                ]
+            },
+            "AuthorSchema": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "First name and last initial, or 'Former member'"
+                    },
+                    "verified": {
+                        "type": "boolean"
+                    },
+                    "campaign": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "'Campaign team · <candidate>' or null"
+                    },
+                    "is_you": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "campaign",
+                    "is_you",
+                    "name",
+                    "verified"
+                ]
+            },
+            "BlockSchema": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "until": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "code",
+                    "message"
+                ]
+            },
+            "CaseHideRequestRequest": {
+                "type": "object",
+                "properties": {
+                    "note": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "ChooseStateRequest": {
+                "type": "object",
+                "properties": {
+                    "state": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "state"
+                ]
+            },
+            "CommentSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "body": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "edited_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "author": {
+                        "$ref": "#/components/schemas/AuthorSchema"
+                    },
+                    "can_edit": {
+                        "type": "boolean"
+                    },
+                    "can_delete": {
+                        "type": "boolean"
+                    },
+                    "notice": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/NoticeSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "author",
+                    "body",
+                    "can_delete",
+                    "can_edit",
+                    "created_at",
+                    "edited_at",
+                    "id",
+                    "notice",
+                    "status"
+                ]
+            },
+            "CommunityBriefSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "level": {
+                        "$ref": "#/components/schemas/LevelEnum"
+                    },
+                    "level_label": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "level",
+                    "level_label",
+                    "name",
+                    "path"
+                ]
+            },
+            "CommunityCommentPage": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "type": "integer"
+                    },
+                    "next": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "previous": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CommentSchema"
+                        }
+                    }
+                },
+                "required": [
+                    "count",
+                    "next",
+                    "previous",
+                    "results"
+                ]
+            },
+            "CommunityDetailSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "level": {
+                        "$ref": "#/components/schemas/LevelEnum"
+                    },
+                    "level_label": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "parent_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "members": {
+                        "type": "string",
+                        "description": "Banded: 'Fewer than 10', '10–99', '100–999', '1,000+' (spec 17 §4.4)"
+                    },
+                    "post_count": {
+                        "type": "integer"
+                    },
+                    "has_children": {
+                        "type": "boolean"
+                    },
+                    "breadcrumb": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CommunityBriefSchema"
+                        }
+                    },
+                    "read_scope": {
+                        "type": "string"
+                    },
+                    "posting_open": {
+                        "type": "boolean"
+                    },
+                    "ndc_members_only": {
+                        "type": "boolean"
+                    },
+                    "can_read": {
+                        "type": "boolean"
+                    },
+                    "can_post": {
+                        "type": "boolean"
+                    },
+                    "post_block": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/BlockSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "membership": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/MembershipSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "campaigns": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {}
+                        },
+                        "description": "Linked campaigns to post for (rule 7): [{id, name}]"
+                    }
+                },
+                "required": [
+                    "active",
+                    "breadcrumb",
+                    "campaigns",
+                    "can_post",
+                    "can_read",
+                    "has_children",
+                    "id",
+                    "level",
+                    "level_label",
+                    "members",
+                    "membership",
+                    "name",
+                    "ndc_members_only",
+                    "parent_id",
+                    "path",
+                    "post_block",
+                    "post_count",
+                    "posting_open",
+                    "read_scope",
+                    "state"
+                ]
+            },
+            "CommunityReportResponse": {
+                "type": "object",
+                "properties": {
+                    "reference": {
+                        "type": "string"
+                    },
+                    "route": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CommunitySchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "level": {
+                        "$ref": "#/components/schemas/LevelEnum"
+                    },
+                    "level_label": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "parent_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    },
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "members": {
+                        "type": "string",
+                        "description": "Banded: 'Fewer than 10', '10–99', '100–999', '1,000+' (spec 17 §4.4)"
+                    },
+                    "post_count": {
+                        "type": "integer"
+                    },
+                    "has_children": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "active",
+                    "has_children",
+                    "id",
+                    "level",
+                    "level_label",
+                    "members",
+                    "name",
+                    "parent_id",
+                    "path",
+                    "post_count",
+                    "state"
+                ]
+            },
             "DatabaseEnum": {
                 "enum": [
                     "ok",
                     "unavailable"
                 ],
                 "type": "string"
+            },
+            "FeedSchema": {
+                "type": "object",
+                "properties": {
+                    "pinned": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PinnedSchema"
+                        }
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PostSchema"
+                        }
+                    },
+                    "next": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "previous": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "next",
+                    "pinned",
+                    "previous",
+                    "results"
+                ]
             },
             "Health": {
                 "type": "object",
@@ -10257,6 +12393,16 @@
                     "webhooks"
                 ]
             },
+            "LevelEnum": {
+                "enum": [
+                    "national",
+                    "state",
+                    "lga",
+                    "ward",
+                    "polling_unit"
+                ],
+                "type": "string"
+            },
             "MarkedRead": {
                 "type": "object",
                 "properties": {
@@ -10268,12 +12414,114 @@
                     "updated"
                 ]
             },
+            "MembershipSchema": {
+                "type": "object",
+                "properties": {
+                    "how": {
+                        "type": "string"
+                    },
+                    "how_label": {
+                        "type": "string"
+                    },
+                    "joined_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "notify_new_posts": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "how",
+                    "how_label",
+                    "joined_at",
+                    "notify_new_posts"
+                ]
+            },
             "ModeEnum": {
                 "enum": [
                     "direct",
                     "server"
                 ],
                 "type": "string"
+            },
+            "MyCommunitiesSchema": {
+                "type": "object",
+                "properties": {
+                    "consented": {
+                        "type": "boolean"
+                    },
+                    "verified": {
+                        "type": "boolean"
+                    },
+                    "memberships": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MyMembershipSchema"
+                        }
+                    },
+                    "left_levels": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "state_change_available_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "unmatched": {
+                        "type": "boolean",
+                        "description": "Verified, but the polling unit isn't matched to INEC's list yet (§18)"
+                    },
+                    "geography_loaded": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "consented",
+                    "geography_loaded",
+                    "left_levels",
+                    "memberships",
+                    "state_change_available_at",
+                    "unmatched",
+                    "verified"
+                ]
+            },
+            "MyMembershipSchema": {
+                "type": "object",
+                "properties": {
+                    "community": {
+                        "$ref": "#/components/schemas/CommunitySchema"
+                    },
+                    "level": {
+                        "type": "string"
+                    },
+                    "how": {
+                        "type": "string"
+                    },
+                    "how_label": {
+                        "type": "string"
+                    },
+                    "joined_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "notify_new_posts": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "community",
+                    "how",
+                    "how_label",
+                    "joined_at",
+                    "level",
+                    "notify_new_posts"
+                ]
             },
             "NigerianStateEnum": {
                 "enum": [
@@ -10314,6 +12562,33 @@
                     "yobe",
                     "zamfara",
                     "fct"
+                ],
+                "type": "string"
+            },
+            "NoticeSchema": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "$ref": "#/components/schemas/NoticeSchemaKindEnum"
+                    },
+                    "rule": {
+                        "type": "string"
+                    },
+                    "rule_title": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "kind",
+                    "rule",
+                    "rule_title"
+                ]
+            },
+            "NoticeSchemaKindEnum": {
+                "enum": [
+                    "hidden",
+                    "removed",
+                    "deleted"
                 ],
                 "type": "string"
             },
@@ -10382,6 +12657,12 @@
                                 "type": "null"
                             }
                         ]
+                    },
+                    "community_post": {
+                        "$ref": "#/components/schemas/NotificationCommunityPost"
+                    },
+                    "community": {
+                        "$ref": "#/components/schemas/NotificationCommunity"
                     }
                 },
                 "required": [
@@ -10502,6 +12783,42 @@
                     "title"
                 ]
             },
+            "NotificationCommunity": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "path"
+                ]
+            },
+            "NotificationCommunityPost": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "count": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "count",
+                    "id"
+                ]
+            },
             "NotificationDonation": {
                 "type": "object",
                 "properties": {
@@ -10527,7 +12844,10 @@
                     "security_notice",
                     "privacy_request_update",
                     "membership_decision",
-                    "donation_receipt"
+                    "donation_receipt",
+                    "community_reply",
+                    "community_post",
+                    "community_placed"
                 ],
                 "type": "string"
             },
@@ -10603,10 +12923,14 @@
                 "properties": {
                     "announcements": {
                         "type": "boolean"
+                    },
+                    "community_replies": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
-                    "announcements"
+                    "announcements",
+                    "community_replies"
                 ]
             },
             "NotificationPrivacyRequest": {
@@ -10834,13 +13158,84 @@
                     }
                 }
             },
+            "PatchedCommunityBellRequest": {
+                "type": "object",
+                "properties": {
+                    "notify_new_posts": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "PatchedCommunitySettingsChangeRequest": {
+                "type": "object",
+                "properties": {
+                    "posting_open": {
+                        "type": "boolean"
+                    },
+                    "read_scope": {
+                        "$ref": "#/components/schemas/ReadScopeEnum"
+                    },
+                    "ndc_members_only": {
+                        "type": "boolean"
+                    }
+                }
+            },
             "PatchedNotificationPreferencesRequest": {
                 "type": "object",
                 "properties": {
                     "announcements": {
                         "type": "boolean"
+                    },
+                    "community_replies": {
+                        "type": "boolean"
                     }
                 }
+            },
+            "PatchedWritePostSchemaRequest": {
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                    },
+                    "campaign_candidate": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    }
+                }
+            },
+            "PinnedSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "category_label": {
+                        "type": "string"
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "audience": {
+                        "$ref": "#/components/schemas/CommunityBriefSchema"
+                    }
+                },
+                "required": [
+                    "audience",
+                    "category_label",
+                    "id",
+                    "published_at",
+                    "title"
+                ]
             },
             "PositionEnum": {
                 "enum": [
@@ -10853,6 +13248,78 @@
                     "councillor"
                 ],
                 "type": "string"
+            },
+            "PostSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "body": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "edited_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "author": {
+                        "$ref": "#/components/schemas/AuthorSchema"
+                    },
+                    "can_edit": {
+                        "type": "boolean"
+                    },
+                    "can_delete": {
+                        "type": "boolean"
+                    },
+                    "notice": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/NoticeSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "community": {
+                        "$ref": "#/components/schemas/CommunityBriefSchema"
+                    },
+                    "comment_count": {
+                        "type": "integer"
+                    },
+                    "reaction_count": {
+                        "type": "integer"
+                    },
+                    "liked": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "author",
+                    "body",
+                    "can_delete",
+                    "can_edit",
+                    "comment_count",
+                    "community",
+                    "created_at",
+                    "edited_at",
+                    "id",
+                    "liked",
+                    "notice",
+                    "reaction_count",
+                    "status"
+                ]
             },
             "PublicCandidate": {
                 "type": "object",
@@ -11032,6 +13499,28 @@
                 ],
                 "type": "string"
             },
+            "ReactionSchema": {
+                "type": "object",
+                "properties": {
+                    "liked": {
+                        "type": "boolean"
+                    },
+                    "reaction_count": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "liked",
+                    "reaction_count"
+                ]
+            },
+            "ReadScopeEnum": {
+                "enum": [
+                    "signed_in",
+                    "members"
+                ],
+                "type": "string"
+            },
             "Ready": {
                 "type": "object",
                 "properties": {
@@ -11060,6 +13549,39 @@
                     "not_ready"
                 ],
                 "type": "string"
+            },
+            "RejoinLevelRequest": {
+                "type": "object",
+                "properties": {
+                    "level": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "level"
+                ]
+            },
+            "ReportRequest": {
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 16
+                    },
+                    "details": {
+                        "type": "string",
+                        "maxLength": 1000
+                    },
+                    "contact_email": {
+                        "type": "string",
+                        "format": "email"
+                    }
+                },
+                "required": [
+                    "reason"
+                ]
             },
             "UnreadCount": {
                 "type": "object",
@@ -11252,6 +13774,26 @@
                 ],
                 "type": "string"
             },
+            "WritePostSchemaRequest": {
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4000
+                    },
+                    "campaign_candidate": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    }
+                },
+                "required": [
+                    "body"
+                ]
+            },
             "Error": {
                 "type": "object",
                 "required": [
@@ -11346,6 +13888,11 @@
             "meaning": "That candidate can't be chosen here.",
             "web_handling": false
         },
+        "community_closed": {
+            "status": 409,
+            "meaning": "The community has closed (its geography was deactivated).",
+            "web_handling": false
+        },
         "consent_required": {
             "status": 403,
             "meaning": "Consent for this purpose is needed; carries `purpose`, `version`, `text`.",
@@ -11354,6 +13901,16 @@
         "donations_unavailable": {
             "status": 503,
             "meaning": "Donations aren't open.",
+            "web_handling": false
+        },
+        "duplicate_post": {
+            "status": 409,
+            "meaning": "The same post was made in the last 24 hours.",
+            "web_handling": false
+        },
+        "edit_window_closed": {
+            "status": 409,
+            "meaning": "Posts and comments can be edited for 30 minutes, unless reported.",
             "web_handling": false
         },
         "error": {
@@ -11446,9 +14003,19 @@
             "meaning": "Admin endpoints need two-step verification.",
             "web_handling": true
         },
+        "ndc_members_only": {
+            "status": 403,
+            "meaning": "Only NDC members can take part in this community.",
+            "web_handling": false
+        },
         "no_recipients": {
             "status": 400,
             "meaning": "No accounts matched the notice audience.",
+            "web_handling": false
+        },
+        "not_a_member": {
+            "status": 403,
+            "meaning": "Only members of this community can do this.",
             "web_handling": false
         },
         "not_acceptable": {
@@ -11508,7 +14075,7 @@
         },
         "posting_paused": {
             "status": 403,
-            "meaning": "Candidate posting is paused for the blackout; see `until`.",
+            "meaning": "Posting is paused: a candidate in a blackout, a community's posting switch, or a community pause; see `until`.",
             "web_handling": true
         },
         "profile_incomplete": {
@@ -11601,6 +14168,11 @@
             "meaning": "Official items need a source.",
             "web_handling": false
         },
+        "state_change_too_soon": {
+            "status": 409,
+            "meaning": "The chosen state community can change once every 30 days; see `until`.",
+            "web_handling": false
+        },
         "storage_unavailable": {
             "status": 503,
             "meaning": "Files can't be stored right now.",
@@ -11631,6 +14203,11 @@
             "meaning": "Only 3 announcements can be pinned.",
             "web_handling": false
         },
+        "too_soon": {
+            "status": 403,
+            "meaning": "New accounts can post 24 hours after finishing their profile; see `until`.",
+            "web_handling": false
+        },
         "under_18": {
             "status": 400,
             "meaning": "NDCConnect and party membership are for people aged 18 and over.",
@@ -11654,6 +14231,11 @@
         "validation_error": {
             "status": 400,
             "meaning": "The request had invalid fields; see `fields`.",
+            "web_handling": true
+        },
+        "verification_required": {
+            "status": 403,
+            "meaning": "LGA, ward and polling-unit communities need a verified PVC.",
             "web_handling": true
         },
         "webhook_not_configured": {
@@ -11682,6 +14264,31 @@
             "key": "ip",
             "purpose": "Clerk webhooks (02)",
             "rate": "300/min"
+        },
+        "community_comment": {
+            "key": "user",
+            "purpose": "Community comments: 30 an hour (17)",
+            "rate": "30/hour"
+        },
+        "community_post_day": {
+            "key": "user",
+            "purpose": "Community posts: 20 a day (17)",
+            "rate": "20/day"
+        },
+        "community_post_hour": {
+            "key": "user",
+            "purpose": "Community posts: 5 an hour (17)",
+            "rate": "5/hour"
+        },
+        "community_reaction": {
+            "key": "user",
+            "purpose": "Community likes: 120 an hour (17)",
+            "rate": "120/hour"
+        },
+        "community_write": {
+            "key": "user",
+            "purpose": "Community joins, leaves, edits and deletes (17)",
+            "rate": "60/hour"
         },
         "data_export": {
             "key": "user",

@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field, inline_serializer
 from rest_framework import serializers
 
 from apps.candidates.reference import State
@@ -44,11 +45,19 @@ class PublicArticleSerializer(serializers.ModelSerializer):
     byline = serializers.SerializerMethodField()
     byline_verified = serializers.SerializerMethodField()
     pinned = serializers.SerializerMethodField()
+    audience = serializers.SerializerMethodField()
 
     class Meta:
         model = Article
         fields = ["id", "source", "category", "category_label", "title", "excerpt", "state", "state_label", "image", "published_at",
-                  "edited_at", "byline", "byline_verified", "pinned"]
+                  "edited_at", "byline", "byline_verified", "pinned", "audience"]
+
+    @extend_schema_field(inline_serializer("ArticleAudience", {"id": serializers.UUIDField(), "name": serializers.CharField(),
+                                                                "path": serializers.CharField()}, allow_null=True))
+    def get_audience(self, a):
+        """Spec 17 §9: "For: Ikeja LGA community"."""
+        c = a.audience_community if a.audience_community_id else None
+        return {"id": c.id, "name": c.name, "path": c.path} if c else None
 
     def get_category_label(self, a):
         return a.get_category_display() if a.category else ""
@@ -164,6 +173,8 @@ class AnnouncementSerializer(serializers.Serializer):
     source_name = serializers.CharField(max_length=120, required=False, allow_blank=True)
     source_url = serializers.CharField(max_length=500, required=False, allow_blank=True)
     notify = serializers.BooleanField(required=False, default=False)
+    audience_community = serializers.UUIDField(required=False, allow_null=True,
+                                               help_text="Spec 17 §9: show pinned in this community and below; required for Community Announcements")
 
     validate_source_url = SubmitSerializer.validate_source_url
 

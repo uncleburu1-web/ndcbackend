@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views as v
 
-CASE_ACTIONS = ["claim", "release", "keep", "remove", "restore", "escalate", "warn", "pause", "lift-pause", "hold"]
+CASE_ACTIONS = ["claim", "release", "keep", "remove", "restore", "escalate", "warn", "pause", "lift-pause", "hold", "hide", "unhide"]
 
 urlpatterns = [
     path("rules/", v.RulesView.as_view(), name="rules"),
@@ -15,8 +15,9 @@ urlpatterns = [
     path("me/counter-notices/", v.MyCounterNotices.as_view(), name="my-counter-notices"),
     path("admin/moderation/cases/", v.AdminCases.as_view(), name="admin-moderation-cases"),
     path("admin/moderation/cases/<uuid:pk>/", v.AdminCaseDetail.as_view(), name="admin-moderation-case"),
-    *[path(f"admin/moderation/cases/<uuid:pk>/{a}/", v.AdminCaseAction.as_view(action_name=a), name=f"admin-moderation-case-{a}")
-      for a in CASE_ACTIONS],
+    *[path(f"admin/moderation/cases/<uuid:pk>/{a}/",
+           (v.AdminCaseHideAction if a in ("hide", "unhide") else v.AdminCaseAction).as_view(action_name=a),
+           name=f"admin-moderation-case-{a}") for a in CASE_ACTIONS],
     path("admin/moderation/cases/<uuid:pk>/reports/<uuid:report_id>/reporter/", v.AdminRevealReporter.as_view(),
          name="admin-moderation-reporter"),
     path("admin/moderation/appeals/", v.AdminAppeals.as_view(), name="admin-moderation-appeals"),

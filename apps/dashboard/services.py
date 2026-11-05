@@ -21,24 +21,27 @@ from .cards import Card, Stat, to_dict
 logger = logging.getLogger(__name__)
 
 # Order matters: cards appear in this order (spec 11 §4.2).
-SUMMARY_APPS = ["privacy", "moderation", "news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts",
+SUMMARY_APPS = ["privacy", "moderation", "communities", "news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts",
                 "integrations"]
-CARD_ORDER = ["audit_chain_broken", "incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
-              "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing", "data_integrity_issues", "access_review_due"]
+CARD_ORDER = ["audit_chain_broken", "incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "community_hidden_waiting", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
+              "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing", "data_integrity_issues", "communities_unmoderated", "access_review_due"]
 GROUPS = [("people", "People"), ("candidates", "Candidates and following"), ("content", "Content"), ("pvc", "PVC"),
           ("membership", "Membership"), ("donations", "Donations")]
 ADMIN_ROLES = {Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.MODERATOR,
                Role.PRIVACY_OFFICER}
 CACHE_SECONDS = 30
-APP_LABELS = {"privacy": "Privacy and security", "moderation": "Moderation", "news": "News", "posts": "Candidate posts", "pvc": "PVC checks", "membership": "Membership", "donations": "Donations",
+APP_LABELS = {"privacy": "Privacy and security", "moderation": "Moderation", "communities": "Communities", "news": "News", "posts": "Candidate posts", "pvc": "PVC checks", "membership": "Membership", "donations": "Donations",
               "candidates": "Candidates", "follows": "Following", "accounts": "Accounts", "integrations": "Integrations"}
 
 
 def admin_roles(user) -> list[str]:
     if not (user and user.is_authenticated and user.is_active):
         return []
-    return sorted(set(RoleAssignment.objects.filter(user=user, is_active=True, scope_type=ScopeType.GLOBAL, role__in=ADMIN_ROLES)
-                      .values_list("role", flat=True)))
+    roles = set(RoleAssignment.objects.filter(user=user, is_active=True, scope_type=ScopeType.GLOBAL, role__in=ADMIN_ROLES)
+                .values_list("role", flat=True))
+    if RoleAssignment.objects.filter(user=user, is_active=True, role=Role.MODERATOR, scope_type=ScopeType.COMMUNITY).exists():
+        roles.add(Role.MODERATOR)  # a community moderator (spec 17 §8.2)
+    return sorted(roles)
 
 
 def admin_areas(user) -> list[str]:
@@ -56,14 +59,14 @@ def admin_areas(user) -> list[str]:
         areas.append("pvc")
     if has_role(user, Role.MEMBERSHIP_OFFICER):
         areas.append("membership")
-    if sysadmin or has_role(user, Role.MODERATOR) or has_role(user, Role.NEWS_REVIEWER):
-        areas.append("moderation")  # spec 13 §4.9
+    if sysadmin or Role.MODERATOR in roles or has_role(user, Role.NEWS_REVIEWER):
+        areas.append("moderation")  # spec 13 §4.9; community moderators too (spec 17)
     if has_role(user, Role.NEWS_REVIEWER):
         areas.append("news")
     if has_role(user, Role.PRIVACY_OFFICER):
         areas.append("privacy")  # spec 14 §4.13 (implied by system admin)
     if sysadmin:
-        areas += ["announcements", "posts", "team", "audit", "integrations"]  # integrations: spec 15
+        areas += ["announcements", "posts", "team", "audit", "integrations", "communities"]  # integrations: spec 15; communities: 17
     return areas
 
 
@@ -172,6 +175,15 @@ def readiness(now):
         bad = li.get("issues", 0) or li.get("errors", 0)
         out.append(_item("security", "Data integrity", "warning" if bad else "ready",
                          integrity.summary(li) if bad else ""))
+    # spec 17 §15.3
+    from apps.access.models import RoleAssignment as RA
+    from apps.core.models import JobRun
+
+    run = JobRun.objects.filter(job="sync_communities", ok=True).order_by("-finished_at").first()
+    out.append(_item("security", "Communities synced", "ready" if run else "warning",
+                     (run.summary[:120] if run and run.summary else "") if run else "Not run yet · run sync_communities"))
+    mods = RA.objects.filter(role=Role.MODERATOR, scope_type=ScopeType.GLOBAL, is_active=True, user__is_active=True).exists()
+    out.append(_item("security", "Moderators in place", "ready" if mods else "warning", "" if mods else "No platform-wide moderator yet"))
     from apps.search.index import health as search_health
 
     h = search_health()  # spec 12 §6.6: entries vs public items, within 1%

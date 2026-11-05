@@ -159,8 +159,9 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 
 - `/admin` shows each admin role its own queues, weekly counts, readiness (gates and settings as set/not set, never values), background jobs and recent activity. Numbers are cached 30 seconds per role set.
 - Every scheduled command records a `JobRun` (shown under Background jobs; "Overdue" when it hasn't run in time). Suggested schedule:
-  - every 15 minutes: `sweep_payments` (or the alias `sweep_donations`) and `moderation_tick`;
-  - daily: `check_donations`, `prune_pvc`, `prune_news`, `prune_notifications`, `prune_posts`, `prune_moderation`;
+  - every 15 minutes: `sweep_payments` (or the alias `sweep_donations`) and `moderation_tick` (also raises community items hidden over 48 hours to urgent);
+  - daily: `check_donations`, `prune_pvc`, `prune_news`, `prune_notifications`, `prune_posts`, `prune_moderation`, `prune_communities`;
+  - nightly: `sync_communities --placements` (spec 17);
   - hourly: `privacy_tick`;
   - weekly: `prune_jobruns` (job records older than 90 days), `verify_audit`, `prune_audit`, `check_integrity` (spec 16).
 
@@ -257,6 +258,22 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
   missing from a newer file become inactive. `python manage.py match_geography --dry-run` reports how many existing memberships,
   PVC checks and candidates match exactly; without `--dry-run` it adds the links (people's own text is never changed).
   `data/geo/sample.csv` is invented test data, not INEC's list.
+
+## Communities (spec 17)
+
+- **Setup:** after `migrate`, run `python manage.py sync_communities`. It creates the national and 37 state communities and, from
+  `apps/geo`, one per LGA, ward (registration area) and polling unit; run it again after every `load_geography` (`--dry-run` shows
+  what would change). Running it twice changes nothing; communities whose geography went inactive become read-only.
+- **Placement:** people join national and state communities themselves (consent "Communities", then a chosen state). A verified PVC
+  matched to `geo` places them in their state, LGA, ward and polling unit automatically (outbox job `communities_place`).
+  `sync_communities --placements` re-runs placement for everyone nightly as a safety net.
+- **Moderators:** Admin → Team → Grant role → Moderator, then **Where** (a state, or Nigeria) and optionally an LGA. They see and
+  decide cases in that community and the levels below only. Admin → Communities shows the tree, settings (posting open, who can
+  read, NDC members only) and moderators. Nobody, admins included, can see who is in a community.
+- **Schedule:** `sync_communities --placements` nightly, `prune_communities` daily (deleted items 30 days, removed items and ended
+  memberships per spec 17 §17.3).
+- **Checks:** `check_integrity` adds community checks (memberships missing their parent level, members of closed communities,
+  count drift (fixed), items hidden over 48 hours).
 
 ## Tests
 

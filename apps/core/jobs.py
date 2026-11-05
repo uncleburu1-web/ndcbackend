@@ -44,6 +44,8 @@ KNOWN_JOBS = {
     "migrate_media_to_cloudinary": ("Move local images to Cloudinary", None),
     # spec 16
     "check_integrity": ("Check data integrity", 8 * 24 * H),
+    "sync_communities": ("Sync communities from geography", 26 * H),  # spec 17 §12.2
+    "prune_communities": ("Clear old community posts", 26 * H),
 }
 MANUAL_STALE = 24 * H  # a by-hand run that hasn't finished after this "didn't finish"
 KEEP = timedelta(days=90)

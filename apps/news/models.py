@@ -60,6 +60,8 @@ class Article(models.Model):
     show_author_name = models.BooleanField(default=False)
     declarations = models.JSONField(default=dict, blank=True)
     pinned_at = models.DateTimeField(null=True, blank=True)
+    # spec 17 §9: an official announcement shown pinned in this community and the levels below it; null = everyone
+    audience_community = models.ForeignKey("communities.Community", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     important = models.BooleanField(default=False)
     submitted_at = models.DateTimeField(null=True, blank=True)
     published_at = models.DateTimeField(null=True, blank=True)
@@ -89,6 +91,7 @@ class Article(models.Model):
             ),
             # spec 16 §6.3
             models.CheckConstraint(condition=~Q(status="successful") | Q(published_at__isnull=False), name="news_article_published_shape"),
+            models.CheckConstraint(condition=Q(audience_community__isnull=True) | Q(source="official"), name="news_article_audience_shape"),
             models.CheckConstraint(condition=~Q(status="removed") | Q(removed_at__isnull=False), name="news_article_removed_shape"),
             choice_check("status", ArticleStatus.values, "news_status_valid"),
             state_check("state", "news_state_valid"),

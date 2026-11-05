@@ -46,7 +46,20 @@ def _scope_label(a):
 
         c = Candidate.objects.filter(pk=a.scope_id).only("full_name").first()
         return c.full_name if c else "A removed candidate"
-    return "One community"
+    from apps.communities.models import Community
+
+    c = Community.objects.filter(pk=a.scope_id).only("name").first()
+    return f"{c.name} (and below)" if c else "A community"
+
+
+def _is_uuid(v) -> bool:
+    import uuid
+
+    try:
+        uuid.UUID(str(v))
+    except ValueError:
+        return False
+    return True
 
 
 def assignment_payload(a, viewer=None):
@@ -84,8 +97,20 @@ class TeamView(AdminView):
         if user is None:
             raise ServiceError("No NDCConnect account uses that email. They need to sign in once first.",
                                code="user_not_found", status_code=404)
+        scope_type, scope_id = ScopeType.GLOBAL, None
+        community = request.data.get("community")
+        if community:  # spec 17 §8.2: a moderator for one national, state or LGA community (and everything below it)
+            from apps.communities.models import Community
+
+            if role != Role.MODERATOR:
+                raise ServiceError("Only moderators can be given a community.", code="invalid_role", status_code=400)
+            c = Community.objects.filter(pk=str(community), level__in=["national", "state", "lga"], active=True).first() \
+                if _is_uuid(community) else None
+            if c is None:
+                raise ServiceError("Choose a national, state or LGA community.", code="validation_error", status_code=400)
+            scope_type, scope_id = ScopeType.COMMUNITY, c.pk
         try:
-            a = services.grant_role(user=user, role=role, note=note, actor=request.user)
+            a = services.grant_role(user=user, role=role, scope_type=scope_type, scope_id=scope_id, note=note, actor=request.user)
         except services.RoleError as exc:
             raise role_error(exc) from exc
         return Response(assignment_payload(a, request.user), status=status.HTTP_201_CREATED)

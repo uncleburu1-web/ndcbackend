@@ -559,8 +559,9 @@ class MigrationTests(TransactionTestCase):
         ex.migrate(before)
         # media's backfill (spec 15) depends on the newer news/posts migrations, so it is rolled back to 0001 with them
         # core 0005 (spec 16 triggers) depends on the newer news/posts/moderation migrations too
-        others = [n for n in leaves if n[0] not in {"moderation", "news", "posts", "notifications", "media", "core"}] + [
-            ("media", "0001_initial"), ("core", "0004_outbox_constraints_prune_index")]
+        # communities 0002 (spec 17) needs core 0005; news 0006 needs communities
+        others = [n for n in leaves if n[0] not in {"moderation", "news", "posts", "notifications", "media", "core", "communities"}] + [
+            ("media", "0001_initial"), ("core", "0004_outbox_constraints_prune_index"), ("communities", "0001_initial")]
         old = MigrationExecutor(connection).loader.project_state(before + others).apps
         U, Art, Cand, Post = (old.get_model("accounts", "User"), old.get_model("news", "Article"), old.get_model("candidates", "Candidate"),
                               old.get_model("posts", "CandidatePost"))

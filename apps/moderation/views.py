@@ -11,6 +11,9 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.cache import add_never_cache_headers, patch_cache_control
 from django.utils.dateparse import parse_datetime
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
+from rest_framework import serializers as DS
 from rest_framework import status
 from rest_framework.negotiation import DefaultContentNegotiation
 from rest_framework.pagination import PageNumberPagination
@@ -20,13 +23,12 @@ from rest_framework.response import Response
 from rest_framework.throttling import SimpleRateThrottle
 from rest_framework.views import APIView
 
-from apps.core import filters as F
-from apps.access.models import Role
 from apps.access.permissions import IsSignedIn, IsSystemAdmin
-from apps.access.services import has_role, is_system_admin
+from apps.access.services import is_system_admin
 from apps.audit.models import AuditLog
 from apps.audit.services import client_ip, record
 from apps.candidates.models import Candidate
+from apps.core import filters as F
 from apps.core.exceptions import ServiceError
 from apps.news.serializers import ReportSerializer
 from apps.news.views import PublicThrottle, ReportThrottle
@@ -34,7 +36,16 @@ from apps.news.views import PublicThrottle, ReportThrottle
 from . import rules as R
 from . import services as S
 from . import targets as T
-from .models import Appeal, Case, CaseStatus, LegalNotice, LegalNoticeItem, Report, Restriction, TargetKind
+from .models import (
+    Appeal,
+    Case,
+    CaseStatus,
+    LegalNotice,
+    LegalNoticeItem,
+    Report,
+    Restriction,
+    TargetKind,
+)
 
 
 class _Private(APIView):
@@ -65,7 +76,7 @@ class IsModerationStaff(IsSignedIn):
 
     def has_permission(self, request, view):
         u = request.user
-        return super().has_permission(request, view) and (is_system_admin(u) or has_role(u, Role.MODERATOR) or has_role(u, Role.NEWS_REVIEWER))
+        return super().has_permission(request, view) and S.is_moderation_staff(u)
 
 
 def _uuid(value, field="id"):
@@ -212,8 +223,24 @@ class AdminCases(_Private):
         if tab != "closed":
             qs = qs.order_by("priority_rank", "opened_at")
         kind = {"news": "article", "posts": "post", "profiles": "candidate"}.get(qp.get("type", ""), qp.get("type", ""))
-        if kind in TargetKind.values:
+        if kind == "communities":  # spec 17: community posts and comments together
+            qs = qs.filter(target_kind__in=T.COMMUNITY_KINDS)
+        elif kind in TargetKind.values:
             qs = qs.filter(target_kind=kind)
+        if qp.get("community"):  # moderation history for one community and the levels below (SRS 2.2.5)
+            from apps.communities.models import (
+                Community,
+                CommunityComment,
+                CommunityPost,
+            )
+            from apps.communities.services import under_paths
+
+            com = Community.objects.filter(pk=_uuid(qp["community"], "community")).first()
+            if com is not None:
+                qs = qs.filter(Q(target_kind=TargetKind.COMMUNITY_POST,
+                                 target_id__in=CommunityPost.objects.filter(under_paths([com.path], "community__path")).values("pk"))
+                               | Q(target_kind=TargetKind.COMMUNITY_COMMENT,
+                                   target_id__in=CommunityComment.objects.filter(under_paths([com.path], "post__community__path")).values("pk")))
         if qp.get("priority") == "urgent":
             qs = qs.filter(priority__in=["urgent", "legal"])
         elif qp.get("priority") in R.PRIORITY_RANK:
@@ -252,6 +279,14 @@ def _item_payload(case, obj, request):
     elif k == TargetKind.POST:
         out |= {"body": obj.body, "candidate": {"slug": obj.candidate.slug, "full_name": obj.candidate.full_name},
                 "author": {"label": f"Campaign account for {obj.candidate.full_name}"}}
+    elif k in T.COMMUNITY_KINDS:  # spec 17 §17.2: the author's short name, never contact details
+        from apps.communities.text import short_name
+
+        com = T.community_of(k, obj)
+        out |= {"body": obj.body, "community": {"id": com.id, "name": com.name, "path": com.path, "level": com.level},
+                "author": {"label": short_name(obj.author) + (f" · Campaign team · {obj.campaign_candidate.full_name}"
+                                                               if obj.campaign_candidate_id else "")},
+                "hidden_at": obj.hidden_at}
     else:
         out |= {"body": obj.biography, "position": obj.get_position_display(), "author": None}
     return out
@@ -281,11 +316,14 @@ def _case_detail(case, request):
                          "evidence_url": a.evidence_url, "created_at": a.created_at, "decision_reason": a.decision_reason}
                         for a in case.appeals.all()]}
     standing = None
-    if case.target_kind == TargetKind.ARTICLE and obj is not None and obj.source == "community" and obj.author_id:
+    community_author = case.target_kind in T.COMMUNITY_KINDS and obj is not None and obj.author_id
+    if (case.target_kind == TargetKind.ARTICLE and obj is not None and obj.source == "community" and obj.author_id) or community_author:
+        pause_kind = Restriction.Kind.COMMUNITY_PAUSE if community_author else Restriction.Kind.NEWS_PAUSE
         standing = S.standing(obj.author)
         standing["user_id"] = obj.author_id
+        standing["pause_kind"] = pause_kind
         standing["active_pause"] = next(({"id": r.id, "ends_at": r.ends_at} for r in Restriction.objects.filter(
-            user_id=obj.author_id, kind=Restriction.Kind.NEWS_PAUSE, lifted_at__isnull=True, ends_at__gt=now)), None)
+            user_id=obj.author_id, kind=pause_kind, lifted_at__isnull=True, ends_at__gt=now)), None)
     out["standing"] = standing
     # what this viewer may do (the server re-checks every action)
     blocked = ""
@@ -348,7 +386,15 @@ class AdminCaseAction(_Private):
                 days = int(d.get("days", 0))
             except (TypeError, ValueError):
                 days = 0
-            S.pause_news(case, u, days, str(d.get("rule", "")), str(d.get("reason", "") or note), request=request)
+            if case.target_kind in T.COMMUNITY_KINDS:
+                S.pause_community(case, u, days, str(d.get("rule", "")), str(d.get("reason", "") or note),
+                                  scope="all" if d.get("scope") == "all" else "community", request=request)
+            else:
+                S.pause_news(case, u, days, str(d.get("rule", "")), str(d.get("reason", "") or note), request=request)
+        elif a == "hide":
+            S.hide(case, u, note, request=request)
+        elif a == "unhide":
+            S.unhide(case, u, note, request=request)
         elif a == "lift-pause":
             r = get_object_or_404(Restriction, pk=_uuid(d.get("restriction")), case=case)
             S._check(u, case, T.load(case.target_kind, case.target_id))
@@ -358,6 +404,16 @@ class AdminCaseAction(_Private):
                 raise ServiceError("Only system administrators can set legal holds.", code="permission_denied", status_code=403)
             S.set_hold(case, u, bool(d.get("on")), request=request)
         return Response(_case_detail(Case.objects.select_related("assigned_to", "decided_by").get(pk=case.pk), request))
+
+
+class AdminCaseHideAction(AdminCaseAction):
+    """Spec 17 §8.3: Hide / Unhide a community item while deciding. Same answer as the case detail."""
+
+    @extend_schema(summary="Hide or unhide a community post or comment while deciding (spec 17 §8.3)",
+                   request=inline_serializer("CaseHideRequest", {"note": DS.CharField(required=False)}),
+                   responses=OpenApiResponse(OpenApiTypes.OBJECT, description="The case, as GET /admin/moderation/cases/{id}/ returns it"))
+    def post(self, request, pk):
+        return super().post(request, pk)
 
 
 class AdminRevealReporter(_Private):

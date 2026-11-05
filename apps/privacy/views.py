@@ -134,7 +134,8 @@ class MyConsent(_Private):
 
     def delete(self, request, purpose):
         _purpose(purpose)
-        return Response(consent.withdraw(request.user, purpose, request=request))
+        delete_content = str(request.query_params.get("delete_content", "")).lower() in ("1", "true")  # communities (spec 17 §5.4)
+        return Response(consent.withdraw(request.user, purpose, request=request, delete_content=delete_content))
 
 
 class MyConsentPrompted(_Private):

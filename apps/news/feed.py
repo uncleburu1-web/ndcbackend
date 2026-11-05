@@ -33,7 +33,7 @@ def _posts(state: str):
 def pinned_items(source: str = "", state: str = ""):
     if source not in ("", Source.OFFICIAL):
         return []
-    qs = _articles(Source.OFFICIAL, state).filter(pinned_at__isnull=False).select_related("author")
+    qs = _articles(Source.OFFICIAL, state).filter(pinned_at__isnull=False).select_related("author", "audience_community")
     return list(qs.order_by("-pinned_at")[: settings.NEWS_MAX_PINNED])
 
 
@@ -60,7 +60,7 @@ def feed_page(source: str, state: str, page: int, size: int = 20):
     rows = list(keys.order_by("-published_at", "-id")[start:start + size])
     a_ids = [r[0] for r in rows if r[2] == "a"]
     p_ids = [r[0] for r in rows if r[2] == "p"]
-    articles = {a.pk: a for a in Article.objects.filter(pk__in=a_ids).select_related("author")}
+    articles = {a.pk: a for a in Article.objects.filter(pk__in=a_ids).select_related("author", "audience_community")}
     posts = {p.pk: p for p in CandidatePost.objects.filter(pk__in=p_ids).select_related("candidate")}
     items = [articles[r[0]] if r[2] == "a" else posts[r[0]] for r in rows]
     return pinned, items, count
@@ -69,5 +69,5 @@ def feed_page(source: str, state: str, page: int, size: int = 20):
 def feed(source: str = "", state: str = ""):
     """Articles-only helper kept for callers that page a queryset themselves (spec 07)."""
     pinned = pinned_items(source, state)
-    qs = _articles(source, state).select_related("author").exclude(pk__in=[p.pk for p in pinned])
+    qs = _articles(source, state).select_related("author", "audience_community").exclude(pk__in=[p.pk for p in pinned])
     return pinned, qs.order_by("-published_at", "-id")

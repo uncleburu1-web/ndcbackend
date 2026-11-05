@@ -61,12 +61,22 @@ def grant(user, purpose, method=ConsentRecord.Method.DIALOG) -> ConsentRecord:
             rec.save(update_fields=["withdrawn_at", "withdrawal_effect"])
         try:
             with transaction.atomic():
-                return ConsentRecord.objects.create(user=user, purpose=purpose, version=p.version, method=method)
+                new = ConsentRecord.objects.create(user=user, purpose=purpose, version=p.version, method=method)
         except IntegrityError:  # a parallel grant
             return active(user, purpose)
+        if purpose == Purpose.COMMUNITY_MEMBERSHIP:  # spec 17 §5.2: placement runs once consent is given
+            from apps.core import outbox
+
+            outbox.enqueue("communities_place", {"user": str(user.pk)}, dedupe_key=f"communities_place:{user.pk}")
+        return new
 
 
-def _undo(user, purpose) -> str:
+def _undo(user, purpose, options=None) -> str:
+    options = options or {}
+    if purpose == "community_membership":
+        from apps.communities.services import withdraw as leave_all
+
+        return leave_all(user, delete_content=bool(options.get("delete_content")))
     if purpose == "political_following":
         from apps.follows.services import remove_all_for_user
 
@@ -88,11 +98,12 @@ def _undo(user, purpose) -> str:
     return ""
 
 
-def withdraw(user, purpose, request=None) -> dict:
+def withdraw(user, purpose, request=None, **options) -> dict:
+    """`options`: `delete_content` for communities (spec 17 §5.4)."""
     _purpose(purpose)
     with transaction.atomic():
         rec = ConsentRecord.objects.select_for_update().filter(user=user, purpose=purpose, withdrawn_at__isnull=True).first()
-        effect = _undo(user, purpose)  # raises (and rolls back) if the owning app refuses
+        effect = _undo(user, purpose, options)  # raises (and rolls back) if the owning app refuses
         if rec:
             rec.withdrawn_at, rec.withdrawal_effect = timezone.now(), effect[:200]
             rec.save(update_fields=["withdrawn_at", "withdrawal_effect"])
@@ -133,6 +144,11 @@ def consents_needed(user) -> list[str]:
             continue
         if rec.version < p.material_since:
             out.append(p.key)
+        elif p.key == Purpose.VERIFIED_BADGE and rec.version < p.version and rec.prompts_shown < LEGACY_PROMPTS:
+            from apps.pvc.services import public_badge
+
+            if public_badge(user):
+                out.append(p.key)  # spec 17 §17.1: asked again before the badge shows in communities
         elif (p.key == Purpose.POLITICAL_FOLLOWING and rec.method == ConsentRecord.Method.BEFORE_RECORDS and not rec.confirmed_at
               and rec.prompts_shown < LEGACY_PROMPTS):
             out.append(p.key)  # only follows get the legacy confirmation prompt (spec 14 §4.2)

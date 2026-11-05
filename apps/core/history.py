@@ -17,6 +17,8 @@ HISTORY_TABLES = [
     "news_articleevent", "posts_postevent", "moderation_caseevent", "privacy_datarequestevent", "privacy_incidentevent",
     "audit_auditlog",
 ]
+# Added after core 0005 by the owning app's own migration (the 0005 copy stays frozen):
+LATER_TABLES = ["communities_communityevent"]  # communities 0002 (spec 17)
 
 FUNCTION_SQL = r"""
 CREATE OR REPLACE FUNCTION ndc_append_only() RETURNS trigger AS $$

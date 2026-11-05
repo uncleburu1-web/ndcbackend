@@ -23,6 +23,7 @@ USER_OWNER_LINKS = {
     "access.RoleAssignment.user", "follows.CandidateFollow.user", "notifications.Notification.recipient",
     "notifications.NotificationPreference.user", "privacy.ConsentRecord.user", "pvc.PvcVerification.user", "pvc.PvcEvent.user",
     "moderation.Restriction.user",
+    "communities.CommunityMembership.user", "communities.CommunitySettings.user", "communities.CommunityReaction.user",  # spec 17
 }
 USER_LEGAL_RECORDS = {"membership.Membership.user"}  # PROTECT (§5.1 row 3)
 MONEY_PARENTS = {"donations.Donation", "membership.Membership", "membership.MembershipPayment"}
@@ -37,6 +38,7 @@ EXCEPTIONS = {
     "moderation.Restriction.case": "a pause outlives the case that caused it",
     "notifications.Notification.membership": "a membership notice survives the record as 'your membership'",
     "notifications.Notification.donation": "a receipt survives an erased record as 'your donation'",
+    "moderation.Restriction.community": "a community pause outlives a community that closed",
 }
 
 
@@ -69,6 +71,10 @@ def expected(f) -> tuple[set, str]:
         return {models.PROTECT}, "reference data is deactivated, never deleted"
     if f.model._meta.label == "notifications.Notification":
         return {models.CASCADE}, "a notice about deleted content is meaningless"
+    if target == "communities.Community":
+        return {models.PROTECT}, "communities are deactivated, never deleted"
+    if target == "communities.CommunityPost":
+        return {models.CASCADE}, "comments and likes go with their post (retention only)"
     return set(), "not covered by the policy: add a reason to EXCEPTIONS"
 
 

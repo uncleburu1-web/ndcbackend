@@ -22,6 +22,8 @@ class TargetKind(models.TextChoices):
     ARTICLE = "article", "News"
     POST = "post", "Candidate post"
     CANDIDATE = "candidate", "Candidate profile"
+    COMMUNITY_POST = "community_post", "Community post"  # spec 17 §8.1
+    COMMUNITY_COMMENT = "community_comment", "Community comment"
 
 
 class ReportStatus(models.TextChoices):
@@ -63,7 +65,7 @@ class Case(models.Model):
     """One moderation case per item at a time, grouping its reports and decisions (spec 13)."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    target_kind = models.CharField(max_length=10, choices=TargetKind.choices)
+    target_kind = models.CharField(max_length=20, choices=TargetKind.choices)
     target_id = models.UUIDField()
     source = models.CharField(max_length=20, choices=CaseSource.choices, default=CaseSource.USER_REPORT)
     status = models.CharField(max_length=10, choices=CaseStatus.choices, default=CaseStatus.OPEN)
@@ -112,7 +114,7 @@ class Report(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     reference = models.CharField(max_length=12, unique=True)
-    target_kind = models.CharField(max_length=10, choices=TargetKind.choices)
+    target_kind = models.CharField(max_length=20, choices=TargetKind.choices)
     target_id = models.UUIDField()
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name="reports")
     reason = models.CharField(max_length=16)
@@ -158,6 +160,8 @@ class CaseEvent(models.Model):
         REPORTER_VIEWED = "reporter_viewed"
         COUNTER_NOTICE = "counter_notice"
         AUTHOR_REMOVED = "author_removed"
+        HIDDEN = "hidden"  # spec 17 §8.3
+        UNHIDDEN = "unhidden"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name="events")
@@ -179,18 +183,21 @@ class CaseEvent(models.Model):
 
 
 class Restriction(models.Model):
-    """A warning or a community-news pause on a person's account (spec 13)."""
+    """A warning, a community-news pause, or a community posting pause on a person's account (spec 13, 17 §8.4)."""
 
     class Kind(models.TextChoices):
         WARNING = "warning", "Warning"
         NEWS_PAUSE = "news_pause", "Community news paused"
+        COMMUNITY_PAUSE = "community_pause", "Community posting paused"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="restrictions")
-    kind = models.CharField(max_length=12, choices=Kind.choices)
+    kind = models.CharField(max_length=16, choices=Kind.choices)
     rule = models.CharField(max_length=8, blank=True)
     reason = models.CharField(max_length=500, blank=True)
     case = models.ForeignKey(Case, null=True, blank=True, on_delete=models.SET_NULL, related_name="restrictions")
+    # community_pause only: the community (and the levels below it) it covers; null = every community (spec 17 §8.4)
+    community = models.ForeignKey("communities.Community", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     starts_at = models.DateTimeField()
     ends_at = models.DateTimeField(null=True, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

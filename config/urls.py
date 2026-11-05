@@ -22,6 +22,7 @@ api_v1 = [
     path("", include("apps.privacy.urls")),
     path("", include("apps.integrations.urls")),
     path("", include("apps.media.urls")),
+    path("", include("apps.communities.urls")),  # spec 17
     path("", include("apps.core.schema_urls")),
 ]
 

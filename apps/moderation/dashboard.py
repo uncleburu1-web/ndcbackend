@@ -1,8 +1,7 @@
 """Moderation figures for the admin home (spec 13 §4.9). Per-user (what the viewer can act on), so not cached."""
 from django.db.models import Min
 
-from apps.access.models import Role
-from apps.access.services import has_role, is_system_admin
+from apps.access.services import is_system_admin
 from apps.dashboard.cards import Card
 
 from . import rules as R
@@ -15,7 +14,7 @@ def admin_summary(user, *, now):
     from . import services
 
     sysadmin = is_system_admin(user)
-    if not (sysadmin or has_role(user, Role.MODERATOR) or has_role(user, Role.NEWS_REVIEWER)):
+    if not (sysadmin or services.is_moderation_staff(user)):
         return []
     cases = services.visible_cases(user).exclude(status=CaseStatus.CLOSED)
     if not sysadmin:

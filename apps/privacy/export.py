@@ -9,7 +9,7 @@ from django.utils import timezone
 from .register import CATEGORIES, PRIVACY_VERSION
 
 SCHEMA_VERSION = 1
-EXPORT_APPS = ["accounts", "access", "follows", "donations", "membership", "pvc", "news", "posts", "notifications", "moderation", "privacy"]
+EXPORT_APPS = ["accounts", "access", "follows", "donations", "membership", "pvc", "news", "posts", "communities", "notifications", "moderation", "privacy"]
 
 README = """NDCConnect: your data
 =====================

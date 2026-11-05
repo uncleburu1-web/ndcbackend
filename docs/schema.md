@@ -79,7 +79,7 @@ Data register: Security and audit records.
 | `id` | uuid |  | primary key |
 | `actor_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
 | `actor_label` | varchar(32) |  |  |
-| `action` | varchar(48) |  | one of 96 values; indexed |
+| `action` | varchar(48) |  | one of 100 values; indexed |
 | `target_type` | varchar(64) |  |  |
 | `target_id` | varchar(64) |  | indexed |
 | `metadata` | jsonb |  | per-action details from an allow-list; displayed, never joined |
@@ -497,6 +497,7 @@ Data register: Community news you submit.
 | `show_author_name` | boolean |  |  |
 | `declarations` | jsonb |  | the ticked declarations at submission, kept as evidence |
 | `pinned_at` | timestamptz | yes |  |
+| `audience_community_id` | → | yes | → `communities.Community`, on delete PROTECT (communities are deactivated, never deleted) |
 | `important` | boolean |  |  |
 | `submitted_at` | timestamptz | yes |  |
 | `published_at` | timestamptz | yes |  |
@@ -516,6 +517,7 @@ Constraints:
 - `news_official_shape`: check source = 'community' or (not (category = '') and not (status = 'pending'))
 - `news_community_shape`: check source = 'official' or (category = '' and pinned_at is null)
 - `news_article_published_shape`: check not (status = 'successful') or published_at is not null
+- `news_article_audience_shape`: check audience_community is null or source = 'official'
 - `news_article_removed_shape`: check not (status = 'removed') or removed_at is not null
 - `news_status_valid`: check status in (pending, successful, rejected, withdrawn, removed)
 - `news_state_valid`: check state in (37 values) or state = ''
@@ -638,7 +640,7 @@ Data register: Reports and moderation.
 | Column | Type | Null | Notes |
 |---|---|---|---|
 | `id` | uuid |  | primary key |
-| `target_kind` | varchar(10) |  | one of article, post, candidate |
+| `target_kind` | varchar(20) |  | one of article, post, candidate, community_post, community_comment |
 | `target_id` | uuid |  |  |
 | `source` | varchar(20) |  | one of user_report, agency_notice, court_order, copyright_notice, proactive |
 | `status` | varchar(10) |  | one of open, escalated, closed |
@@ -686,7 +688,7 @@ Data register: Reports and moderation.
 |---|---|---|---|
 | `id` | uuid |  | primary key |
 | `case_id` | → |  | → `moderation.Case`, on delete CASCADE (history goes when retention deletes its parent) |
-| `event` | varchar(20) |  | one of 20 values |
+| `event` | varchar(20) |  | one of 22 values |
 | `actor_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
 | `note` | varchar(1000) |  |  |
 | `created_at` | timestamptz |  |  |
@@ -760,7 +762,7 @@ Data register: Reports and moderation.
 |---|---|---|---|
 | `id` | uuid |  | primary key |
 | `reference` | varchar(12) |  | unique |
-| `target_kind` | varchar(10) |  | one of article, post, candidate |
+| `target_kind` | varchar(20) |  | one of article, post, candidate, community_post, community_comment |
 | `target_id` | uuid |  |  |
 | `case_id` | → |  | → `moderation.Case`, on delete CASCADE (reports are grouped by their case and pruned with it) |
 | `reason` | varchar(16) |  |  |
@@ -783,7 +785,7 @@ Indexes:
 
 ### `moderation.Restriction` — `moderation_restriction`
 
-A warning or a community-news pause on a person's account (spec 13).
+A warning, a community-news pause, or a community posting pause on a person's account (spec 13, 17 §8.4).
 
 Data register: Reports and moderation.
 
@@ -791,10 +793,11 @@ Data register: Reports and moderation.
 |---|---|---|---|
 | `id` | uuid |  | primary key |
 | `user_id` | → |  | → `accounts.User`, on delete CASCADE (owner of private data; erased through the owning service) |
-| `kind` | varchar(12) |  | one of warning, news_pause |
+| `kind` | varchar(16) |  | one of warning, news_pause, community_pause |
 | `rule` | varchar(8) |  |  |
 | `reason` | varchar(500) |  |  |
 | `case_id` | → | yes | → `moderation.Case`, on delete SET_NULL (a pause outlives the case that caused it) |
+| `community_id` | → | yes | → `communities.Community`, on delete SET_NULL (a community pause outlives a community that closed) |
 | `starts_at` | timestamptz |  |  |
 | `ends_at` | timestamptz | yes |  |
 | `created_by_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
@@ -818,7 +821,7 @@ Data register: Notifications.
 |---|---|---|---|
 | `id` | uuid |  | primary key |
 | `recipient_id` | → |  | → `accounts.User`, on delete CASCADE (owner of private data; erased through the owning service) |
-| `kind` | varchar(32) |  | one of 13 values |
+| `kind` | varchar(32) |  | one of 16 values |
 | `article_id` | → | yes | → `news.Article`, on delete CASCADE (a notice about deleted content is meaningless) |
 | `candidate_post_id` | → | yes | → `posts.CandidatePost`, on delete CASCADE (a notice about deleted content is meaningless) |
 | `case_id` | → | yes | → `moderation.Case`, on delete CASCADE (a notice about deleted content is meaningless) |
@@ -827,6 +830,9 @@ Data register: Notifications.
 | `incident_id` | → | yes | → `privacy.Incident`, on delete CASCADE (a notice about deleted content is meaningless) |
 | `membership_id` | → | yes | → `membership.Membership`, on delete SET_NULL (a membership notice survives the record as 'your membership') |
 | `donation_id` | → | yes | → `donations.Donation`, on delete SET_NULL (a receipt survives an erased record as 'your donation') |
+| `community_post_id` | → | yes | → `communities.CommunityPost`, on delete CASCADE (a notice about deleted content is meaningless) |
+| `community_id` | → | yes | → `communities.Community`, on delete CASCADE (a notice about deleted content is meaningless) |
+| `count` | integer ≥ 0 |  |  |
 | `decision` | varchar(10) |  |  |
 | `created_at` | timestamptz |  |  |
 | `read_at` | timestamptz | yes |  |
@@ -836,7 +842,8 @@ Constraints:
 - `notif_one_announcement`: unique (recipient, article) where kind = 'announcement'
 - `notif_one_candidate_post`: unique (recipient, candidate_post) where kind = 'candidate_post'
 - `notif_one_donation_receipt`: unique (recipient, donation) where kind = 'donation_receipt'
-- `notif_target_by_kind`: check (article is not null and candidate_post is null and kind in (announcement, news_decision)) or (article is null and candidate_post is null and kind = 'pvc_decision') or (article is null and candidate_post is not null and kind = 'candidate_post') or (article is null and candidate_post is null and kind in (report_outcome, content_removed, account_warning, submissions_paused, appeal_decision)) or (article is null and candidate_post is null and kind in (security_notice, privacy_request_update)) or (article is null and candidate_post is null and kind in (membership_decision, donation_receipt))
+- `notif_target_by_kind`: check (article is not null and candidate_post is null and kind in (announcement, news_decision)) or (article is null and candidate_post is null and kind = 'pvc_decision') or (article is null and candidate_post is not null and kind = 'candidate_post') or (article is null and candidate_post is null and kind in (report_outcome, content_removed, account_warning, submissions_paused, appeal_decision)) or (article is null and candidate_post is null and kind in (security_notice, privacy_request_update)) or (article is null and candidate_post is null and kind in (membership_decision, donation_receipt)) or (article is null and candidate_post is null and community_post is not null and kind in (community_reply, community_post)) or (article is null and candidate_post is null and community_post is null and kind = 'community_placed')
+- `notif_one_community_post`: unique (recipient, community_post) where kind = 'community_post'
 
 Indexes:
 
@@ -854,6 +861,7 @@ Data register: Notifications.
 | `id` | bigint (auto) |  | primary key |
 | `user_id` | → (one) |  | → `accounts.User`, on delete CASCADE (owner of private data; erased through the owning service); unique |
 | `announcements` | boolean |  |  |
+| `community_replies` | boolean |  |  |
 | `updated_at` | timestamptz |  |  |
 
 ## Privacy and security
@@ -895,7 +903,7 @@ Data register: Your privacy choices and requests.
 |---|---|---|---|
 | `id` | uuid |  | primary key |
 | `user_id` | → |  | → `accounts.User`, on delete CASCADE (owner of private data; erased through the owning service) |
-| `purpose` | varchar(24) |  | one of political_following, membership, pvc_check, verified_badge |
+| `purpose` | varchar(24) |  | one of political_following, membership, pvc_check, verified_badge, community_membership |
 | `version` | smallint ≥ 0 |  |  |
 | `method` | varchar(16) |  | one of dialog, form, before_records |
 | `granted_at` | timestamptz |  |  |

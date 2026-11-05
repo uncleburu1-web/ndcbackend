@@ -21,6 +21,7 @@ class Purpose(models.TextChoices):
     MEMBERSHIP = "membership", "NDC membership application"
     PVC_CHECK = "pvc_check", "PVC check"
     VERIFIED_BADGE = "verified_badge", "Public verified-voter badge"
+    COMMUNITY_MEMBERSHIP = "community_membership", "Communities"  # spec 17 §17.1
 
 
 class ConsentRecord(models.Model):

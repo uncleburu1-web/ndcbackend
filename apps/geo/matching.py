@@ -54,6 +54,11 @@ def match_all(dry_run=False) -> dict:
                     r["polling_unit"] += 1
                 if fields and not dry_run:
                     M.objects.filter(pk=obj.pk).update(**fields)
+                    if name == "pvc_records":  # a new link can place a verified voter in communities (spec 17 §5.2)
+                        from apps.core import outbox
+
+                        outbox.enqueue("communities_place", {"user": str(obj.user_id)}, dedupe_key=f"communities_place:{obj.user_id}",
+                                       kick=False)
             out[name] = r
         if dry_run:
             transaction.set_rollback(True)

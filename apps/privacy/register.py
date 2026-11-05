@@ -91,6 +91,17 @@ CATEGORIES = [
              "Posts are public under the candidate's name; who wrote them: system administrators only.",
              "Deleted or removed posts after 1 year.",
              "Posts stay under the candidate; the author link is kept for the record.", job="prune_posts"),
+    Category("communities", "Communities", ("communities.CommunityMembership", "communities.CommunitySettings", "communities.CommunityPost",
+                                            "communities.CommunityComment", "communities.CommunityReaction", "communities.CommunityEvent"),
+             "Which communities you're in (state, LGA, ward and polling unit) and how you were placed there, what you post and comment, "
+             "the posts you like, and the history of edits and moderation decisions on your posts.",
+             "To let you discuss politics with people where you vote.",
+             "Your explicit consent, NDPA s. 30(1)(a) (it shows your political opinions and where you vote).",
+             "Members of a community see its posts and comments with your first name and last initial. Nobody, admins included, can see who "
+             "is in a community or who liked a post. Moderators see items in their queue; system administrators can open an author's "
+             "account through an audited view.",
+             "Posts you delete: text erased after 30 days. Removed posts: 1 year. Ended memberships: 30 days.",
+             "Memberships and likes are deleted; your posts and comments stay as 'Former member'.", sensitive=True, job="prune_communities"),
     Category("candidates", "Candidate profiles", ("candidates.Candidate",),
              "Public candidate details (name, office, area, biography, photo, links) and which admins created or edited them.",
              "To publish verified candidate profiles.",
@@ -166,6 +177,7 @@ NOT_PERSONAL = {
     "geo.Ward": "INEC reference data (spec 16 §8)",
     "geo.PollingUnit": "INEC reference data (spec 16 §8)",
     "geo.Dataset": "a record of each geography load (spec 16 §8)",
+    "communities.Community": "communities themselves are geography, with counts only (spec 17 §17.2)",
 }
 
 
@@ -197,9 +209,20 @@ CONSENT_PURPOSES = {
         "An officer checks your VIN and details on INEC's public voter checker. Your VIN is encrypted and only its last 4 characters are shown.",
         "Your PVC details are deleted. Paying for membership needs a verified PVC again.", notice_anchor="pvc"),
     "verified_badge": ConsentPurpose(
-        "verified_badge", "Public verified-voter badge", 1,
-        "The badge shows next to your name on community news you publish with your name. It tells readers you're a verified voter.",
+        "verified_badge", "Public verified-voter badge", 2,
+        "The badge shows next to your name on community news you publish with your name, and on your community posts and comments. "
+        "It tells readers you're a verified voter.",
         "The badge is turned off.", notice_anchor="pvc"),
+    # v2 adds communities (spec 17 §17.1). Material for communities only: a v1 record keeps the badge on community news, and the
+    # badge shows in communities once the person agrees to v2 (pvc.services.community_badge; consents_needed asks them).
+    "community_membership": ConsentPurpose(
+        "community_membership", "Communities", 1,
+        "Communities let you discuss politics with people in your state, LGA, ward and polling unit. Joining records which communities "
+        "you're in, and what you post, comment and like there. If your PVC is verified, we place you in the communities for your polling "
+        "unit. Nobody can see who is in a community; posts show your first name and last initial. You can leave any community or "
+        "withdraw at any time from Your data.",
+        "You leave every community. Your posts and comments stay, shown as 'Former member', unless you choose to delete them too.",
+        notice_anchor="communities"),
 }
 
 

@@ -125,6 +125,10 @@ def mark_deleted(clerk_user_id: str) -> Optional[User]:
         from apps.news.services import erase_for_deleted_user as erase_news
 
         news_erased = erase_news(user)
+        # Memberships and likes deleted; published community posts stay as "Former member" (spec 17 §17.4).
+        from apps.communities.services import erase_for_deleted_user as erase_communities
+
+        erase_communities(user)
         # Privacy requests keep what was asked, detached from the account (spec 14 §10). Consents stay on the anonymised row.
         from apps.privacy.models import DataRequest
 
