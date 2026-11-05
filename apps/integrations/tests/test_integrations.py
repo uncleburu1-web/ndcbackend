@@ -63,7 +63,7 @@ class _Handler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
-        except BrokenPipeError:
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):  # the client timed out on purpose (Windows: 10053)
             pass
 
     do_GET = do_POST = _answer

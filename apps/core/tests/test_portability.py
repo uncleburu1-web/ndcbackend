@@ -46,3 +46,10 @@ class PortabilityTests(SimpleTestCase):
         self.assertTrue(settings.TESTING)
         self.assertEqual(settings.PAYMENT_PROVIDER, "fake")
         self.assertEqual(settings.CLERK_SECRET_KEY, "")
+
+    def test_paths_checked_by_parts_not_slashes(self):
+        # "/tests/" in str(path) never matches on Windows (backslashes); use path.parts.
+        pat = re.compile(r"""["'][^"']*/[^"']*["']\s+(not\s+)?in\s+str\(""")
+        bad = [f"{p.relative_to(ROOT)}:{i}" for p in SOURCES for i, ln in enumerate(_text(p).splitlines(), 1)
+               if pat.search(ln) and p.name != "test_portability.py"]
+        self.assertEqual(bad, [])

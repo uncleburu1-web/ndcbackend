@@ -110,7 +110,7 @@ class CatalogueTests(TestCase):
     def scan(self):
         found = {}
         for path in (ROOT / "apps").rglob("*.py"):
-            if "/tests/" in str(path) or "/migrations/" in str(path):
+            if "tests" in path.parts or "migrations" in path.parts:  # parts, not "/…/": Windows paths use backslashes
                 continue
             text = path.read_text(encoding="utf-8")
             for pat in CODE_PATTERNS:
@@ -190,7 +190,7 @@ class RateLimitTests(TestCase):
         self.assertEqual(sorted(set(RL) - set(rates)), [])
         used = set()
         for path in (ROOT / "apps").rglob("*.py"):
-            if "/tests/" not in str(path):
+            if "tests" not in path.parts:
                 used |= set(re.findall(r'^\s+scope = "([a-z_]+)"\s*$', path.read_text(encoding="utf-8"), re.M))
         self.assertEqual(sorted(used - set(RL)), [])
 
