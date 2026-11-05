@@ -10,5 +10,10 @@ def admin_summary(user, *, now):
     if not is_system_admin(user):
         return []
     st = outbox.stats(now)
-    return [Card("background_tasks_failing", "Background tasks failing", st["failed"], "/admin/integrations",
+    from apps.core import integrity
+
+    last = integrity.last() or {}
+    integrity_card = Card("data_integrity_issues", "Data integrity issues", int(last.get("issues") or 0), "/admin",
+                          any_is_warning=True)  # spec 16 §11.2: counts from the weekly check_integrity
+    return [integrity_card, Card("background_tasks_failing", "Background tasks failing", st["failed"], "/admin/integrations",
                  oldest_at=st["oldest_failed_at"], any_is_warning=True)]

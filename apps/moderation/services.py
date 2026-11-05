@@ -4,8 +4,6 @@ through each app's own services (news, posts), which call back into `content_rem
 `content_restored` here, so a removal from any screen ends up in the same case, with the same
 notifications and the same compliance figures. People decide; report counts never remove anything.
 """
-import hashlib
-import hmac
 from datetime import timedelta
 
 from django.conf import settings
@@ -14,6 +12,7 @@ from django.db.models import Q
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
+from apps.core.history import allow_history_delete
 from apps.access.models import Role
 from apps.access.services import has_role, is_system_admin
 from apps.audit.models import AuditLog
@@ -46,10 +45,10 @@ def _event(case, kind, actor=None, note=""):
 
 
 def _ip_hash(ip):
-    """07's HMAC of the IP: lets limits and burst checks work without keeping the address."""
-    if not ip:
-        return ""
-    return hmac.new(settings.SECRET_KEY.encode(), ip.encode(), hashlib.sha256).hexdigest()
+    """07's HMAC of the IP: lets limits and burst checks work without keeping the address (one format, spec 16 F6)."""
+    from apps.core.hashing import ip_hash
+
+    return ip_hash(ip)
 
 
 ip_hash = _ip_hash
@@ -966,8 +965,8 @@ def prune(now=None) -> dict:
             ComplianceYear.objects.create(year=y, figures=_compute(y))
     ids = list(old.values_list("pk", flat=True))
     n_reports = Report.objects.filter(case_id__in=ids).count()
-    with transaction.atomic():
-        Case.objects.filter(pk__in=ids).delete()  # events, reports, appeals and notices' items cascade (QuerySet.delete skips the guard)
+    with allow_history_delete():  # spec 16 §6.3
+        Case.objects.filter(pk__in=ids).delete()  # events, reports, appeals and notices' items cascade
     return {"cases": len(ids), "reports": n_reports, "years_frozen": len(years)}
 
 

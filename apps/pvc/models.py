@@ -3,8 +3,9 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 
-from apps.candidates.reference import State
+from apps.core.fields import StateField, choice_check, state_check
 
 
 class PvcStatus(models.TextChoices):
@@ -21,9 +22,13 @@ class PvcVerification(models.Model):
     vin_encrypted = models.BinaryField(blank=True, default=b"")
     vin_last4 = models.CharField(max_length=4, blank=True)
     surname = models.CharField(max_length=80)
-    state = models.CharField(max_length=16, choices=State.choices)
+    state = StateField(blank=False)
     lga = models.CharField(max_length=120)
     polling_unit = models.CharField(max_length=160, blank=True)
+    # spec 16 §8.2: optional links to INEC's geography beside what the person typed (never overwritten)
+    geo_lga = models.ForeignKey("geo.Lga", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    geo_ward = models.ForeignKey("geo.Ward", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    geo_polling_unit = models.ForeignKey("geo.PollingUnit", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     status = models.CharField(max_length=12, choices=PvcStatus.choices, default=PvcStatus.PENDING, db_index=True)
     reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     reviewed_at = models.DateTimeField(null=True, blank=True)
@@ -36,6 +41,11 @@ class PvcVerification(models.Model):
     class Meta:
         ordering = ["created_at"]
         indexes = [models.Index(fields=["status", "state", "created_at"], name="pvc_queue_idx")]
+        constraints = [  # spec 16 §6.3
+            models.CheckConstraint(condition=Q(status="pending") | Q(reviewed_at__isnull=False), name="pvc_pvcverification_review_shape"),
+            choice_check("status", PvcStatus.values, "pvc_status_valid"),
+            state_check("state", "pvc_state_valid", allow_blank=False),
+        ]
 
     def __str__(self):
         return f"pvc {self.pk}"
@@ -82,6 +92,9 @@ class PvcSettings(models.Model):
                                                "Take your registration slip or details.")
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [models.CheckConstraint(condition=Q(id=1), name="pvc_settings_single_row")]  # spec 16 §6.3
 
     @classmethod
     def current(cls) -> "PvcSettings":

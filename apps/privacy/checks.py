@@ -109,6 +109,7 @@ def run(now=None, memo=None) -> list[tuple[str, str]]:
         add("Cloudinary folder per environment", not s.CLOUDINARY_FOLDER.rstrip("/").endswith("/dev"), warn=True)
     else:
         add("Images on Cloudinary", False, warn=True)
+    add("IP hash key set", bool(getattr(s, "IP_HASH_KEY", "")), warn=True)  # spec 16 F6
     add("Security contact set", bool(s.SECURITY_CONTACT_EMAIL))
     add("Privacy contact set", bool(s.PRIVACY_CONTACT_EMAIL))
     out.append(("Restore test within 100 days", restore_state(now, memo)[0]))

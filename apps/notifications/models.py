@@ -31,6 +31,8 @@ OWN_RECORD_KINDS = ["membership_decision", "donation_receipt"]  # spec 15: about
 
 
 class Notification(models.Model):
+    """One in-app notice to one person, linked to what it is about by kind (spec 07, 15). Never audited."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
     kind = models.CharField(max_length=32, choices=Kind.choices)
@@ -70,6 +72,8 @@ class Notification(models.Model):
 
 
 class NotificationPreference(models.Model):
+    """A person's notification settings (announcements on or off)."""
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notification_preference")
     announcements = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)

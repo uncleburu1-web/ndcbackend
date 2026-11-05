@@ -48,6 +48,8 @@ IMPLIED_BY_SYSTEM_ADMIN = {Role.MODERATOR, Role.NEWS_REVIEWER, Role.MEMBERSHIP_O
 
 
 class RoleAssignment(TimeStampedModel):
+    """One role held by one person, globally or for one candidate or community. Revoked rows stay as history."""
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="role_assignments")
     role = models.CharField(max_length=32, choices=Role.choices)
     scope_type = models.CharField(max_length=16, choices=ScopeType.choices, default=ScopeType.GLOBAL)

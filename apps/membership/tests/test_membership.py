@@ -383,7 +383,7 @@ class NumberConcurrencyTests(TransactionTestCase):
             u = mk_user(f"user_c{i}")
             m = Membership.objects.create(user=u, status=M.PENDING_APPROVAL, state="kano", full_name=f"M {i}")
             MembershipPayment.objects.create(membership=m, provider="fake", amount_kobo=2_000_000, status="successful",
-                                             payer_email="x@example.com")
+                                             payer_email="x@example.com", paid_at=timezone.now())
             pvc.verify(pvc.submit(u, vin="90F5B0F8E0295612345", surname="X", state="kano", lga="Fagge"), officer)
             members.append(m)
         barrier = threading.Barrier(4)

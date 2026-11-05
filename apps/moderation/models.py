@@ -9,6 +9,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q
 
+from apps.core.fields import StateField, choice_check, state_check
+
 ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"  # no 0/O, 1/I/L
 
 
@@ -58,6 +60,8 @@ class Decision(models.TextChoices):
 
 
 class Case(models.Model):
+    """One moderation case per item at a time, grouping its reports and decisions (spec 13)."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     target_kind = models.CharField(max_length=10, choices=TargetKind.choices)
     target_id = models.UUIDField()
@@ -80,7 +84,7 @@ class Case(models.Model):
     legal_hold = models.BooleanField(default=False)
     restorable = models.BooleanField(default=False)  # copyright: counter-notice window passed unanswered
     title = models.CharField(max_length=200, blank=True)  # snapshot for the queue (spec 13 §4.3)
-    state = models.CharField(max_length=20, blank=True)
+    state = StateField()
     opened_at = models.DateTimeField(auto_now_add=True)
     closed_at = models.DateTimeField(null=True, blank=True)
 
@@ -88,6 +92,10 @@ class Case(models.Model):
         ordering = ["priority_rank", "due_at"]
         constraints = [
             models.UniqueConstraint(fields=["target_kind", "target_id"], condition=~Q(status="closed"), name="moderation_one_live_case"),
+            # spec 16 §6.3
+            models.CheckConstraint(condition=~Q(status="closed") | Q(closed_at__isnull=False), name="moderation_case_closed_shape"),
+            choice_check("status", CaseStatus.values, "moderation_case_status_valid"),
+            state_check("state", "moderation_case_state_valid"),
         ]
         indexes = [
             models.Index(fields=["status", "priority_rank", "due_at"], name="moderation_queue_idx"),
@@ -100,6 +108,8 @@ class Case(models.Model):
 
 
 class Report(models.Model):
+    """One report about one item, by a signed-in member or a guest (spec 13). Reporters are masked from moderators."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     reference = models.CharField(max_length=12, unique=True)
     target_kind = models.CharField(max_length=10, choices=TargetKind.choices)
@@ -169,6 +179,8 @@ class CaseEvent(models.Model):
 
 
 class Restriction(models.Model):
+    """A warning or a community-news pause on a person's account (spec 13)."""
+
     class Kind(models.TextChoices):
         WARNING = "warning", "Warning"
         NEWS_PAUSE = "news_pause", "Community news paused"
@@ -192,6 +204,8 @@ class Restriction(models.Model):
 
 
 class Appeal(models.Model):
+    """An author's one appeal against a removal or a pause, decided by someone else (spec 13)."""
+
     class Kind(models.TextChoices):
         REMOVAL = "removal", "Removal"
         PAUSE = "pause", "Pause"
@@ -223,6 +237,8 @@ class Appeal(models.Model):
 
 
 class LegalNotice(models.Model):
+    """An agency notice, court order or copyright notice received by NDCConnect (spec 13)."""
+
     class Kind(models.TextChoices):
         AGENCY = "agency", "Government agency notice"
         COURT = "court_order", "Court order"
@@ -258,6 +274,8 @@ class LegalNotice(models.Model):
 
 
 class LegalNoticeItem(models.Model):
+    """One item named in a legal notice, with what was done about it."""
+
     class Outcome(models.TextChoices):
         PENDING = "pending", "Waiting"
         REMOVED = "removed", "Removed with notice"

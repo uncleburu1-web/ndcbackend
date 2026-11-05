@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "apps.privacy",
     "apps.integrations",  # spec 15: registry, HTTP client, webhook register
     "apps.media",  # spec 15 §7: Cloudinary / local images
+    "apps.geo",  # spec 16 §8: INEC geography reference data
 ]
 
 MIDDLEWARE = [
@@ -153,6 +154,9 @@ CACHE_BACKEND = config("CACHE_BACKEND", default="memory")  # memory | database
 CACHES = {"default": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "ndc_cache",
                       "OPTIONS": {"MAX_ENTRIES": 50_000, "CULL_FREQUENCY": 4}}
           if CACHE_BACKEND == "database" else {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
+
+# Keyed IP hashes (spec 16 F6): a separate key so rotating DJANGO_SECRET_KEY doesn't reset abuse correlation.
+IP_HASH_KEY = config("IP_HASH_KEY", default="")
 
 # Request logging (spec 15 §12.6)
 SLOW_REQUEST_MS = config("SLOW_REQUEST_MS", default=1500, cast=int)

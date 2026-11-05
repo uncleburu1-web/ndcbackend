@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q
 
-from apps.candidates.reference import State
+from apps.core.fields import StateField, choice_check, state_check
 
 
 class Source(models.TextChoices):
@@ -40,13 +40,15 @@ class ArticleQuerySet(models.QuerySet):
 
 
 class Article(models.Model):
+    """An official announcement or a member's community news story (spec 07)."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     source = models.CharField(max_length=10, choices=Source.choices)
     status = models.CharField(max_length=12, choices=ArticleStatus.choices, default=ArticleStatus.PENDING)
     category = models.CharField(max_length=20, choices=Category.choices, blank=True)
     title = models.CharField(max_length=150)
     body = models.TextField()
-    state = models.CharField(max_length=20, choices=State.choices, blank=True)
+    state = StateField()
     source_name = models.CharField(max_length=120, blank=True)
     source_url = models.URLField(max_length=500, blank=True)
     image = models.CharField(max_length=255, blank=True)
@@ -85,6 +87,11 @@ class Article(models.Model):
                 name="news_community_shape",
                 condition=Q(source="official") | (Q(category="") & Q(pinned_at__isnull=True)),
             ),
+            # spec 16 §6.3
+            models.CheckConstraint(condition=~Q(status="successful") | Q(published_at__isnull=False), name="news_article_published_shape"),
+            models.CheckConstraint(condition=~Q(status="removed") | Q(removed_at__isnull=False), name="news_article_removed_shape"),
+            choice_check("status", ArticleStatus.values, "news_status_valid"),
+            state_check("state", "news_state_valid"),
         ]
         indexes = [
             models.Index(fields=["status", "-published_at"], name="news_feed_idx"),

@@ -115,7 +115,7 @@ class OverviewAccessTests(Base):
     def test_each_role_gets_exactly_its_sections(self):
         expect = {
             "sa": (["incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
-                    "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing"],
+                    "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing", "data_integrity_issues"],
                    ["people", "candidates", "content", "pvc", "membership", "donations"], True),
             "news": (["reports_review", "reports_urgent", "appeals_waiting", "news_pending"], ["content"], False),
             "pvc": (["pvc_pending"], ["pvc"], False),
@@ -498,7 +498,10 @@ class AuditViewerTests(Base):
 
     def test_dates_and_links(self):
         e = record(AuditLog.Action.CANDIDATE_PUBLISHED, target=mk_candidate(), actor=self.sa)
-        AuditLog.objects.filter(pk=e.pk).update(created_at=timezone.now() - timedelta(days=5))
+        from apps.core.history import tamper
+
+        with tamper("audit_auditlog"):  # back-date a row (spec 16: audit rows can't normally change)
+            AuditLog.objects.filter(pk=e.pk).update(created_at=timezone.now() - timedelta(days=5))
         c = client(self.sa)
         day = (timezone.localtime() - timedelta(days=5)).date().isoformat()
         r = c.get(reverse("admin-audit") + f"?area=candidates&from={day}&to={day}")

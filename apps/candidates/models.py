@@ -8,9 +8,17 @@ from django.db import models
 from django.db.models import Q
 from django.utils.text import slugify
 
+from apps.core.fields import StateField, choice_check, state_check
 from apps.core.models import TimeStampedModel
 
-from .reference import AREA_LABELS, AREA_RULES, NOT_IN_FCT, Position, State, area_display
+from .reference import (
+    AREA_LABELS,
+    AREA_RULES,
+    NOT_IN_FCT,
+    Position,
+    State,
+    area_display,
+)
 
 MAX_PRIORITIES = 8
 MAX_PRIORITY_LEN = 120
@@ -30,14 +38,19 @@ class CandidateStatus(models.TextChoices):
 
 
 class Candidate(TimeStampedModel):
+    """A candidate profile created by system admins; public only when published and verified (spec 03)."""
+
     slug = models.SlugField(max_length=170, unique=True)
     full_name = models.CharField(max_length=150)
     party = models.CharField(max_length=40, default="NDC")
     position = models.CharField(max_length=20, choices=Position.choices)
     election_year = models.PositiveSmallIntegerField()
-    state = models.CharField(max_length=20, choices=State.choices, blank=True, default="")
+    state = StateField(default="")
     area_name = models.CharField(max_length=120, blank=True, default="")
     ward_name = models.CharField(max_length=120, blank=True, default="")
+    # spec 16 §8.2: optional links to INEC's geography beside what the person typed (never overwritten)
+    geo_lga = models.ForeignKey("geo.Lga", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    geo_ward = models.ForeignKey("geo.Ward", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
 
     biography = models.TextField(max_length=5000, blank=True, default="")
     campaign_summary = models.TextField(max_length=1000, blank=True, default="")
@@ -64,6 +77,10 @@ class Candidate(TimeStampedModel):
                 condition=~Q(status=CandidateStatus.PUBLISHED) | Q(verified_at__isnull=False),
                 name="candidates_published_requires_verified",
             ),
+            # spec 16 §6.3
+            state_check("state", "candidates_state_valid"),
+            choice_check("status", CandidateStatus.values, "candidates_status_valid"),
+            models.CheckConstraint(condition=Q(election_year__gte=2023, election_year__lte=2099), name="candidates_election_year_plausible"),
         ]
         indexes = [models.Index(fields=["status", "election_year", "position", "state"])]
 

@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.utils import timezone
 
+from apps.core.history import allow_history_delete
 from apps.news import images
 from apps.moderation.services import held_ids
 from apps.posts.models import CandidatePost
@@ -18,7 +19,8 @@ class Command(TrackedCommand):
                                                                                                                   removed_at__lt=cutoff)
         old = old.exclude(pk__in=held_ids("post"))
         files = list(old.values_list("image", "image_thumb"))
-        n, _ = old.delete()
+        with allow_history_delete():  # spec 16 §6.3
+            n, _ = old.delete()
         for pair in files:
             images.delete(*pair)
         text = f"Deleted {n} rows with old posts"

@@ -161,6 +161,11 @@ NOT_PERSONAL = {
     "search.SearchEntry": "an index of items that are already public",
     "moderation.ComplianceYear": "yearly aggregate counts",
     "privacy.AuditAnchor": "a hash, no personal data",
+    "geo.State": "INEC reference data (spec 16 §8)",
+    "geo.Lga": "INEC reference data (spec 16 §8)",
+    "geo.Ward": "INEC reference data (spec 16 §8)",
+    "geo.PollingUnit": "INEC reference data (spec 16 §8)",
+    "geo.Dataset": "a record of each geography load (spec 16 §8)",
 }
 
 

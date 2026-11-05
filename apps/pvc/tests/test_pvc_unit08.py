@@ -108,7 +108,7 @@ class NotificationTests(Base):
     def test_check_constraint(self):
         from django.db import IntegrityError, transaction
 
-        a = Article.objects.create(source="official", status="successful", category="party", title="T", body="B")
+        a = Article.objects.create(source="official", status="successful", category="party", title="T", body="B", published_at=timezone.now())
         with self.assertRaises(IntegrityError), transaction.atomic():
             Notification.objects.create(recipient=self.voter, kind="pvc_decision", article=a, decision="verified")
         with self.assertRaises(IntegrityError), transaction.atomic():

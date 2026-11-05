@@ -57,6 +57,13 @@ class OutboxJob(models.Model):
 
     class Meta:
         ordering = ["next_attempt_at"]
-        indexes = [models.Index(fields=["status", "next_attempt_at"], name="core_outbox_due_idx")]
+        indexes = [models.Index(fields=["status", "next_attempt_at"], name="core_outbox_due_idx"),
+                   # spec 16 F8: the prune path
+                   models.Index(fields=["finished_at"], name="core_outbox_finished_idx", condition=models.Q(status__in=["done", "failed"]))]
         constraints = [models.UniqueConstraint(fields=["dedupe_key"], condition=models.Q(status__in=["pending", "running"]) & ~models.Q(dedupe_key=""),
-                                               name="core_outbox_one_pending_per_key")]
+                                               name="core_outbox_one_pending_per_key"),
+                       # spec 16 §6.3
+                       models.CheckConstraint(condition=~models.Q(status__in=["done", "failed"]) | models.Q(finished_at__isnull=False),
+                                              name="core_outboxjob_finished_shape"),
+                       models.CheckConstraint(condition=models.Q(status__in=["pending", "running", "done", "failed"]),
+                                              name="core_outbox_status_valid")]

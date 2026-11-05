@@ -46,7 +46,8 @@ def mk_article(title, body="Polling units opened on time across the state this m
                author=None, published_at=None):
     return Article.objects.create(source=source, status=status, title=title, body=body, state=state, author=author,
                                   category="party" if source == "official" else "", submitted_at=timezone.now(),
-                                  published_at=published_at or (timezone.now() if status == "successful" else None))
+                                  published_at=published_at or (timezone.now() if status == "successful" else None),
+                                  removed_at=timezone.now() if status == "removed" else None)
 
 
 def mk_post(c, title, body="Join us at the town hall on Saturday."):
@@ -130,7 +131,8 @@ class PublicOnlyTests(TestCase):
         mk_article("Zebra removed", status="removed")
         hidden = mk_candidate("hidden-c", "Hidden Person")
         p = mk_post(hidden, "Zebra post")
-        mk_post(hidden, "Zebra deleted post").__class__.objects.filter(title="Zebra deleted post").update(status="deleted")
+        mk_post(hidden, "Zebra deleted post").__class__.objects.filter(title="Zebra deleted post").update(status="deleted",
+                                                                                                         deleted_at=timezone.now())
         Candidate.objects.filter(pk=hidden.pk).update(status="unpublished")  # bypasses signals: the query-time check catches it
         res = self.kinds("zebra")
         self.assertEqual(res, {Kind.CANDIDATE: [], Kind.ARTICLE: [], Kind.POST: []})

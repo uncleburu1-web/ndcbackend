@@ -18,10 +18,20 @@ from apps.accounts.models import User
 from apps.audit.models import AuditLog
 from apps.candidates.models import Candidate
 from apps.core.exceptions import ServiceError
+from apps.core.history import allow_history_delete
 from apps.moderation import rules as R
 from apps.moderation import services as S
-from apps.moderation.models import (ALPHABET, Appeal, Case, CaseEvent, ComplianceYear, LegalNotice, Report, Restriction,
-                                    new_reference)
+from apps.moderation.models import (
+    ALPHABET,
+    Appeal,
+    Case,
+    CaseEvent,
+    ComplianceYear,
+    LegalNotice,
+    Report,
+    Restriction,
+    new_reference,
+)
 from apps.news.models import Article
 from apps.notifications.models import Notification
 from apps.posts.models import CandidatePost
@@ -246,7 +256,8 @@ class RoleTableTests(Base):
         allowed = {"sa": {"community", "official", "post", "candidate"}, "mod": {"community", "post"}, "news": {"community"}}
         for who, kinds in allowed.items():
             for name, (kind, obj) in targets.items():
-                Case.objects.all().delete()
+                with allow_history_delete():  # cases carry append-only events (spec 16)
+                    Case.objects.all().delete()
                 reason = "profile_wrong" if kind == "candidate" else "spam"
                 S.report(kind, obj, reason, ip=f"10.2.{len(who)}.{len(name)}")
                 c = self.case(kind, obj)
@@ -547,7 +558,9 @@ class MigrationTests(TransactionTestCase):
         leaves = ex.loader.graph.leaf_nodes()
         ex.migrate(before)
         # media's backfill (spec 15) depends on the newer news/posts migrations, so it is rolled back to 0001 with them
-        others = [n for n in leaves if n[0] not in {"moderation", "news", "posts", "notifications", "media"}] + [("media", "0001_initial")]
+        # core 0005 (spec 16 triggers) depends on the newer news/posts/moderation migrations too
+        others = [n for n in leaves if n[0] not in {"moderation", "news", "posts", "notifications", "media", "core"}] + [
+            ("media", "0001_initial"), ("core", "0004_outbox_constraints_prune_index")]
         old = MigrationExecutor(connection).loader.project_state(before + others).apps
         U, Art, Cand, Post = (old.get_model("accounts", "User"), old.get_model("news", "Article"), old.get_model("candidates", "Candidate"),
                               old.get_model("posts", "CandidatePost"))

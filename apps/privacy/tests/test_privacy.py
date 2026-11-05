@@ -23,13 +23,21 @@ from apps.audit.models import AuditLog
 from apps.audit.services import record, verify_chain
 from apps.candidates.models import Candidate
 from apps.core import jobs
+from apps.core.history import tamper  # noqa: E402
 from apps.core.logging import _scrub
 from apps.follows.models import CandidateFollow
 from apps.notifications.models import Notification
-from apps.privacy import consent, incidents as I, register
+from apps.privacy import consent, register
+from apps.privacy import incidents as I
 from apps.privacy import requests as RQ
 from apps.privacy.export import EXPORT_APPS, build_export
-from apps.privacy.models import AccessReview, AuditAnchor, ConsentRecord, DataRequest, Incident
+from apps.privacy.models import (
+    AccessReview,
+    AuditAnchor,
+    ConsentRecord,
+    DataRequest,
+    Incident,
+)
 from apps.pvc.models import PvcVerification
 
 NOW = timezone.now()
@@ -143,7 +151,7 @@ class ConsentTests(APITestCase):
         self.assertEqual(r.data["error"]["code"], "consent_required")
         self.assertEqual(r.data["error"]["purpose"], "pvc_check")
         PvcVerification.objects.create(user=self.u, vin_last4="0123", surname="Obi", state="lagos", lga="ikeja", status="successful",
-                                       consent_at=NOW)
+                                       consent_at=NOW, reviewed_at=NOW)
         consent.grant(self.u, "pvc_check")
         r = client(self.u).patch(reverse("my-pvc-badge"), {"show_badge": True}, format="json")
         self.assertEqual(r.data["error"]["purpose"], "verified_badge")
@@ -234,7 +242,7 @@ class ExportTests(APITestCase):
         CandidateFollow.objects.create(user=self.u, candidate=self.c)
         consent.grant(self.u, "political_following")
         PvcVerification.objects.create(user=self.u, vin_last4="4321", surname="Exporter", state="lagos", lga="ikeja", status="successful",
-                                       consent_at=NOW, reviewed_by=self.rev)
+                                       consent_at=NOW, reviewed_at=NOW, reviewed_by=self.rev)
         Membership.objects.create(user=self.u, full_name="Ada Exporter", nin_last4="9876", state="lagos", status="draft")
         a = Article.objects.create(source="community", status="successful", title="Ikeja polling unit opens early", body="x " * 200,
                                    author=self.u, state="lagos", decided_by=self.rev, decision_reason="Fine", published_at=NOW,
@@ -313,7 +321,7 @@ class SelfDeletionTests(APITestCase):
         self.c = mk_candidate()
         CandidateFollow.objects.create(user=self.u, candidate=self.c)
         PvcVerification.objects.create(user=self.u, vin_last4="1111", surname="Del", state="lagos", lga="ikeja", status="successful",
-                                       consent_at=NOW)
+                                       consent_at=NOW, reviewed_at=NOW)
 
     def post(self, **kw):
         return self.client.post(reverse("my-delete"), {"confirm": "delete"}, format="json", **tok(self.u, **kw))
@@ -336,7 +344,8 @@ class SelfDeletionTests(APITestCase):
         from apps.donations.models import Donation
 
         Donation.objects.create(reference="DON-XYZ123", amount_kobo=500000, designation="party", donor_user=self.u, donor_name="Person",
-                                donor_email="u_del@example.com", status="successful", public_label="Person")
+                                donor_email="u_del@example.com", status="successful", public_label="Person",
+                                paid_at=NOW, donor_state="lagos")
         with mock.patch("apps.accounts.clerk.delete_user", return_value=True):
             r = self.post()
         self.assertEqual(r.status_code, 200, r.data)
@@ -629,21 +638,24 @@ class AuditChainTests(TestCase):
         rows = list(AuditLog.objects.order_by("seq"))
         self.assertEqual([x.seq for x in rows], list(range(rows[0].seq, rows[0].seq + len(rows))))
         self.assertEqual(rows[1].prev_hash, rows[0].hash)
-        AuditLog.objects.filter(pk=rows[2].pk).update(metadata={"n": 99})
+        with tamper("audit_auditlog"):
+            AuditLog.objects.filter(pk=rows[2].pk).update(metadata={"n": 99})
         self.assertEqual(verify_chain()["broken_at"], rows[2].seq)
 
     def test_deleted_row_detected(self):
         for i in range(4):
             record(AuditLog.Action.USER_VIEWED, actor_label="system:test", n=i)
         rows = list(AuditLog.objects.order_by("seq"))
-        AuditLog.objects.filter(pk=rows[1].pk).delete()
+        with tamper("audit_auditlog"):
+            AuditLog.objects.filter(pk=rows[1].pk).delete()
         self.assertFalse(verify_chain()["ok"])
 
     def test_prune_with_anchor_still_verifies(self):
         for i in range(6):
             record(AuditLog.Action.USER_VIEWED, actor_label="system:test", n=i)
         rows = list(AuditLog.objects.order_by("seq"))
-        AuditLog.objects.filter(pk__in=[r.pk for r in rows[:3]]).update(created_at=timezone.now() - timedelta(days=7 * 365))
+        with tamper("audit_auditlog"):
+            AuditLog.objects.filter(pk__in=[r.pk for r in rows[:3]]).update(created_at=timezone.now() - timedelta(days=7 * 365))
         call_command("prune_audit", stdout=io.StringIO())
         self.assertEqual(AuditAnchor.objects.get().seq, rows[2].seq)
         self.assertTrue(verify_chain()["ok"])
@@ -663,7 +675,8 @@ class AuditChainTests(TestCase):
         record(AuditLog.Action.USER_VIEWED, actor_label="system:test")
         call_command("verify_audit", stdout=io.StringIO())
         self.assertEqual(checks.audit_state()[0], "PASS")
-        AuditLog.objects.update(action="user.updated")
+        with tamper("audit_auditlog"):
+            AuditLog.objects.update(action="user.updated")
         with self.assertRaises(Exception):
             call_command("verify_audit", stdout=io.StringIO())
         state, words = checks.audit_state()

@@ -162,7 +162,7 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
   - every 15 minutes: `sweep_payments` (or the alias `sweep_donations`) and `moderation_tick`;
   - daily: `check_donations`, `prune_pvc`, `prune_news`, `prune_notifications`, `prune_posts`, `prune_moderation`;
   - hourly: `privacy_tick`;
-  - weekly: `prune_jobruns` (job records older than 90 days), `verify_audit`, `prune_audit`.
+  - weekly: `prune_jobruns` (job records older than 90 days), `verify_audit`, `prune_audit`, `check_integrity` (spec 16).
 
 ## Search (spec 12)
 
@@ -237,6 +237,26 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **Logs:** one line per request with the route name, status, duration and request ID (`LOG_FORMAT=json` for JSON lines);
   requests over `SLOW_REQUEST_MS` (1500) are warnings. Error responses carry the request ID; search for it in the logs.
 - **Schedule:** `process_outbox` every minute; `prune_outbox` and `prune_webhooks` daily; `media_audit` weekly.
+
+## Database (spec 16)
+
+- **Data dictionary:** `docs/schema.md` (every table, column, delete rule and constraint) and `docs/erd.mmd` (Mermaid), generated
+  from the models. After any model change run `python manage.py schema_doc` and commit both; CI runs `schema_doc --check`, which
+  also fails on a model without a docstring, a JSON column without a reason or a delete rule outside `apps/core/schema_policy.py`.
+- **When `migrate` stops** with `ConstraintViolated: <rule>: N existing row(s) break this rule`, nothing was changed. Run
+  `python manage.py check_integrity --constraint <rule>` for the IDs, fix those records through the app (or ask for a data fix),
+  then run `migrate` again.
+- **History is append-only in the database:** event tables and the audit log refuse edits and deletes. Only the prune jobs delete
+  old rows (`apps.core.history.allow_history_delete()`).
+- **`check_integrity`** (weekly) counts what the database can't enforce; the result shows on `/admin` (Readiness → Data
+  integrity, and a card when there are issues). Counts only.
+- **`IP_HASH_KEY`:** a long random string used to hash IP addresses for abuse limits (falls back to `SECRET_KEY`). Set it before
+  launch; changing it later only resets abuse limits.
+- **Geography:** `python manage.py load_geography <file.csv> --source "<where it came from>" --published-on YYYY-MM-DD` loads
+  INEC's polling-unit list (format in `data/geo/README.md`; `--dry-run` first). Loading the same file again changes nothing; units
+  missing from a newer file become inactive. `python manage.py match_geography --dry-run` reports how many existing memberships,
+  PVC checks and candidates match exactly; without `--dry-run` it adds the links (people's own text is never changed).
+  `data/geo/sample.csv` is invented test data, not INEC's list.
 
 ## Tests
 

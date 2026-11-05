@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 SUMMARY_APPS = ["privacy", "moderation", "news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts",
                 "integrations"]
 CARD_ORDER = ["audit_chain_broken", "incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
-              "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing", "access_review_due"]
+              "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing", "data_integrity_issues", "access_review_due"]
 GROUPS = [("people", "People"), ("candidates", "Candidates and following"), ("content", "Content"), ("pvc", "PVC"),
           ("membership", "Membership"), ("donations", "Donations")]
 ADMIN_ROLES = {Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.MODERATOR,
@@ -163,6 +163,15 @@ def readiness(now):
 
     out.append(_item("integrations", "Shared cache", "ready" if cache_is_shared() else "info" if settings.DEBUG else "error",
                      "" if cache_is_shared() else "Per-process memory" + (" (development)" if settings.DEBUG else "")))
+    from apps.core import integrity  # spec 16 §11.2
+
+    li = integrity.last()
+    if li is None:
+        out.append(_item("security", "Data integrity", "warning", "Not checked yet · run check_integrity"))
+    else:
+        bad = li.get("issues", 0) or li.get("errors", 0)
+        out.append(_item("security", "Data integrity", "warning" if bad else "ready",
+                         integrity.summary(li) if bad else ""))
     from apps.search.index import health as search_health
 
     h = search_health()  # spec 12 §6.6: entries vs public items, within 1%

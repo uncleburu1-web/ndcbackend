@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.utils import timezone
 
+from apps.core.history import allow_history_delete
 from apps.news import images
 from apps.moderation.services import held_ids
 from apps.news.models import Article
@@ -18,7 +19,8 @@ class Command(TrackedCommand):
         old = (Article.objects.filter(status__in=["rejected", "withdrawn"], updated_at__lt=now - timedelta(days=180))
                | Article.objects.filter(status="removed", removed_at__lt=now - timedelta(days=365))).exclude(pk__in=held_ids("article"))
         files = list(old.values_list("image", "image_thumb"))
-        n_articles, _ = old.delete()  # events/notifications cascade (QuerySet.delete bypasses the event guard)
+        with allow_history_delete():  # spec 16 §6.3: retention may delete history
+            n_articles, _ = old.delete()  # events/notifications cascade
         for pair in files:
             images.delete(*pair)
         text = f"Deleted {n_articles} rows with old articles"

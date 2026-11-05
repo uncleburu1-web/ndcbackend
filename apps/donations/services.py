@@ -6,8 +6,6 @@ Donation rules — spec 05 §6. Every status change happens here, under a row lo
 - Webhooks are never trusted on their own: every handled event triggers `verify`.
 - Repeated events are no-ops (idempotent state machine).
 """
-import hashlib
-import hmac
 import logging
 from datetime import timedelta
 
@@ -72,9 +70,9 @@ def published_candidate(slug: str) -> Candidate | None:
 
 
 def ip_hash(ip: str) -> str:
-    if not ip:
-        return ""
-    return hmac.new(settings.SECRET_KEY.encode(), ip.encode(), hashlib.sha256).hexdigest()[:32]
+    from apps.core.hashing import ip_hash as keyed
+
+    return keyed(ip)  # spec 16 F6: 64 hex characters, keyed with IP_HASH_KEY
 
 
 def public_label_for(d: Donation) -> str:

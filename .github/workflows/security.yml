@@ -82,6 +82,8 @@ jobs:
           python manage.py spectacular --format openapi-json --file /tmp/openapi.json --validate --fail-on-warn
           python -c "import json,sys; a=json.load(open('/tmp/openapi.json')); b=json.load(open('docs/openapi.json')); sys.exit(a!=b)" \
             || (echo "docs/openapi.json is stale — regenerate it (docs/api.md)"; exit 1)
+      - name: data dictionary is current (spec 16 §11.1)
+        run: python manage.py schema_doc --check
       - name: no unexplained breaking changes
         run: |
           BASE="${{ github.event.pull_request.base.sha || github.event.before }}"

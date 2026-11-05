@@ -7,6 +7,8 @@ import uuid
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
 
+from apps.core.fields import StateField, state_check
+
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -26,6 +28,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
+    """A person's NDCConnect account, linked to Clerk by `clerk_user_id`. Never hard-deleted: anonymised when the person deletes their account."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     clerk_user_id = models.CharField(max_length=64, unique=True, db_index=True)
     # Mirror of Clerk's primary email; read-only in NDCConnect (changed through Clerk).
@@ -39,7 +43,7 @@ class User(AbstractBaseUser):
     last_seen_at = models.DateTimeField(null=True, blank=True)
     mfa_enabled = models.BooleanField(null=True, blank=True)  # from the last session token's `mfa` claim (access review only)
     # Spec 12: optional, user-set, private. Only pre-fills state filters; never ranks or targets anything.
-    home_state = models.CharField(max_length=20, blank=True, default="")
+    home_state = StateField(default="")
     welcome_shown_at = models.DateTimeField(null=True, blank=True)  # set by the welcome-animation spec
     is_active = models.BooleanField(default=True)
     deactivated_at = models.DateTimeField(null=True, blank=True)
@@ -58,6 +62,7 @@ class User(AbstractBaseUser):
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [state_check("home_state", "accounts_home_state_valid")]  # spec 16 F2
 
     def __str__(self):
         return self.email or self.clerk_user_id

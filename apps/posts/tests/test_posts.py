@@ -178,7 +178,7 @@ class DeliveryTests(Base):
 
     def test_constraint(self):
         u = mk_user("user_x")
-        a = Article.objects.create(source="official", status="successful", category="party", title="T", body="B")
+        a = Article.objects.create(source="official", status="successful", category="party", title="T", body="B", published_at=timezone.now())
         p = self.publish()
         with self.assertRaises(IntegrityError), transaction.atomic():
             Notification.objects.create(recipient=u, kind="candidate_post", article=a)

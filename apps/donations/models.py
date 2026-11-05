@@ -7,6 +7,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models import F, Q
 
+from apps.core.fields import StateField, choice_check, state_check
+
 
 class DonationStatus(models.TextChoices):
     INITIATED = "initiated", "Initiated"
@@ -35,6 +37,8 @@ def new_reference() -> str:
 
 
 class Donation(models.Model):
+    """One donation attempt, its verified status and the donor details the law requires (spec 05). Money in kobo, NGN only."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     reference = models.CharField(max_length=32, unique=True, default=new_reference, editable=False)
     provider = models.CharField(max_length=16)
@@ -49,7 +53,7 @@ class Donation(models.Model):
     donor_name = models.CharField(max_length=150)
     donor_email = models.EmailField()
     donor_phone = models.CharField(max_length=14)
-    donor_state = models.CharField(max_length=16)
+    donor_state = StateField(blank=False)
     donor_address = models.CharField(max_length=300)
     display_choice = models.CharField(max_length=12, choices=DisplayChoice.choices)
     public_label = models.CharField(max_length=150, blank=True)  # snapshot at success
@@ -75,6 +79,13 @@ class Donation(models.Model):
                 condition=(Q(designation="candidate", candidate__isnull=False) | Q(designation="party", candidate__isnull=True)),
                 name="donations_designation_consistent",
             ),
+            # spec 16 §6.3: status ⇄ timestamp shapes, valid values, plausible years
+            models.CheckConstraint(condition=~Q(status="successful") | Q(paid_at__isnull=False), name="donations_donation_paid_shape"),
+            models.CheckConstraint(condition=~Q(status="refunded") | (Q(refunded_at__isnull=False) & Q(refunded_kobo=F("amount_kobo"))),
+                                   name="donations_donation_refund_shape"),
+            choice_check("status", DonationStatus.values, "donations_status_valid"),
+            state_check("donor_state", "donations_donor_state_valid", allow_blank=False),
+            models.CheckConstraint(condition=Q(election_year__isnull=True) | Q(election_year__gte=2023, election_year__lte=2099), name="donations_election_year_plausible"),
         ]
         indexes = [
             models.Index(fields=["status", "-paid_at"], name="donations_public_idx"),

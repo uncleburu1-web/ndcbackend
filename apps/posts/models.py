@@ -7,6 +7,8 @@ import uuid
 from django.conf import settings
 from django.db import models
 
+from apps.core.fields import choice_check
+
 
 class PostKind(models.TextChoices):
     ANNOUNCEMENT = "announcement", "Announcement"
@@ -25,6 +27,8 @@ class PostQuerySet(models.QuerySet):
 
 
 class CandidatePost(models.Model):
+    """An announcement or news post published by a candidate's linked campaign accounts (spec 09)."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     candidate = models.ForeignKey("candidates.Candidate", on_delete=models.PROTECT, related_name="posts")
     kind = models.CharField(max_length=12, choices=PostKind.choices)
@@ -56,6 +60,11 @@ class CandidatePost(models.Model):
         indexes = [
             models.Index(fields=["candidate", "status", "-published_at"], name="posts_candidate_idx"),
             models.Index(fields=["status", "-published_at"], name="posts_feed_idx"),
+        ]
+        constraints = [  # spec 16 §6.3
+            models.CheckConstraint(condition=~models.Q(status="removed") | models.Q(removed_at__isnull=False), name="posts_post_removed_shape"),
+            models.CheckConstraint(condition=~models.Q(status="deleted") | models.Q(deleted_at__isnull=False), name="posts_post_deleted_shape"),
+            choice_check("status", PostStatus.values, "posts_status_valid"),
         ]
 
     def __str__(self):

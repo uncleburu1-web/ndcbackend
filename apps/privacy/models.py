@@ -24,6 +24,8 @@ class Purpose(models.TextChoices):
 
 
 class ConsentRecord(models.Model):
+    """A person's consent to one purpose at one version; withdrawn rather than deleted (spec 14)."""
+
     class Method(models.TextChoices):
         DIALOG = "dialog", "Consent dialog"
         FORM = "form", "Form declaration"
@@ -47,6 +49,8 @@ class ConsentRecord(models.Model):
 
 
 class DataRequest(models.Model):
+    """A privacy request (access, correction, objection…) with its 30-day clock (spec 14)."""
+
     class Kind(models.TextChoices):
         ACCESS = "access", "Access to my data"
         RECTIFICATION = "rectification", "Correct my data"
@@ -98,6 +102,8 @@ class _AppendOnly(models.Model):
 
 
 class DataRequestEvent(_AppendOnly):
+    """Append-only history of a privacy request, including replies shown to the person."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     request = models.ForeignKey(DataRequest, on_delete=models.CASCADE, related_name="events")
     event = models.CharField(max_length=20)
@@ -111,6 +117,8 @@ class DataRequestEvent(_AppendOnly):
 
 
 class Incident(models.Model):
+    """An entry in the breach and incident register with its NDPC and ngCERT clocks (spec 14)."""
+
     class Risk(models.TextChoices):
         NONE = "none", "No risk to people"
         LOW = "low", "Some risk"
@@ -155,6 +163,8 @@ class Incident(models.Model):
 
 
 class IncidentEvent(_AppendOnly):
+    """Append-only timeline of an incident."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     incident = models.ForeignKey(Incident, on_delete=models.CASCADE, related_name="events")
     event = models.CharField(max_length=24)
@@ -168,6 +178,8 @@ class IncidentEvent(_AppendOnly):
 
 
 class AccessReview(models.Model):
+    """A completed 90-day review of who holds admin roles (spec 14)."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     completed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
     completed_at = models.DateTimeField(auto_now_add=True)

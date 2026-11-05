@@ -5,6 +5,8 @@ from django.db import models
 
 
 class WebhookReceipt(models.Model):
+    """One received webhook: IDs, type, a body hash and the outcome; never the payload (spec 15 §12.4)."""
+
     class Status(models.TextChoices):
         PROCESSED = "processed", "Processed"
         IGNORED = "ignored", "Ignored"
@@ -27,4 +29,5 @@ class WebhookReceipt(models.Model):
     class Meta:
         ordering = ["-received_at"]
         constraints = [models.UniqueConstraint(fields=["provider", "event_id"], name="integrations_one_receipt_per_event")]
-        indexes = [models.Index(fields=["provider", "status", "received_at"], name="integrations_receipt_idx")]
+        indexes = [models.Index(fields=["provider", "status", "received_at"], name="integrations_receipt_idx"),
+                   models.Index(fields=["received_at"], name="integrations_receipt_age_idx")]  # spec 16 F8: the prune path

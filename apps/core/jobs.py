@@ -42,6 +42,8 @@ KNOWN_JOBS = {
     "prune_webhooks": ("Clear webhook receipts past 90 days", 26 * H),
     "media_audit": ("Find and remove orphan images", 8 * 24 * H),
     "migrate_media_to_cloudinary": ("Move local images to Cloudinary", None),
+    # spec 16
+    "check_integrity": ("Check data integrity", 8 * 24 * H),
 }
 MANUAL_STALE = 24 * H  # a by-hand run that hasn't finished after this "didn't finish"
 KEEP = timedelta(days=90)

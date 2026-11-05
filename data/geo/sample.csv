@@ -1,0 +1,6 @@
+state_code,state,lga_code,lga,ward_code,ward,pu_code,polling_unit
+24,LAGOS,07,Ikeja,05,Anifowoshe / Ikeja,001,Sample Primary School I
+24,LAGOS,07,Ikeja,05,Anifowoshe / Ikeja,002,Sample Primary School II
+24,LAGOS,07,Ikeja,06,Alausa / Oregun,001,Sample Town Hall
+24,LAGOS,01,Agege,01,Sample Ward One,001,Sample Market Square
+37,FEDERAL CAPITAL TERRITORY,01,Abaji,01,Sample Central,001,Sample Open Space

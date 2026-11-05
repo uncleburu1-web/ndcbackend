@@ -6,6 +6,8 @@ from django.db import models
 
 
 class AuditLog(models.Model):
+    """Append-only, hash-chained record of sensitive actions (FR-059; spec 02, 14). Kept 6 years."""
+
     class Action(models.TextChoices):
         USER_CREATED = "user.created"
         USER_UPDATED = "user.updated"

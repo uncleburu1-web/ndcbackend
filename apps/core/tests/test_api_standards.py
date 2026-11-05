@@ -299,7 +299,7 @@ class OutboxTests(TestCase):
     def test_dedupe_while_pending(self):
         self.assertIsNotNone(outbox.enqueue("test_job", {}, dedupe_key="d1", kick=False))
         self.assertIsNone(outbox.enqueue("test_job", {}, dedupe_key="d1", kick=False))
-        OutboxJob.objects.update(status="done")
+        OutboxJob.objects.update(status="done", finished_at=timezone.now())
         self.assertIsNotNone(outbox.enqueue("test_job", {}, dedupe_key="d1", kick=False))
 
     def test_backoff_then_failed_and_scrubbed(self):

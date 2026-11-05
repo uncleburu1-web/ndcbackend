@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import F, Q
 
-from apps.candidates.reference import State
+from apps.core.fields import StateField, choice_check, state_check
 
 STATE_CODES = {
     "abia": "AB", "adamawa": "AD", "akwa_ibom": "AK", "anambra": "AN", "bauchi": "BA", "bayelsa": "BY", "benue": "BE",
@@ -34,6 +34,8 @@ class Sex(models.TextChoices):
 
 
 class Membership(models.Model):
+    """One person's party membership application and register entry (Electoral Act 2026 s. 77(2); spec 06)."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="membership")
     status = models.CharField(max_length=20, choices=MembershipStatus.choices, default=MembershipStatus.DRAFT, db_index=True)
@@ -41,10 +43,14 @@ class Membership(models.Model):
     sex = models.CharField(max_length=8, choices=Sex.choices, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=300, blank=True)
-    state = models.CharField(max_length=16, choices=State.choices, blank=True)
+    state = StateField()
     lga = models.CharField(max_length=120, blank=True)
     ward = models.CharField(max_length=120, blank=True)
     polling_unit = models.CharField(max_length=160, blank=True)
+    # spec 16 §8.2: optional links to INEC's geography beside what the person typed (never overwritten)
+    geo_lga = models.ForeignKey("geo.Lga", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    geo_ward = models.ForeignKey("geo.Ward", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    geo_polling_unit = models.ForeignKey("geo.PollingUnit", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     nin_encrypted = models.BinaryField(blank=True, default=b"")
     nin_last4 = models.CharField(max_length=4, blank=True)
     photo = models.CharField(max_length=200, blank=True)  # private storage name
@@ -66,6 +72,10 @@ class Membership(models.Model):
                 condition=~Q(status="active") | (Q(membership_number__isnull=False) & Q(activated_at__isnull=False)),
                 name="membership_active_has_number",
             ),
+            # spec 16 §6.3
+            models.CheckConstraint(condition=~Q(status="cancelled") | Q(cancelled_at__isnull=False), name="membership_membership_cancel_shape"),
+            choice_check("status", MembershipStatus.values, "membership_status_valid"),
+            state_check("state", "membership_state_valid"),
         ]
 
     def __str__(self):
@@ -121,6 +131,8 @@ def new_reference() -> str:
 
 
 class MembershipPayment(models.Model):
+    """One membership fee payment; successful only after provider verification (spec 06)."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     membership = models.ForeignKey(Membership, on_delete=models.PROTECT, related_name="payments")
     reference = models.CharField(max_length=32, unique=True, default=new_reference, editable=False)
@@ -148,6 +160,11 @@ class MembershipPayment(models.Model):
             models.CheckConstraint(condition=Q(currency="NGN"), name="membership_payment_ngn_only"),
             models.UniqueConstraint(fields=["membership"], condition=Q(status__in=["initiated", "pending"]),
                                     name="membership_one_open_payment"),
+            # spec 16 §6.3
+            models.CheckConstraint(condition=~Q(status="successful") | Q(paid_at__isnull=False), name="membership_payment_paid_shape"),
+            models.CheckConstraint(condition=~Q(status="refunded") | (Q(refunded_at__isnull=False) & Q(refunded_kobo=F("amount_kobo"))),
+                                   name="membership_payment_refund_shape"),
+            choice_check("status", PaymentStatus.values, "membership_payment_status_valid"),
         ]
 
     def __str__(self):
@@ -159,6 +176,8 @@ class MembershipPayment(models.Model):
 
 
 class MembershipPaymentEvent(models.Model):
+    """Append-only history of a membership payment (webhooks, verifications, status changes)."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     payment = models.ForeignKey(MembershipPayment, on_delete=models.PROTECT, related_name="events")
     source = models.CharField(max_length=16)
@@ -189,6 +208,9 @@ class MembershipSettings(models.Model):
     requires_approval = models.BooleanField(default=True)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [models.CheckConstraint(condition=Q(id=1), name="membership_settings_single_row")]  # spec 16 §6.3
 
     @classmethod
     def current(cls) -> "MembershipSettings":
