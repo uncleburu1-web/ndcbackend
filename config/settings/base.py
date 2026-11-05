@@ -5,8 +5,20 @@ All secrets come from environment variables; see .env.example.
 import json
 from pathlib import Path
 
+import os
+
 import dj_database_url
-from decouple import Csv, config
+from decouple import Config, Csv, RepositoryEmpty
+from decouple import config as _dotenv_config
+
+if os.environ.get("NDC_TESTS") == "1":
+    # Tests (manage.py test): only real environment variables count, never .env, except where the test database is.
+    _isolated = Config(RepositoryEmpty())
+
+    def config(name, *args, **kwargs):
+        return (_dotenv_config if name == "DATABASE_URL" else _isolated)(name, *args, **kwargs)
+else:
+    config = _dotenv_config
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 

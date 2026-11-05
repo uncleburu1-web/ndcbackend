@@ -5,6 +5,8 @@ from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
 
+from apps.core.dates import day_month
+
 PASS, FAIL, WARN = "PASS", "FAIL", "WARN"
 DEV_KEY_PREFIX = "insecure"
 
@@ -48,7 +50,7 @@ def audit_state(now=None, memo=None):
     row = last_run("verify_audit", memo)
     if row is None:
         return WARN, "Audit log: not checked yet (run verify_audit)"
-    when = f"{timezone.localtime(row.finished_at):%-d %b}"
+    when = day_month(row.finished_at)
     if row.ok:
         return PASS, f"Audit log: intact (checked {when})"
     return FAIL, f"Audit log: {row.error.split(': ', 1)[-1] if row.error else 'chain broken'} (checked {when})"
@@ -61,7 +63,7 @@ def restore_state(now=None, memo=None):
         return WARN, "Restore test: none recorded"
     age = now - row.finished_at
     ok = age <= timedelta(days=settings.RESTORE_DRILL_MAX_DAYS)
-    return (PASS if ok else WARN), f"Restore test: {timezone.localtime(row.finished_at):%-d %b %Y}"
+    return (PASS if ok else WARN), f"Restore test: {day_month(row.finished_at)} {timezone.localtime(row.finished_at):%Y}"
 
 
 def run(now=None, memo=None) -> list[tuple[str, str]]:

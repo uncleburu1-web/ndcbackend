@@ -152,7 +152,8 @@ class Command(BaseCommand):
         files = {docs / "schema.md": build_markdown(), docs / "erd.mmd": build_mermaid()}
         problems = [p for m in _ours() for p in check_model(m)]
         if check:
-            stale = [p.name for p, text in files.items() if not p.exists() or p.read_text() != text]
+            # Compare text, not line endings: a Windows checkout may have CRLF (git autocrlf).
+            stale = [p.name for p, text in files.items() if not p.exists() or p.read_text(encoding="utf-8").replace("\r\n", "\n") != text]
             for p in problems:
                 self.stderr.write(p)
             if stale:
@@ -162,7 +163,7 @@ class Command(BaseCommand):
             self.stdout.write("Schema docs are current.")
             return
         for p, text in files.items():
-            p.write_text(text)
+            p.write_text(text, encoding="utf-8", newline="\n")
         for p in problems:
             self.stderr.write(p)
         self.stdout.write(f"Wrote {', '.join(p.name for p in files)}" + (f"; {len(problems)} policy problems" if problems else ""))

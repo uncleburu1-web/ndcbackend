@@ -3,6 +3,7 @@ import io
 import json
 import logging
 import os
+import tempfile
 import zipfile
 from datetime import timedelta
 from unittest import mock
@@ -274,7 +275,7 @@ class ExportTests(APITestCase):
         self.assertIn(self.mine, blob)  # their own report
 
     def test_endpoint_streams_no_store_counts_and_limits(self):
-        before = set(os.listdir("/tmp"))
+        before = set(os.listdir(tempfile.gettempdir()))
         with override_settings(REST_FRAMEWORK={**__import__("django.conf").conf.settings.REST_FRAMEWORK,
                                                "DEFAULT_THROTTLE_RATES": {**__import__("django.conf").conf.settings.REST_FRAMEWORK[
                                                    "DEFAULT_THROTTLE_RATES"], "data_export": "3/day"}}):
@@ -294,7 +295,7 @@ class ExportTests(APITestCase):
             self.assertEqual((r.status_code, r.data["error"]["code"]), (429, "export_limit"))
         api_settings.reload()
         ExportThrottle.THROTTLE_RATES = api_settings.DEFAULT_THROTTLE_RATES
-        self.assertEqual(set(os.listdir("/tmp")) - before, set())
+        self.assertEqual(set(os.listdir(tempfile.gettempdir())) - before, set())
         self.assertEqual(DataRequest.objects.filter(user=self.u, self_served=True).count(), 3)
 
     def test_reverification_required(self):

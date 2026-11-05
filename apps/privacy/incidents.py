@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
 from apps.audit.models import AuditLog
+from apps.core.dates import day_month
 from apps.audit.services import record
 from apps.core.exceptions import ServiceError
 
@@ -298,7 +299,7 @@ def clocks(inc, now=None):
     def clock(key, label, due, done):
         if done:
             out.append({"key": key, "label": label, "due_at": due, "done_at": done, "state": "done",
-                        "words": f"{label}: notified {timezone.localtime(done):%-d %b %H:%M}"})
+                        "words": f"{label}: notified {day_month(done)} {timezone.localtime(done):%H:%M}"})
             return
         if key == "people":
             out.append({"key": key, "label": label, "due_at": due, "done_at": None, "state": "overdue" if now > due + timedelta(hours=1) else "due",

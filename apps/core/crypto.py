@@ -19,9 +19,9 @@ logger = logging.getLogger(__name__)
 def _dev_key() -> str:
     path = Path(settings.BASE_DIR) / ".dev_pii_key"
     if not path.exists():
-        path.write_text(Fernet.generate_key().decode())
+        path.write_text(Fernet.generate_key().decode(), encoding="utf-8")
         logger.warning("PII_ENCRYPTION_KEYS not set: generated a development key in %s (never use in production).", path.name)
-    return path.read_text().strip()
+    return path.read_text(encoding="utf-8").strip()
 
 
 @lru_cache(maxsize=1)

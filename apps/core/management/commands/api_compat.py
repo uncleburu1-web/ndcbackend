@@ -99,8 +99,8 @@ class Command(BaseCommand):
         parser.add_argument("--changes", default=str(Path(settings.BASE_DIR) / "docs" / "api-changes.md"))
 
     def handle(self, *args, base, new, changes, **opts):
-        old_s, new_s = json.loads(Path(base).read_text()), json.loads(Path(new).read_text())
-        log = Path(changes).read_text() if Path(changes).exists() else ""
+        old_s, new_s = json.loads(Path(base).read_text(encoding="utf-8")), json.loads(Path(new).read_text(encoding="utf-8"))
+        log = Path(changes).read_text(encoding="utf-8") if Path(changes).exists() else ""
         found = breaking(old_s, new_s)
         unexplained = [(op, p) for op, p in found if op not in log]
         for op, p in found:

@@ -278,7 +278,10 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 ## Tests
 
 ```bash
-DJANGO_SETTINGS_MODULE=config.settings.test python manage.py test apps
+python manage.py test apps
 ```
+
+`manage.py test` always uses `config.settings.test` (unless you pass `--settings`) and ignores `.env` except `DATABASE_URL`,
+so your local keys, gates and consent switches can't change the results. Works the same on Windows (PowerShell) and Linux.
 
 Tests use real RS256-signed tokens and real Svix signatures. Only Clerk's network calls are replaced.

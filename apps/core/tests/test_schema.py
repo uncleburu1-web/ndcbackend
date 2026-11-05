@@ -180,7 +180,7 @@ class HistoryTests(TestCase):
 
     def test_tamper_helper_is_tests_only(self):
         root = Path(settings.BASE_DIR) / "apps"
-        users = [p for p in root.rglob("*.py") if "tests" not in p.parts and p.name != "history.py" and "tamper(" in p.read_text()]
+        users = [p for p in root.rglob("*.py") if "tests" not in p.parts and p.name != "history.py" and "tamper(" in p.read_text(encoding="utf-8")]
         self.assertEqual(users, [])
 
 

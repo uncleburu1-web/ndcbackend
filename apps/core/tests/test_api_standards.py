@@ -112,7 +112,7 @@ class CatalogueTests(TestCase):
         for path in (ROOT / "apps").rglob("*.py"):
             if "/tests/" in str(path) or "/migrations/" in str(path):
                 continue
-            text = path.read_text()
+            text = path.read_text(encoding="utf-8")
             for pat in CODE_PATTERNS:
                 for m in pat.finditer(text):
                     found.setdefault(m.group(1), str(path.relative_to(ROOT)))
@@ -191,7 +191,7 @@ class RateLimitTests(TestCase):
         used = set()
         for path in (ROOT / "apps").rglob("*.py"):
             if "/tests/" not in str(path):
-                used |= set(re.findall(r'^\s+scope = "([a-z_]+)"\s*$', path.read_text(), re.M))
+                used |= set(re.findall(r'^\s+scope = "([a-z_]+)"\s*$', path.read_text(encoding="utf-8"), re.M))
         self.assertEqual(sorted(used - set(RL)), [])
 
     def test_check_security_needs_a_shared_cache(self):
@@ -369,13 +369,14 @@ class SchemaTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         out = subprocess.run([sys.executable, "manage.py", "spectacular", "--format", "openapi-json", "--validate", "--fail-on-warn"],
-                             cwd=ROOT, capture_output=True, text=True, env={**__import__("os").environ,
-                                                                           "DJANGO_SETTINGS_MODULE": "config.settings.schema"})
+                             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
+                             env={**__import__("os").environ, "DJANGO_SETTINGS_MODULE": "config.settings.schema",
+                                  "PYTHONIOENCODING": "utf-8"})  # Windows consoles default to cp1252
         cls.generated, cls.stderr, cls.code = out.stdout, out.stderr, out.returncode
 
     def test_generates_without_warnings_and_matches_the_snapshot(self):
         self.assertEqual(self.code, 0, self.stderr[-2000:])
-        committed = (ROOT / "docs" / "openapi.json").read_text()
+        committed = (ROOT / "docs" / "openapi.json").read_text(encoding="utf-8")
         self.assertEqual(json.loads(self.generated), json.loads(committed),
                          "docs/openapi.json is stale: DJANGO_SETTINGS_MODULE=config.settings.schema python manage.py spectacular "
                          "--format openapi-json --file docs/openapi.json")
@@ -401,7 +402,7 @@ class SchemaTests(TestCase):
     def test_untyped_operations_only_shrink(self):
         d = json.loads(self.generated)
         untyped = {f"{m.upper()} {p}" for p, v in d["paths"].items() for m, o in v.items() if o.get("x-untyped")}
-        baseline = {ln.strip() for ln in (ROOT / "docs" / "openapi-untyped.txt").read_text().splitlines()
+        baseline = {ln.strip() for ln in (ROOT / "docs" / "openapi-untyped.txt").read_text(encoding="utf-8").splitlines()
                     if ln.strip() and not ln.startswith("#")}
         self.assertEqual(sorted(untyped - baseline), [], "new endpoints must declare their response schema with @extend_schema")
         for typed in ("GET /api/v1/ready/", "POST /api/v1/media/upload-signature/", "GET /api/v1/me/notifications/",
@@ -433,9 +434,9 @@ class CompatTests(TestCase):
         import tempfile
 
         d = Path(tempfile.mkdtemp())
-        (d / "old.json").write_text(json.dumps(self.old))
-        (d / "new.json").write_text(json.dumps(new))
-        (d / "changes.md").write_text(log)
+        (d / "old.json").write_text(json.dumps(self.old), encoding="utf-8")
+        (d / "new.json").write_text(json.dumps(new), encoding="utf-8")
+        (d / "changes.md").write_text(log, encoding="utf-8")
         out = io.StringIO()
         call_command("api_compat", base=str(d / "old.json"), new=str(d / "new.json"), changes=str(d / "changes.md"), stdout=out)
         return out.getvalue()
