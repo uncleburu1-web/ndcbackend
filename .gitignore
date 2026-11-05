@@ -2,8 +2,9 @@ __pycache__/
 *.pyc
 .venv/
 .env
-staticfiles/
-media/
-.fake_payments/
-private_media/
+/staticfiles/
+/media/
+/.fake_payments/
+/private_media/
 .dev_pii_key
+.ruff_cache/
