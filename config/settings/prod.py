@@ -23,6 +23,13 @@ if not [k for k in PII_ENCRYPTION_KEYS if k.strip()]:
 if PAYMENT_PROVIDER == "fake":
     raise ImproperlyConfigured("The fake payment provider can't run in production. Set PAYMENT_PROVIDER=paystack.")
 
+# Railway (deployment ahead of spec 19): it sets RAILWAY_* variables, serves the app on RAILWAY_PUBLIC_DOMAIN, and probes the
+# health check over plain HTTP with the Host "healthcheck.railway.app". Liveness carries no data, so it skips the HTTPS redirect.
+if config("RAILWAY_ENVIRONMENT_NAME", default=""):
+    _railway_domain = config("RAILWAY_PUBLIC_DOMAIN", default="")
+    ALLOWED_HOSTS = [*ALLOWED_HOSTS, "healthcheck.railway.app", *([_railway_domain] if _railway_domain else [])]  # noqa: F405
+SECURE_REDIRECT_EXEMPT = [r"^api/v1/health/$"]
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=True, cast=bool)
 SECURE_HSTS_SECONDS = 60 * 60 * 24 * 365

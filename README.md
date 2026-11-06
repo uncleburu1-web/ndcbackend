@@ -295,6 +295,23 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **Checks:** `check_integrity` adds event count drift, events over capacity, waitlists with free places and open volunteering for
   unpublished candidates.
 
+## Deploying on Railway (ahead of spec 19)
+
+Two services from this repo plus the Postgres service, all in one Railway project and region:
+
+| Service | Start command | Notes |
+|---|---|---|
+| `ndcbackend` (web) | `gunicorn config.wsgi --bind 0.0.0.0:$PORT --workers 2 --timeout 60 --access-logfile -` | Pre-deploy: `python manage.py migrate --noinput && python manage.py createcachetable`. Health check `/api/v1/health/`. Public domain. Volume at `/data` (private media). |
+| `ndc-worker` | `python manage.py run_schedule` | No domain, no pre-deploy. Drains the outbox every 5 seconds and runs every scheduled job when it is due (`apps/core/management/commands/run_schedule.py`), so no cron services are needed. |
+
+- Python is pinned by `.python-version`; Railpack installs `requirements.txt`. `config.wsgi` defaults to the production settings.
+- On Railway the production settings add `healthcheck.railway.app` and `RAILWAY_PUBLIC_DOMAIN` to the allowed hosts; `/api/v1/health/` skips the HTTPS redirect (it carries no data).
+- **Variables (both services):** `DJANGO_SETTINGS_MODULE=config.settings.prod`, `DATABASE_URL=${{Postgres.DATABASE_URL}}?sslmode=require` (private network), `NUM_PROXIES=1`, `CLERK_AUTHORIZED_PARTIES` and `CORS_ALLOWED_ORIGINS` (the frontend's origin), `PRIVATE_MEDIA_ROOT=/data/private_media` (web), and the secrets, set in the Railway dashboard only: `DJANGO_SECRET_KEY`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SIGNING_SECRET`, `PII_ENCRYPTION_KEYS`, `IP_HASH_KEY`, `PAYSTACK_SECRET_KEY`, `CLOUDINARY_*`.
+- **Use the same `PII_ENCRYPTION_KEYS` and `IP_HASH_KEY` everywhere that writes to the same database** (both services, and your laptop if it points at Railway's Postgres). A laptop without `PII_ENCRYPTION_KEYS` generates its own `.dev_pii_key`, and VINs and NINs it saves can't be read by the deployed app (or the reverse).
+- Production refuses the fake payment provider: set `PAYMENT_PROVIDER=paystack` (donations and membership stay closed by their gates). Admin two-step verification is on by default (`ADMIN_MFA_REQUIRED`); without Clerk Pro and the `mfa` claim, admins get 403 on `/api/v1/admin/` until it is set up or the variable is set to `False` on a test deployment.
+- Images: production doesn't serve `MEDIA_ROOT`, so public images need `MEDIA_BACKEND=cloudinary`.
+- After the first deploy: `python manage.py check_security` and `/api/v1/ready/` (both run in the web service's shell: `railway ssh` or the dashboard).
+
 ## Tests
 
 ```bash
