@@ -23,7 +23,7 @@ if not [k for k in PII_ENCRYPTION_KEYS if k.strip()]:
 if PAYMENT_PROVIDER == "fake":
     raise ImproperlyConfigured("The fake payment provider can't run in production. Set PAYMENT_PROVIDER=paystack.")
 
-# Railway (deployment ahead of spec 19): it sets RAILWAY_* variables, serves the app on RAILWAY_PUBLIC_DOMAIN, and probes the
+# Railway (deployment ahead of spec 20): it sets RAILWAY_* variables, serves the app on RAILWAY_PUBLIC_DOMAIN, and probes the
 # health check over plain HTTP with the Host "healthcheck.railway.app". Liveness carries no data, so it skips the HTTPS redirect.
 if config("RAILWAY_ENVIRONMENT_NAME", default=""):
     _railway_domain = config("RAILWAY_PUBLIC_DOMAIN", default="")

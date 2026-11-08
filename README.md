@@ -295,7 +295,7 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **Checks:** `check_integrity` adds event count drift, events over capacity, waitlists with free places and open volunteering for
   unpublished candidates.
 
-## Deploying on Railway (ahead of spec 19)
+## Deploying on Railway (ahead of spec 20)
 
 Two services from this repo plus the Postgres service, all in one Railway project and region:
 
