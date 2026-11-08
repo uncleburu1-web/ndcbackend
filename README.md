@@ -310,6 +310,9 @@ Two services from this repo plus the Postgres service, all in one Railway projec
 - **Use the same `PII_ENCRYPTION_KEYS` and `IP_HASH_KEY` everywhere that writes to the same database** (both services, and your laptop if it points at Railway's Postgres). A laptop without `PII_ENCRYPTION_KEYS` generates its own `.dev_pii_key`, and VINs and NINs it saves can't be read by the deployed app (or the reverse).
 - Production refuses the fake payment provider: set `PAYMENT_PROVIDER=paystack` (donations and membership stay closed by their gates). Admin two-step verification is on by default (`ADMIN_MFA_REQUIRED`); without Clerk Pro and the `mfa` claim, admins get 403 on `/api/v1/admin/` until it is set up or the variable is set to `False` on a test deployment.
 - Images: production doesn't serve `MEDIA_ROOT`, so public images need `MEDIA_BACKEND=cloudinary`.
+- `FRONTEND_BASE_URL` must be the web app's address (payment callbacks and links in notices). Donations and membership stay closed until their switches are set (`DONATIONS_ENABLED`, `DONATIONS_COMPLIANCE_APPROVED`, `MEMBERSHIP_ENABLED`, `MEMBERSHIP_DATA_APPROVED`, all `False` on Railway) and a Paystack key is present; the Paystack webhook is `/api/v1/webhooks/payments/paystack/`.
+- A boolean variable that points at a missing shared variable is an empty string, which stops Django at startup: define the shared value first.
+- Granting the first admin on Railway: run `grant_role <email> system_admin` from a laptop whose `DATABASE_URL` points at Railway, after the person has signed in once; after that, Admin → Team.
 - After the first deploy: `python manage.py check_security` and `/api/v1/ready/` (both run in the web service's shell: `railway ssh` or the dashboard).
 
 ## Tests
