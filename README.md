@@ -261,6 +261,9 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **Candidate import:** `python manage.py import_candidates [--file data/candidates/ndc_2027.json] [--dry-run] [--list]` loads
   researched candidate profiles as unverified drafts for admin review (50 NDC 2027 candidates; see `data/candidates/README.md`).
   Safe to run again: it never changes a verified, published or hand-made record.
+- **Demo donations (local only):** `python manage.py seed_demo_donations [--count 1500] [--total 557000000] [--remove]` adds
+  anonymous demo donations to preview the Finance pages (references start `NDC-DEMO`). It refuses unless `DEBUG` is on and the
+  database is on this machine, so it can't touch production; `--remove` deletes exactly the demo rows.
 
 ## Communities (spec 17)
 
