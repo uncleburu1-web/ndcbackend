@@ -1,0 +1,928 @@
+{
+  "dataset": "ndc-2027",
+  "party": "NDC",
+  "election_year": 2027,
+  "checked": "2026-11-10",
+  "about": "Nigeria Democratic Congress candidates for the 2027 general election, researched from published news reports and INEC's published final lists. Every record imports as a draft for an admin to check and verify; nothing here is published automatically. Research metadata goes into the internal verification notes only.",
+  "candidates": [
+    {
+      "key": "president-peter-obi",
+      "full_name": "Peter Obi",
+      "position": "president",
+      "state": "",
+      "area_name": "",
+      "biography": "Peter Obi is a former Governor of Anambra State and was the Labour Party's presidential candidate in 2023. He joined the Nigeria Democratic Congress in May 2026 and was affirmed as its presidential candidate on 30 May 2026, when he named former Kano State Governor Rabiu Musa Kwankwaso as his running mate.",
+      "campaign_summary": "Peter Obi is the NDC's presidential candidate for 2027 on a joint ticket with Rabiu Musa Kwankwaso. The party zoned its presidential ticket to the South for a single four-year term at its May 2026 national convention, and Obi was the only aspirant for the nomination.",
+      "priorities": [],
+      "links": [
+        {"label": "Channels TV: NDC unveils Obi", "url": "https://www.channelstv.com/2026/05/30/ndc-unveils-obi-as-presidential-candidate-for-2027-general-elections/"},
+        {"label": "Peoples Gazette: Obi picks Kwankwaso", "url": "https://gazettengr.com/?p=473934"}
+      ],
+      "research": {
+        "status": "party_announced", "confidence": "high",
+        "sources": ["https://www.channelstv.com/2026/05/30/ndc-unveils-obi-as-presidential-candidate-for-2027-general-elections/", "https://gazettengr.com/?p=473934", "https://saharareporters.com/2026/05/19/ndc-party-unveils-peter-obi-consensus-presidential-candidate-2027-elections"],
+        "missing": ["INEC final presidential list entry not read directly (reported by Leadership and Peoples Gazette)", "documented campaign priorities", "official campaign website or social accounts"],
+        "flags": ["Running mate Rabiu Musa Kwankwaso has no Vice President position in the model, so he is not imported"]
+      }
+    },
+    {
+      "key": "governor-lagos-funso-doherty",
+      "full_name": "Funso Doherty",
+      "position": "governor",
+      "state": "lagos",
+      "area_name": "",
+      "biography": "Olufunso Adeshina Doherty is a Lagos politician. INEC's final list of governorship candidates names him as the NDC candidate for Lagos State.",
+      "campaign_summary": "Funso Doherty formally accepted the NDC's nomination for the 2027 Lagos governorship election and appears on INEC's final governorship list as the party's candidate in Lagos.",
+      "priorities": [],
+      "links": [
+        {"label": "Leadership: Doherty accepts nomination", "url": "https://leadership.ng/2027-funso-doherty-accepts-ndc-nomination-as-lagos-governorship-candidate/"},
+        {"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}
+      ],
+      "research": {
+        "status": "inec_listed", "confidence": "high",
+        "sources": ["https://leadership.ng/2027-funso-doherty-accepts-ndc-nomination-as-lagos-governorship-candidate/", "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["background and career details", "documented priorities", "official links"],
+        "flags": ["Earlier reports said another aspirant (Naheem Balogun) also claimed the ticket; INEC lists Doherty"]
+      }
+    },
+    {
+      "key": "governor-oyo-akim-adebola-yusuf",
+      "full_name": "Akim Adebola Yusuf",
+      "position": "governor",
+      "state": "oyo",
+      "area_name": "",
+      "biography": "",
+      "campaign_summary": "Akim Adebola Yusuf is listed by INEC as the NDC's governorship candidate for Oyo State in the 2027 election.",
+      "priorities": [],
+      "links": [{"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}],
+      "research": {
+        "status": "inec_listed", "confidence": "medium",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["biography", "documented priorities", "official links", "second independent source"],
+        "flags": ["INEC writes the name surname-first (Yusuf Akim Adebola); confirm preferred order"]
+      }
+    },
+    {
+      "key": "governor-kano-aminu-abdussalam-gwarzo",
+      "full_name": "Aminu Abdussalam Gwarzo",
+      "position": "governor",
+      "state": "kano",
+      "area_name": "",
+      "biography": "Aminu Abdussalam Gwarzo served as Deputy Governor of Kano State under Governor Abba Kabir Yusuf before resigning. He is a close ally of Rabiu Musa Kwankwaso.",
+      "campaign_summary": "Rabiu Musa Kwankwaso announced Aminu Abdussalam Gwarzo as the NDC's Kano governorship candidate for 2027 after Nasiru Gawuna accepted the Kano Central Senate ticket instead.",
+      "priorities": [],
+      "links": [
+        {"label": "Channels TV: Gwarzo named candidate", "url": "https://www.channelstv.com/?p=1029665"},
+        {"label": "ICIR: Kwankwaso unveils Gwarzo", "url": "https://www.icirnigeria.org/2027-kwankwaso-unveils-gwarzo-as-ndc-governorship-candidate/"}
+      ],
+      "research": {
+        "status": "disputed", "confidence": "medium",
+        "sources": ["https://www.channelstv.com/?p=1029665", "https://www.icirnigeria.org/2027-kwankwaso-unveils-gwarzo-as-ndc-governorship-candidate/", "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["documented priorities", "official links"],
+        "flags": ["Not on INEC's 10 Oct 2026 final governorship list for Kano; a later Blueprint report said he was cleared on review. Confirm INEC's current list before verifying"]
+      }
+    },
+    {
+      "key": "governor-rivers-dumo-lulu-briggs",
+      "full_name": "Dumo Lulu-Briggs",
+      "position": "governor",
+      "state": "rivers",
+      "area_name": "",
+      "biography": "Dumo Owukori Lulu-Briggs ran for Governor of Rivers State under the Accord party in 2023.",
+      "campaign_summary": "Dumo Lulu-Briggs is listed by INEC as the NDC's governorship candidate for Rivers State in the 2027 election.",
+      "priorities": [],
+      "links": [{"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}],
+      "research": {
+        "status": "inec_listed", "confidence": "medium",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["documented priorities", "official links", "fuller biography"],
+        "flags": ["A suit over the Rivers ticket was dismissed by the Federal High Court in July 2026; INEC spells the surname Lilu-Briggs in its list"]
+      }
+    },
+    {
+      "key": "governor-benue-terhemba-shija",
+      "full_name": "Terhemba Shija",
+      "position": "governor",
+      "state": "benue",
+      "area_name": "",
+      "biography": "Terhemba Shija is a professor. INEC's final list names him as the NDC governorship candidate for Benue State.",
+      "campaign_summary": "Prof. Terhemba Shija is the NDC's governorship candidate for Benue State in 2027, according to INEC's final list of governorship candidates.",
+      "priorities": [],
+      "links": [{"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}],
+      "research": {
+        "status": "inec_listed", "confidence": "medium",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["biography beyond title", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "governor-kwara-abdulmumin-ajia",
+      "full_name": "Abdulmumin Yinka Ajia",
+      "position": "governor",
+      "state": "kwara",
+      "area_name": "",
+      "biography": "Abdulmumin Yinka Ajia is a professor. INEC's final list names him as the NDC governorship candidate for Kwara State.",
+      "campaign_summary": "Prof. Abdulmumin Yinka Ajia is listed by INEC as the NDC's governorship candidate for Kwara State in the 2027 election.",
+      "priorities": [],
+      "links": [{"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}],
+      "research": {
+        "status": "inec_listed", "confidence": "medium",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/", "ThisDay report, 24 Oct 2026 (URL not captured)"],
+        "missing": ["biography beyond title", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "governor-bauchi-ibrahim-kashim-muhammad",
+      "full_name": "Ibrahim Kashim Muhammad",
+      "position": "governor",
+      "state": "bauchi",
+      "area_name": "",
+      "biography": "Ibrahim Kashim Muhammad is a lawyer and a former Secretary to the Bauchi State Government.",
+      "campaign_summary": "Barr. Ibrahim Kashim Muhammad emerged as the NDC's consensus governorship candidate for Bauchi State and is listed by INEC as the party's candidate for 2027.",
+      "priorities": [],
+      "links": [{"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}],
+      "research": {
+        "status": "inec_listed", "confidence": "medium",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["source URL for the consensus and former-SSG reports", "documented priorities", "official links"],
+        "flags": ["Previously in the SDP"]
+      }
+    },
+    {
+      "key": "governor-abia-ndubuisi-ogah",
+      "full_name": "Etugo Ndubuisi Ogah",
+      "position": "governor",
+      "state": "abia",
+      "area_name": "",
+      "biography": "",
+      "campaign_summary": "Chief Etugo Ndubuisi Ogah is listed by INEC as the NDC's governorship candidate for Abia State. He has said his programme centres on industrialisation, infrastructure, education and security.",
+      "priorities": ["Industrialisation", "Infrastructure", "Education", "Security"],
+      "links": [{"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}],
+      "research": {
+        "status": "disputed", "confidence": "medium",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["biography", "source URL for the stated priorities", "official links"],
+        "flags": ["Abia NDC candidate-list crisis was reported; INEC lists him as Ogah Iroetugo Ndubuisi - confirm spelling of the first name"]
+      }
+    },
+    {
+      "key": "governor-adamawa-aishatu-dahiru-binani",
+      "full_name": "Aishatu Dahiru Ahmed Binani",
+      "position": "governor",
+      "state": "adamawa",
+      "area_name": "",
+      "biography": "Aishatu Dahiru Ahmed, widely known as Binani, is a former Senator for Adamawa Central and was the APC's governorship candidate in Adamawa in 2023. She left the APC, briefly joined the ADC, and joined the NDC in May 2026.",
+      "campaign_summary": "Senator Aishatu Binani is listed by INEC as the NDC's governorship candidate for Adamawa State in 2027, her second run for the office. If elected she would be the state's first female governor.",
+      "priorities": [],
+      "links": [
+        {"label": "ThisDay: Binani joins NDC", "url": "https://www.thisdaylive.com/2026/05/02/binani-quits-adc-for-ndc-dickson-hands-over-adamawa-structure-to-her/"},
+        {"label": "Wikipedia: Aishatu Dahiru Ahmed", "url": "https://en.wikipedia.org/wiki/Aishatu_Dahiru_Ahmed"}
+      ],
+      "research": {
+        "status": "inec_listed", "confidence": "high",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/", "https://leadership.ng/2027-senator-abbo-emerges-labour-party-governorship-candidate-in-adamawa-2/", "https://www.thisdaylive.com/2026/05/02/binani-quits-adc-for-ndc-dickson-hands-over-adamawa-structure-to-her/"],
+        "missing": ["documented priorities", "official campaign links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "governor-akwa-ibom-michael-okon-enyong",
+      "full_name": "Michael Okon Enyong",
+      "position": "governor",
+      "state": "akwa_ibom",
+      "area_name": "",
+      "biography": "",
+      "campaign_summary": "INEC's final list names Michael Okon Enyong as the NDC's governorship candidate for Akwa Ibom State in 2027.",
+      "priorities": [],
+      "links": [{"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}],
+      "research": {
+        "status": "inec_listed", "confidence": "low",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["biography", "documented priorities", "official links"],
+        "flags": ["Name conflict: the party's 5 Sept 2026 statement reported 'Babanta Michael Okon'; INEC lists 'Enyong Michael Okon'. Confirm the correct name before verifying"]
+      }
+    },
+    {
+      "key": "governor-borno-ibrahim-sanusi-kasim",
+      "full_name": "Ibrahim Sanusi Kasim",
+      "position": "governor",
+      "state": "borno",
+      "area_name": "",
+      "biography": "Ibrahim Sanusi Kasim is a retired Rear Admiral of the Nigerian Navy.",
+      "campaign_summary": "Retired Rear Admiral Ibrahim Sanusi Kasim is the NDC's governorship candidate for Borno State, named in the party's September 2026 statement and on INEC's final list.",
+      "priorities": [],
+      "links": [{"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}],
+      "research": {
+        "status": "inec_listed", "confidence": "medium",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["URL of the 5 Sept party statement", "documented priorities", "official links"],
+        "flags": ["INEC spells the surname Kashim"]
+      }
+    },
+    {
+      "key": "governor-ebonyi-paulinus-igwe-nwagu",
+      "full_name": "Paulinus Igwe Nwagu",
+      "position": "governor",
+      "state": "ebonyi",
+      "area_name": "",
+      "biography": "Paulinus Igwe Nwagu was born in 1959 and holds a degree in political science. He was a councillor in Ezza North Local Government (1990-1993) and its council chairman (1999-2002), represented Ezza North/Ishielu in the House of Representatives from 2007 to 2011, and was elected Senator for Ebonyi Central in 2011 on the PDP platform.",
+      "campaign_summary": "Senator Paulinus Igwe Nwagu is listed by INEC as the NDC's governorship candidate for Ebonyi State. In October 2026 he rejected calls for zoning and said he remained committed to contesting the election to the end.",
+      "priorities": [],
+      "links": [
+        {"label": "ThisDay: Nwagu rejects zoning", "url": "https://www.thisdaylive.com/2026/10/24/ebonyi-ndc-guber-candidate-senator-nwagu-rejects-zoning/"},
+        {"label": "Wikipedia: Paulinus Igwe Nwagu", "url": "https://en.wikipedia.org/wiki/Paulinus_Igwe_Nwagu"}
+      ],
+      "research": {
+        "status": "inec_listed", "confidence": "high",
+        "sources": ["https://www.thisdaylive.com/2026/10/24/ebonyi-ndc-guber-candidate-senator-nwagu-rejects-zoning/", "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/", "https://en.wikipedia.org/wiki/Paulinus_Igwe_Nwagu"],
+        "missing": ["documented priorities", "official links"],
+        "flags": ["The party's 5 Sept 2026 statement had named Nwofe Boniface; INEC's final list and later reporting name Nwagu"]
+      }
+    },
+    {
+      "key": "governor-enugu-chinyeaka-ohaa",
+      "full_name": "Chinyeaka Christian Ohaa",
+      "position": "governor",
+      "state": "enugu",
+      "area_name": "",
+      "biography": "",
+      "campaign_summary": "Chief Chinyeaka Ohaa is the NDC's governorship candidate for Enugu State on INEC's list. A rival aspirant, Prof. James Ene-Nwannaji, withdrew his court challenge to Ohaa's nomination in September 2026 and said he would work with him.",
+      "priorities": [],
+      "links": [
+        {"label": "Sahara Reporters: suit withdrawn", "url": "https://saharareporters.com/2026/09/12/2027-elections-enugu-ndc-party-governorship-aspirant-nwannaji-withdraws-suit-high-court"},
+        {"label": "Peoples Gazette: Enugu INEC list", "url": "https://gazettengr.com/?p=498422"}
+      ],
+      "research": {
+        "status": "inec_listed", "confidence": "high",
+        "sources": ["https://gazettengr.com/?p=498422", "https://saharareporters.com/2026/09/12/2027-elections-enugu-ndc-party-governorship-aspirant-nwannaji-withdraws-suit-high-court", "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["biography", "documented priorities", "official links"],
+        "flags": ["A faction led by Johnpaul Anih held a parallel primary that produced Ene-Nwannaji; that faction's list is not imported"]
+      }
+    },
+    {
+      "key": "governor-jigawa-aminu-sani-dutse",
+      "full_name": "Aminu Sani Dutse",
+      "position": "governor",
+      "state": "jigawa",
+      "area_name": "",
+      "biography": "",
+      "campaign_summary": "Aminu Sani Dutse is the NDC's governorship candidate for Jigawa State, named in the party's September 2026 statement and on INEC's final list.",
+      "priorities": [],
+      "links": [{"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}],
+      "research": {
+        "status": "inec_listed", "confidence": "medium",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["biography", "documented priorities", "official links"],
+        "flags": ["Name order differs between reports (Dutse Aminu Sani on INEC's list)"]
+      }
+    },
+    {
+      "key": "governor-katsina-aliyu-ilu-barde",
+      "full_name": "Aliyu Ilu-Barde",
+      "position": "governor",
+      "state": "katsina",
+      "area_name": "",
+      "biography": "",
+      "campaign_summary": "Aliyu Ilu-Barde is the NDC's governorship candidate for Katsina State, named in the party's September 2026 statement and on INEC's final list.",
+      "priorities": [],
+      "links": [{"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}],
+      "research": {
+        "status": "inec_listed", "confidence": "medium",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["biography", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "governor-plateau-jonathan-sunday-akuns",
+      "full_name": "Jonathan Sunday Akuns",
+      "position": "governor",
+      "state": "plateau",
+      "area_name": "",
+      "biography": "Jonathan Sunday Akuns, known by the title Galadiman Dafo, sought the PDP governorship ticket in Plateau State in 2022 before joining the NDC, where he opened the party's state congress in May 2026.",
+      "campaign_summary": "Da Jonathan Sunday Akuns appears in INEC's document as the NDC's governorship candidate for Plateau State, with Jonathan Pwajok as running mate. His nomination is being challenged in court.",
+      "priorities": [],
+      "links": [
+        {"label": "AllAfrica: Plateau NDC ticket in court", "url": "https://allafrica.com/stories/202610120320.html"},
+        {"label": "Tribune: Plateau NDC reconciles", "url": "https://tribuneonlineng.com/plateau-ndc-moves-to-reconcile-factions/"}
+      ],
+      "research": {
+        "status": "disputed", "confidence": "medium",
+        "sources": ["https://allafrica.com/stories/202610120320.html", "https://tribuneonlineng.com/plateau-ndc-moves-to-reconcile-factions/", "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["documented 2027 priorities", "official links"],
+        "flags": ["On 28 Sept 2026 the Federal High Court in Jos restrained Akuns from presenting himself as the candidate pending a suit; Alfred Dapal also claims the ticket and the party once submitted Yakubu Ndam as a placeholder. Do not verify until the court position is checked"]
+      }
+    },
+    {
+      "key": "governor-sokoto-shamsuddeen-aliyu-haido",
+      "full_name": "Shamsuddeen Aliyu Haido",
+      "position": "governor",
+      "state": "sokoto",
+      "area_name": "",
+      "biography": "",
+      "campaign_summary": "Dr. Shamsuddeen Aliyu Haido is the NDC's governorship candidate for Sokoto State in 2027 and appears on INEC's final governorship list.",
+      "priorities": [],
+      "links": [{"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}],
+      "research": {
+        "status": "inec_listed", "confidence": "medium",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["biography", "documented priorities", "official links"],
+        "flags": ["INEC lists 'Aliyu Shamsudeen Ahmad'; confirm the spelling and whether Haido is part of the official name"]
+      }
+    },
+    {
+      "key": "governor-taraba-yahaya-mohammed-sani",
+      "full_name": "Yahaya Mohammed Sani",
+      "position": "governor",
+      "state": "taraba",
+      "area_name": "",
+      "biography": "Yahaya Mohammed Sani is a professor.",
+      "campaign_summary": "Prof. Yahaya Mohammed Sani is the NDC's governorship candidate for Taraba State, named in the party's September 2026 statement and on INEC's final list.",
+      "priorities": [],
+      "links": [{"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}],
+      "research": {
+        "status": "inec_listed", "confidence": "medium",
+        "sources": ["https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"],
+        "missing": ["biography beyond title", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "governor-zamfara-kabiru-marafa",
+      "full_name": "Kabiru Garba Marafa",
+      "position": "governor",
+      "state": "zamfara",
+      "area_name": "",
+      "biography": "Kabiru Garba Marafa is a former senator who served in the 8th Senate.",
+      "campaign_summary": "Senator Kabiru Marafa won the NDC's governorship ticket in Zamfara State in May 2026, when the party also named candidates for all 34 elective positions in the state. INEC lists him as the party's candidate.",
+      "priorities": [],
+      "links": [
+        {"label": "Channels TV: Marafa clinches ticket", "url": "https://www.channelstv.com/2026/05/29/senator-marafa-clinches-ndc-governorship-ticket-in-zamfara/"},
+        {"label": "INEC governorship list (report)", "url": "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/"}
+      ],
+      "research": {
+        "status": "inec_listed", "confidence": "high",
+        "sources": ["https://www.channelstv.com/2026/05/29/senator-marafa-clinches-ndc-governorship-ticket-in-zamfara/", "https://www.opinionnigeria.com/2027-elections-inec-releases-full-list-of-governorship-candidates/", "https://www.opinionnigeria.com/2027-ndc-to-field-candidates-in-all-28-governorship-states-umeh/"],
+        "missing": ["documented priorities", "official links", "senatorial district he represented"],
+        "flags": []
+      }
+    },
+    {
+      "key": "governor-delta-chris-iyovwaye",
+      "full_name": "Chris Iyovwaye",
+      "position": "governor",
+      "state": "delta",
+      "area_name": "",
+      "biography": "Deacon Chris Iyovwaye is a businessman. He sought the PDP governorship ticket in Delta State ahead of the 2023 election before joining the NDC.",
+      "campaign_summary": "Deacon Chris Iyovwaye won the NDC's governorship primary in Delta State and campaigns on the message \"Reset Delta\". He opened his campaign headquarters in Asaba with Peter Obi and Ovie Omo-Agege, and argues that the state needs stronger institutions and an economy that creates opportunities for young people.",
+      "priorities": ["Tackle poverty, unemployment and insecurity in Delta State", "Build stronger public institutions", "Grow an economy that creates opportunities for young people"],
+      "links": [
+        {"label": "Guardian: campaign HQ opened", "url": "https://guardian.ng/?p=2924229"},
+        {"label": "Guardian: time to reset Delta", "url": "https://guardian.ng/?p=2926724"}
+      ],
+      "research": {
+        "status": "party_announced", "confidence": "high",
+        "sources": ["https://guardian.ng/?p=2924229", "https://guardian.ng/?p=2926724", "https://guardian.ng/?p=2924562", "https://businessday.ng/?p=1142013", "https://thisdaylive.com/index.php/2022/04/06/groups-support-iyovwayes-governorship-ambition-in-delta"],
+        "missing": ["INEC list entry (Delta did not appear in the list report read)", "official links"],
+        "flags": ["BusinessDay also spells the name Iyovwave"]
+      }
+    },
+    {
+      "key": "senator-anambra-central-victor-umeh",
+      "full_name": "Victor Umeh",
+      "position": "senator",
+      "state": "anambra",
+      "area_name": "Anambra Central",
+      "biography": "Victor Umeh is a former senator.",
+      "campaign_summary": "Former senator Victor Umeh won the NDC ticket for Anambra Central Senatorial District in the party's May 2026 primaries in Anambra State.",
+      "priorities": [],
+      "links": [{"label": "Guardian: Anambra senate tickets", "url": "https://guardian.ng/politics/umeh-nwoye-onunkwo-clinch-ndc-senatorial-tickets-in-anambra/"}],
+      "research": {
+        "status": "party_announced", "confidence": "high",
+        "sources": ["https://guardian.ng/politics/umeh-nwoye-onunkwo-clinch-ndc-senatorial-tickets-in-anambra/", "https://newstimes.com.ng/2026/05/2027-victor-umeh-tony-nwoye-secure-ndc-senatorial-tickets/"],
+        "missing": ["INEC senatorial list entry", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "senator-anambra-north-tony-nwoye",
+      "full_name": "Tony Nwoye",
+      "position": "senator",
+      "state": "anambra",
+      "area_name": "Anambra North",
+      "biography": "Tony Nwoye is a former senator.",
+      "campaign_summary": "Former senator Tony Nwoye won the NDC ticket for Anambra North Senatorial District in the party's May 2026 primaries.",
+      "priorities": [],
+      "links": [{"label": "Guardian: Anambra senate tickets", "url": "https://guardian.ng/politics/umeh-nwoye-onunkwo-clinch-ndc-senatorial-tickets-in-anambra/"}],
+      "research": {
+        "status": "party_announced", "confidence": "high",
+        "sources": ["https://guardian.ng/politics/umeh-nwoye-onunkwo-clinch-ndc-senatorial-tickets-in-anambra/", "https://newstimes.com.ng/2026/05/2027-victor-umeh-tony-nwoye-secure-ndc-senatorial-tickets/"],
+        "missing": ["INEC senatorial list entry", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "senator-anambra-south-ebuka-onunkwo",
+      "full_name": "Ebuka Onunkwo",
+      "position": "senator",
+      "state": "anambra",
+      "area_name": "Anambra South",
+      "biography": "Ebuka Onunkwo is a businessman and philanthropist.",
+      "campaign_summary": "Chief Ebuka Onunkwo won the NDC ticket for Anambra South Senatorial District in the party's May 2026 primaries.",
+      "priorities": [],
+      "links": [{"label": "Guardian: Anambra senate tickets", "url": "https://guardian.ng/politics/umeh-nwoye-onunkwo-clinch-ndc-senatorial-tickets-in-anambra/"}],
+      "research": {
+        "status": "party_announced", "confidence": "high",
+        "sources": ["https://guardian.ng/politics/umeh-nwoye-onunkwo-clinch-ndc-senatorial-tickets-in-anambra/", "https://newstimes.com.ng/2026/05/2027-victor-umeh-tony-nwoye-secure-ndc-senatorial-tickets/"],
+        "missing": ["INEC senatorial list entry", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "senator-delta-central-ovie-omo-agege",
+      "full_name": "Ovie Omo-Agege",
+      "position": "senator",
+      "state": "delta",
+      "area_name": "Delta Central",
+      "biography": "Ovie Omo-Agege is a former Deputy President of the Senate and was the APC's governorship candidate in Delta State in 2023. He left the APC and joined the NDC on 28 May 2026.",
+      "campaign_summary": "Senator Ovie Omo-Agege was granted a waiver by the NDC to contest the Delta Central Senatorial seat and won the party's primary. He has said he backs Peter Obi for president.",
+      "priorities": [],
+      "links": [
+        {"label": "Peoples Gazette: NDC waivers", "url": "https://gazettengr.com/2027-ndc-grants-waivers-to-omo-agege-ochei-for-senatorial-seats/"},
+        {"label": "Leadership: Omo-Agege joins NDC", "url": "https://leadership.ng/omo-agege-joins-ndc-declares-for-delta-central-senate-seat/"}
+      ],
+      "research": {
+        "status": "party_announced", "confidence": "high",
+        "sources": ["https://gazettengr.com/2027-ndc-grants-waivers-to-omo-agege-ochei-for-senatorial-seats/", "https://leadership.ng/omo-agege-joins-ndc-declares-for-delta-central-senate-seat/", "https://oasismagazine.com.ng/2026/05/ndc-primaries-omo-agege-obakpororo-secure-landslide-victory/", "https://www.thecable.ng/?p=1341129"],
+        "missing": ["INEC senatorial list entry", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "senator-delta-north-victor-ochei",
+      "full_name": "Victor Ochei",
+      "position": "senator",
+      "state": "delta",
+      "area_name": "Delta North",
+      "biography": "Victor Ochei is a former Speaker of the Delta State House of Assembly. He left the APC for the NDC in May 2026.",
+      "campaign_summary": "Rt. Hon. Victor Ochei was granted a waiver by the NDC to contest the Delta North Senatorial seat and is the party's candidate there.",
+      "priorities": [],
+      "links": [{"label": "Leadership: NDC waivers", "url": "https://leadership.ng/ndc-grants-waivers-to-omo-agege-ochei-for-delta-senatorial-race/"}],
+      "research": {
+        "status": "party_announced", "confidence": "high",
+        "sources": ["https://leadership.ng/ndc-grants-waivers-to-omo-agege-ochei-for-delta-senatorial-race/", "https://guardian.ng/?p=2924229"],
+        "missing": ["INEC senatorial list entry", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "senator-delta-south-adowei-binaebi",
+      "full_name": "Adowei Binaebi",
+      "position": "senator",
+      "state": "delta",
+      "area_name": "Delta South",
+      "biography": "",
+      "campaign_summary": "Adowei Binaebi is reported as the NDC's candidate for Delta South Senatorial District and attended the opening of the party's governorship campaign headquarters in Asaba.",
+      "priorities": [],
+      "links": [{"label": "Guardian: Delta campaign HQ", "url": "https://guardian.ng/?p=2924229"}],
+      "research": {
+        "status": "party_announced", "confidence": "low",
+        "sources": ["https://guardian.ng/?p=2924229"],
+        "missing": ["second independent source", "primary result", "INEC senatorial list entry", "biography", "documented priorities", "official links"],
+        "flags": ["Single passing mention; confirm candidacy before verifying"]
+      }
+    },
+    {
+      "key": "senator-kano-north-nasiru-sule-garo",
+      "full_name": "Nasiru Sule Garo",
+      "position": "senator",
+      "state": "kano",
+      "area_name": "Kano North",
+      "biography": "Nasiru Sule Garo is a former lawmaker.",
+      "campaign_summary": "The NDC affirmed Nasiru Sule Garo as its candidate for Kano North Senatorial District in August 2026 after the earlier nominee, Sunusi Danbatta, withdrew voluntarily and pledged his support.",
+      "priorities": [],
+      "links": [
+        {"label": "Arise: NDC affirms Garo", "url": "https://www.arise.tv/ndc-replaces-danbatta-with-garo-as-kano-north-senatorial-candidate-for-2027/"},
+        {"label": "Peoples Gazette: Sule-Garo affirmed", "url": "https://gazettengr.com/?p=496161"}
+      ],
+      "research": {
+        "status": "party_announced", "confidence": "high",
+        "sources": ["https://www.arise.tv/ndc-replaces-danbatta-with-garo-as-kano-north-senatorial-candidate-for-2027/", "https://gazettengr.com/?p=496161"],
+        "missing": ["INEC senatorial list entry", "fuller biography", "documented priorities", "official links"],
+        "flags": ["Substitution candidate; confirm INEC accepted the substitution"]
+      }
+    },
+    {
+      "key": "senator-kano-central-nasiru-yusuf-gawuna",
+      "full_name": "Nasiru Yusuf Gawuna",
+      "position": "senator",
+      "state": "kano",
+      "area_name": "Kano Central",
+      "biography": "Nasiru Yusuf Gawuna served as Deputy Governor of Kano State under Governor Abdullahi Umar Ganduje and was the APC's governorship candidate in Kano in 2023. He joined the NDC in May 2026.",
+      "campaign_summary": "Dr. Nasiru Yusuf Gawuna is the NDC's candidate for Kano Central Senatorial District. The incumbent senator, Rufa'i Sani Hanga, stepped aside so that Gawuna could take the ticket, which Rabiu Kwankwaso announced in May 2026.",
+      "priorities": [],
+      "links": [
+        {"label": "Channels TV: Gawuna for Senate", "url": "https://www.channelstv.com/?p=1029665"},
+        {"label": "Daily Trust: Gawuna campaign team", "url": "https://dailytrust.com/?p=1948351"}
+      ],
+      "research": {
+        "status": "disputed", "confidence": "medium",
+        "sources": ["https://www.channelstv.com/?p=1029665", "https://businessday.ng/?p=1139443", "https://advocate.ng/kano-senator-explains-decision-to-surrender-ticket-to-ndc-offer-gawuna/", "https://dailytrust.com/?p=1948351", "https://www.legit.ng/politics/1729747-former-deputy-governor-decides-apc-return-failed-ndc-governorship-ambition/", "https://www.legit.ng/politics/1728503-breaking-top-ndc-kano-senatorial-candidate-sets-joins-apc/"],
+        "missing": ["INEC senatorial list entry", "documented priorities", "official links"],
+        "flags": ["Conflicting reports: one said he was preparing to defect to the APC; a later report said he insisted on staying in the NDC while some allies left. Confirm he is still the candidate"]
+      }
+    },
+    {
+      "key": "senator-kano-south-alkasim-ibrahim-batayya",
+      "full_name": "Alkasim Ibrahim Batayya",
+      "position": "senator",
+      "state": "kano",
+      "area_name": "Kano South",
+      "biography": "Alkasim Ibrahim Batayya is a former National Chairman of the National Association of Road Transport Owners (NARTO).",
+      "campaign_summary": "Alkasim Ibrahim Batayya emerged as the NDC's consensus candidate for Kano South Senatorial District at a party meeting in Kano, ahead of former senator Kabiru Gaya, who endorsed the decision.",
+      "priorities": [],
+      "links": [
+        {"label": "Legit: Batayya picked for Kano South", "url": "https://www.legit.ng/nigeria/1711535-2027-kano-apc-senator-loses-ndc-senatorial-primary/"},
+        {"label": "Trust Radio: Gaya loses ticket", "url": "https://trustradio.com.ng/en/kabiru-gaya-loses-kano-ndc-senatorial-ticket"}
+      ],
+      "research": {
+        "status": "party_announced", "confidence": "high",
+        "sources": ["https://www.legit.ng/nigeria/1711535-2027-kano-apc-senator-loses-ndc-senatorial-primary/", "https://trustradio.com.ng/en/kabiru-gaya-loses-kano-ndc-senatorial-ticket"],
+        "missing": ["INEC senatorial list entry", "documented priorities", "official links"],
+        "flags": ["Legit.ng gives the name as Kassim Batayya"]
+      }
+    },
+    {
+      "key": "senator-abia-central-nkechi-nwaogu",
+      "full_name": "Nkechi Nwaogu",
+      "position": "senator",
+      "state": "abia",
+      "area_name": "Abia Central",
+      "biography": "Nkechi Nwaogu is a former senator.",
+      "campaign_summary": "Former senator Nkechi Nwaogu is on INEC's final list of senatorial candidates as the NDC's candidate for Abia Central.",
+      "priorities": [],
+      "links": [{"label": "Legit: women on INEC senate list", "url": "https://www.legit.ng/politics/1730897-full-list-names-state-parties-121-women-contesting-senate-seats-2027/"}],
+      "research": {
+        "status": "inec_listed", "confidence": "medium",
+        "sources": ["https://www.legit.ng/politics/1730897-full-list-names-state-parties-121-women-contesting-senate-seats-2027/"],
+        "missing": ["primary result", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "senator-abia-north-nnamdi-iro-orji",
+      "full_name": "Nnamdi Iro Orji",
+      "position": "senator",
+      "state": "abia",
+      "area_name": "Abia North",
+      "biography": "Nnamdi Iro Orji, popularly known as Opotoyom, is an industrialist and politician.",
+      "campaign_summary": "Chief Nnamdi Iro Orji won the NDC primary for Abia North Senatorial District, defeating three other aspirants including former House of Representatives member Uko Nkole.",
+      "priorities": [],
+      "links": [{"label": "National Ambassador: Abia North", "url": "https://nationalambassadorngr.com/opotoyom-ugoeze-emerge-ndc-candidates-for-abia-north-senate-bende-reps/"}],
+      "research": {
+        "status": "party_announced", "confidence": "low",
+        "sources": ["https://nationalambassadorngr.com/opotoyom-ugoeze-emerge-ndc-candidates-for-abia-north-senate-bende-reps/"],
+        "missing": ["second independent source", "INEC senatorial list entry", "documented priorities", "official links"],
+        "flags": ["Earlier coverage said the result was not yet official; single smaller outlet"]
+      }
+    },
+    {
+      "key": "senator-edo-south-bridgitte-epelle-asemota",
+      "full_name": "Bridgitte Osayuki Epelle-Asemota",
+      "position": "senator",
+      "state": "edo",
+      "area_name": "Edo South",
+      "biography": "Bridgitte Osayuki Epelle-Asemota has spent 35 years in the Edo State public service and contested the Ovia Federal Constituency seat in the 2023 general election.",
+      "campaign_summary": "The NDC says Mrs Bridgitte Osayuki Epelle-Asemota is its duly nominated candidate for Edo South Senatorial District, and has asked INEC to correct an error in the published particulars.",
+      "priorities": [],
+      "links": [
+        {"label": "Guardian: Edo South candidate", "url": "https://guardian.ng/?p=2892004"},
+        {"label": "NAN: NDC insists on Osayuki", "url": "https://nannews.ng/?p=333400"}
+      ],
+      "research": {
+        "status": "disputed", "confidence": "medium",
+        "sources": ["https://guardian.ng/?p=2892004", "https://nannews.ng/?p=333400"],
+        "missing": ["documented priorities", "official links"],
+        "flags": ["INEC's publication allegedly carried a wrong image; her eligibility was questioned; another claimant was reported"]
+      }
+    },
+    {
+      "key": "reps-cross-river-ogoja-yala-santus-ofana",
+      "full_name": "Santus Ofana",
+      "position": "house_of_reps",
+      "state": "cross_river",
+      "area_name": "Ogoja/Yala",
+      "biography": "Chief Santus Ofana is an agro-industrialist and the founder of the Ogoja Rice brand.",
+      "campaign_summary": "Santus Ofana won the NDC primary for Ogoja/Yala Federal Constituency with 395 votes across both councils, ahead of five other aspirants. He has called for unity between Ogoja and Yala and says the constituency needs representation that attracts federal projects.",
+      "priorities": ["Attract federal projects to Ogoja/Yala", "Create opportunities for young people and women", "Strengthen agriculture"],
+      "links": [
+        {"label": "NAN: Ofana elected Reps candidate", "url": "https://nannews.ng/ndc-elects-ofana-as-reps-candidate-for-ogoja-yala-constituency/"},
+        {"label": "Leadership: Ofana wins ticket", "url": "https://leadership.ng/santus-ofana-wins-ndc-reps-ticket-for-ogoja-yala/"}
+      ],
+      "research": {
+        "status": "party_announced", "confidence": "high",
+        "sources": ["https://nannews.ng/ndc-elects-ofana-as-reps-candidate-for-ogoja-yala-constituency/", "https://leadership.ng/santus-ofana-wins-ndc-reps-ticket-for-ogoja-yala/", "https://blueprint.ng/2027-polls-i-was-duly-elected-ndc-candidate-for-ogoja-yala-federal-constituency/"],
+        "missing": ["INEC federal constituency list entry", "official links"],
+        "flags": ["He publicly rebutted claims challenging the primary result"]
+      }
+    },
+    {
+      "key": "reps-lagos-badagry-olayemi-toviho",
+      "full_name": "Olayemi Toviho",
+      "position": "house_of_reps",
+      "state": "lagos",
+      "area_name": "Badagry",
+      "biography": "Olayemi Toviho, popularly known as OBJ, sought the Badagry House of Representatives seat on the PDP platform in 2022.",
+      "campaign_summary": "Hon. Olayemi Toviho was returned unopposed as the NDC's House of Representatives candidate for Badagry Federal Constituency. He says he wants to give the constituency quality representation and practical development.",
+      "priorities": [],
+      "links": [{"label": "Vanguard: Toviho clinches ticket", "url": "https://www.vanguardngr.com/?p=2891523"}],
+      "research": {
+        "status": "party_announced", "confidence": "high",
+        "sources": ["https://www.vanguardngr.com/?p=2891523", "https://pmnewsnigeria.com/2022/05/23/2023-toviho-grabs-pdps-ticket-for-badagry-fed-constituency/"],
+        "missing": ["INEC federal constituency list entry", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "reps-anambra-ogbaru-afam-ogene",
+      "full_name": "Afam Victor Ogene",
+      "position": "house_of_reps",
+      "state": "anambra",
+      "area_name": "Ogbaru",
+      "biography": "Afam Victor Ogene was born on 12 March 1963 in Anambra State. He represented Ogbaru in the House of Representatives from 2011 to 2015 and won the seat again in 2023 on the Labour Party platform. He leads the NDC caucus in the House and moved the motion that zoned the party's 2027 presidential ticket to the South.",
+      "campaign_summary": "Hon. Afam Ogene, the incumbent member for Ogbaru, emerged as the NDC's consensus candidate for the constituency at the party's National Assembly primary held in Atani on 29 May 2026.",
+      "priorities": [],
+      "links": [
+        {"label": "365 Daily: Ogene consensus pick", "url": "https://365daily.com.ng/?p=72288"},
+        {"label": "Wikipedia: Afam Ogene", "url": "https://en.wikipedia.org/wiki/Afam_Ogene"}
+      ],
+      "research": {
+        "status": "party_announced", "confidence": "high",
+        "sources": ["https://365daily.com.ng/?p=72288", "https://newsexpressngr.com/news/309518/2027-afam-ogene-emerges-ndc-consensus-candidate-for-ogbaru-fed-constituency", "https://blueprint.ng/official-ndc-zones-2027-presidential-ticket-to-south-2/", "https://en.wikipedia.org/wiki/Afam_Ogene", "https://businessday.ng/news/article/obi-floors-soludo-oduah-in-ogbaru-poll-wins-reps-seat-for-lp/"],
+        "missing": ["INEC federal constituency list entry", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "reps-imo-okigwe-north-chidi-mike-anyanwu",
+      "full_name": "Chidi Mike Anyanwu",
+      "position": "house_of_reps",
+      "state": "imo",
+      "area_name": "Okigwe North",
+      "biography": "",
+      "campaign_summary": "The NDC elected Chidi Mike Anyanwu as its candidate for the Okigwe North Federal Constituency seat in the House of Representatives.",
+      "priorities": [],
+      "links": [{"label": "Blueprint: Anyanwu picks ticket", "url": "https://blueprint.ng/?p=821642"}],
+      "research": {
+        "status": "party_announced", "confidence": "medium",
+        "sources": ["https://blueprint.ng/?p=821642"],
+        "missing": ["second independent source", "INEC list entry", "biography", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "reps-lagos-amuwo-odofin-azubuike-umeadi",
+      "full_name": "Azubuike Emmanuel Umeadi",
+      "position": "house_of_reps",
+      "state": "lagos",
+      "area_name": "Amuwo Odofin",
+      "biography": "Engr. Azubuike Emmanuel Umeadi has chaired the Kirikiri Lighter Terminal chapter of the National Association of Government Approved Freight Forwarders. He left the ADC for the NDC in 2026.",
+      "campaign_summary": "Engr. Azubuike Umeadi won the NDC House of Representatives primary for Amuwo Odofin Federal Constituency, defeating the outgoing member, George Adegeye. He describes his mandate as one for genuine representation, development and empowerment.",
+      "priorities": [],
+      "links": [
+        {"label": "National Daily: Umeadi wins primary", "url": "https://nationaldailyng.com/?p=336727"},
+        {"label": "Guardian: Umeadi leaves ADC", "url": "https://guardian.ng/politics/house-of-representatives-aspirant-umeadi-resigns-from-adc/"}
+      ],
+      "research": {
+        "status": "party_announced", "confidence": "medium",
+        "sources": ["https://nationaldailyng.com/?p=336727", "https://guardian.ng/politics/house-of-representatives-aspirant-umeadi-resigns-from-adc/", "https://primetimereporters.com/?p=27178"],
+        "missing": ["INEC list entry", "documented priorities", "official links"],
+        "flags": ["The reported vote totals (about 40,000) look large for a primary; check the result before verifying"]
+      }
+    },
+    {
+      "key": "reps-imo-owerri-chijioke-onyeneke",
+      "full_name": "Chijioke Onyeneke",
+      "position": "house_of_reps",
+      "state": "imo",
+      "area_name": "Owerri Municipal/Owerri North/Owerri West",
+      "biography": "",
+      "campaign_summary": "Chijioke Onyeneke won the NDC primary for the Owerri federal constituency with 111 votes, ahead of Philip Ejiogu with 11. He says he will give priority to security, education, youth empowerment, jobs, healthcare and economic growth.",
+      "priorities": ["Security", "Quality education", "Youth empowerment and job creation", "Healthcare delivery", "Economic growth"],
+      "links": [{"label": "Peoples Gazette: Onyeneke wins", "url": "https://gazettengr.com/onyeneke-wins-ndc-ticket-for-owerri-constituency/"}],
+      "research": {
+        "status": "party_announced", "confidence": "medium",
+        "sources": ["https://gazettengr.com/onyeneke-wins-ndc-ticket-for-owerri-constituency/"],
+        "missing": ["INEC list entry", "biography", "official links"],
+        "flags": ["Source says 'Owerri federal constituency'; the INEC name is assumed to be Owerri Municipal/Owerri North/Owerri West - confirm"]
+      }
+    },
+    {
+      "key": "reps-cross-river-akpabuyo-bakassi-calabar-south-ededem-hogan",
+      "full_name": "Ededem Hogan",
+      "position": "house_of_reps",
+      "state": "cross_river",
+      "area_name": "Akpabuyo/Bakassi/Calabar South",
+      "biography": "",
+      "campaign_summary": "Ededem Hogan is the NDC's candidate for Akpabuyo/Bakassi/Calabar South Federal Constituency, according to the party's state chairman. He has campaigned against handout politics and promised representation that brings development and opportunities.",
+      "priorities": [],
+      "links": [{"label": "Guardian: Hogan on representation", "url": "https://guardian.ng/?p=2907670"}],
+      "research": {
+        "status": "disputed", "confidence": "medium",
+        "sources": ["https://guardian.ng/?p=2907670"],
+        "missing": ["INEC list entry", "biography", "documented priorities", "official links"],
+        "flags": ["The state chairman called anyone else claiming the ticket an impostor, which implies a rival claimant"]
+      }
+    },
+    {
+      "key": "reps-ondo-okitipupa-irele-kenny-adekanmi",
+      "full_name": "Kenny Adekanmi",
+      "position": "house_of_reps",
+      "state": "ondo",
+      "area_name": "Okitipupa/Irele",
+      "biography": "Prince Kenny Adekanmi is popularly known as Kenny Kunma.",
+      "campaign_summary": "Prince Kenny Adekanmi emerged as the NDC's House of Representatives candidate for Okitipupa/Irele Federal Constituency in Ondo State.",
+      "priorities": [],
+      "links": [{"label": "ThisDay: Adekanmi emerges candidate", "url": "https://www.thisdaylive.com/2026/07/14/ondo-2027-prince-adekanmi-emerges-as-ndc-house-of-representatives-candidate-forokitipupa-irele/"}],
+      "research": {
+        "status": "party_announced", "confidence": "medium",
+        "sources": ["https://www.thisdaylive.com/2026/07/14/ondo-2027-prince-adekanmi-emerges-as-ndc-house-of-representatives-candidate-forokitipupa-irele/"],
+        "missing": ["primary result", "INEC list entry", "documented priorities", "official links"],
+        "flags": ["Earlier coverage looked self-announced; confirm with the party"]
+      }
+    },
+    {
+      "key": "reps-lagos-ajeromi-ifelodun-francis-bartholomew-chima",
+      "full_name": "Francis Bartholomew Chima",
+      "position": "house_of_reps",
+      "state": "lagos",
+      "area_name": "Ajeromi/Ifelodun",
+      "biography": "Francis Bartholomew Chima is popularly known as OmoBarca.",
+      "campaign_summary": "Hon. Francis Bartholomew Chima became the NDC's consensus aspirant for Ajeromi/Ifelodun Federal Constituency after Oladele Egbayelo withdrew in his favour in May 2026.",
+      "priorities": [],
+      "links": [{"label": "The Mirror: OmoBarca consensus", "url": "https://themirroronline.com.ng/ajeromi-ifelodun-2027-omobarca-emerges-consensus-candidate-as-egbayelo-withdraws/"}],
+      "research": {
+        "status": "party_announced", "confidence": "medium",
+        "sources": ["https://themirroronline.com.ng/ajeromi-ifelodun-2027-omobarca-emerges-consensus-candidate-as-egbayelo-withdraws/"],
+        "missing": ["confirmation of the primary result after the withdrawal", "INEC list entry", "documented priorities", "official links"],
+        "flags": ["Source calls him the consensus aspirant before the primary; confirm he was returned as candidate"]
+      }
+    },
+    {
+      "key": "reps-ebonyi-ezza-north-ishielu-edwin-anayo-nwonu",
+      "full_name": "Edwin Anayo Nwonu",
+      "position": "house_of_reps",
+      "state": "ebonyi",
+      "area_name": "Ezza North/Ishielu",
+      "biography": "Edwin Anayo Nwonu is a former member of the House of Representatives who represented Ezza North/Ishielu for eight years. He says he supported pupils and students in the constituency through scholarships, learning materials and payment of examination fees.",
+      "campaign_summary": "Edwin Anayo Nwonu is the NDC's candidate for Ezza North/Ishielu Federal Constituency. He is seeking to return to the House, saying the constituency needs effective representation, and has promised to expand his education support if elected.",
+      "priorities": ["Quality education for constituents", "Expand scholarships and support for examination fees"],
+      "links": [{"label": "VON: Nwonu promises education", "url": "https://von.gov.ng/?p=661047"}],
+      "research": {
+        "status": "party_announced", "confidence": "medium",
+        "sources": ["https://von.gov.ng/?p=661047"],
+        "missing": ["second independent source", "INEC list entry", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "assembly-abia-ohafia-south-christian-ukah",
+      "full_name": "Christian Ukah",
+      "position": "state_assembly",
+      "state": "abia",
+      "area_name": "Ohafia South",
+      "biography": "",
+      "campaign_summary": "The NDC elected Hon. Christian Ukah as its candidate for the Ohafia South State Constituency seat in the 2027 Abia State House of Assembly election.",
+      "priorities": [],
+      "links": [{"label": "Vanguard: Ukah for Ohafia South", "url": "https://www.vanguardngr.com/?p=2891405"}],
+      "research": {
+        "status": "party_announced", "confidence": "medium",
+        "sources": ["https://www.vanguardngr.com/?p=2891405"],
+        "missing": ["INEC state constituency list entry", "biography", "documented priorities", "official links"],
+        "flags": []
+      }
+    },
+    {
+      "key": "assembly-edo-egor-natasha-osawaru",
+      "full_name": "Natasha Osawaru",
+      "position": "state_assembly",
+      "state": "edo",
+      "area_name": "Egor",
+      "biography": "Natasha Osawaru is a member of the Edo State House of Assembly. She left the PDP for the NDC in 2026.",
+      "campaign_summary": "Hon. Natasha Osawaru, a serving Edo State lawmaker, secured the NDC ticket for the Egor State Constituency seat and announced her win on 29 May 2026.",
+      "priorities": [],
+      "links": [{"label": "Legit: Osawaru secures NDC ticket", "url": "https://www.legit.ng/entertainment/celebrities/1712264-2027-2babas-wife-natasha-osawaru-calls-unity-heartfelt-message-secures-ndc-ticket/"}],
+      "research": {
+        "status": "party_announced", "confidence": "medium",
+        "sources": ["https://www.legit.ng/entertainment/celebrities/1712264-2027-2babas-wife-natasha-osawaru-calls-unity-heartfelt-message-secures-ndc-ticket/"],
+        "missing": ["INEC state constituency list entry", "documented priorities", "official links"],
+        "flags": ["Edo holds State Assembly elections in the general cycle, unlike its off-cycle governorship; confirm"]
+      }
+    },
+    {
+      "key": "assembly-nasarawa-kokona-west-iliya-emmanuel-ayas",
+      "full_name": "Iliya Emmanuel Ayas",
+      "position": "state_assembly",
+      "state": "nasarawa",
+      "area_name": "Kokona West",
+      "biography": "",
+      "campaign_summary": "Iliya Emmanuel Ayas emerged as the NDC's candidate for Kokona West State Constituency at the party's substitution primary held in Lafia.",
+      "priorities": [],
+      "links": [{"label": "Daily Trust: Nasarawa NDC primary", "url": "https://dailytrust.com/?p=1953515"}],
+      "research": {
+        "status": "party_announced", "confidence": "low",
+        "sources": ["https://dailytrust.com/?p=1953515"],
+        "missing": ["INEC state constituency list entry", "biography", "documented priorities", "official links"],
+        "flags": ["The governorship candidate from the same Nasarawa primary is not on INEC's final governorship list; check these Assembly nominations were accepted"]
+      }
+    },
+    {
+      "key": "assembly-nasarawa-keffi-east-lucy-kigbu-anzaku",
+      "full_name": "Lucy Kigbu-Anzaku",
+      "position": "state_assembly",
+      "state": "nasarawa",
+      "area_name": "Keffi East",
+      "biography": "",
+      "campaign_summary": "Lucy Kigbu-Anzaku emerged as the NDC's candidate for Keffi East State Constituency at the party's substitution primary held in Lafia.",
+      "priorities": [],
+      "links": [{"label": "Daily Trust: Nasarawa NDC primary", "url": "https://dailytrust.com/?p=1953515"}],
+      "research": {
+        "status": "party_announced", "confidence": "low",
+        "sources": ["https://dailytrust.com/?p=1953515"],
+        "missing": ["INEC state constituency list entry", "biography", "documented priorities", "official links"],
+        "flags": ["Same Nasarawa primary as the governorship candidate missing from INEC's list; check acceptance"]
+      }
+    },
+    {
+      "key": "assembly-nasarawa-keffi-west-mohammed-ramalan",
+      "full_name": "Mohammed Ramalan",
+      "position": "state_assembly",
+      "state": "nasarawa",
+      "area_name": "Keffi West",
+      "biography": "",
+      "campaign_summary": "Mohammed Ramalan emerged as the NDC's candidate for Keffi West State Constituency at the party's substitution primary held in Lafia.",
+      "priorities": [],
+      "links": [{"label": "Daily Trust: Nasarawa NDC primary", "url": "https://dailytrust.com/?p=1953515"}],
+      "research": {
+        "status": "party_announced", "confidence": "low",
+        "sources": ["https://dailytrust.com/?p=1953515"],
+        "missing": ["INEC state constituency list entry", "biography", "documented priorities", "official links"],
+        "flags": ["Same Nasarawa primary as the governorship candidate missing from INEC's list; check acceptance"]
+      }
+    },
+    {
+      "key": "assembly-nasarawa-obi-i-micha-mamman",
+      "full_name": "Micha Mamman",
+      "position": "state_assembly",
+      "state": "nasarawa",
+      "area_name": "Obi I",
+      "biography": "",
+      "campaign_summary": "Micha Mamman emerged as the NDC's candidate for Obi I State Constituency at the party's substitution primary held in Lafia.",
+      "priorities": [],
+      "links": [{"label": "Daily Trust: Nasarawa NDC primary", "url": "https://dailytrust.com/?p=1953515"}],
+      "research": {
+        "status": "party_announced", "confidence": "low",
+        "sources": ["https://dailytrust.com/?p=1953515"],
+        "missing": ["INEC state constituency list entry", "biography", "documented priorities", "official links"],
+        "flags": ["Same Nasarawa primary as the governorship candidate missing from INEC's list; check acceptance"]
+      }
+    },
+    {
+      "key": "assembly-nasarawa-toto-gadabuke-hussaini-mustapha-ganuwa",
+      "full_name": "Hussaini Mustapha-Ganuwa",
+      "position": "state_assembly",
+      "state": "nasarawa",
+      "area_name": "Toto/Gadabuke",
+      "biography": "",
+      "campaign_summary": "Hussaini Mustapha-Ganuwa emerged as the NDC's candidate for Toto/Gadabuke State Constituency at the party's substitution primary held in Lafia.",
+      "priorities": [],
+      "links": [{"label": "Daily Trust: Nasarawa NDC primary", "url": "https://dailytrust.com/?p=1953515"}],
+      "research": {
+        "status": "party_announced", "confidence": "low",
+        "sources": ["https://dailytrust.com/?p=1953515"],
+        "missing": ["INEC state constituency list entry", "biography", "documented priorities", "official links"],
+        "flags": ["Same Nasarawa primary as the governorship candidate missing from INEC's list; check acceptance"]
+      }
+    }
+  ],
+  "not_imported": [
+    {"name": "Rabiu Musa Kwankwaso", "office": "Vice President", "reason": "Confirmed running mate, but the model has no Vice President position."},
+    {"name": "Hon. John Odey", "office": "Governor, Cross River", "reason": "Named by the party in Sept 2026 but no NDC line on INEC's final Cross River governorship list."},
+    {"name": "Danjuma Laah / Abbas", "office": "Governor, Kaduna", "reason": "Disputed ticket and no NDC line on INEC's final Kaduna list."},
+    {"name": "Alhaji Umar Usman Besse", "office": "Governor, Kebbi", "reason": "Named by the party but no NDC line on INEC's final Kebbi list."},
+    {"name": "Musa Shugaba-Abdullahi", "office": "Governor, Nasarawa", "reason": "Substitution primary winner but no NDC line on INEC's final Nasarawa list."},
+    {"name": "Dr. Bolaji Odusina", "office": "Governor, Ogun", "reason": "Reported candidate but no NDC line on INEC's final Ogun list."},
+    {"name": "Sadiq Abubakar / Ardo Babayo Kumo", "office": "Governor, Gombe", "reason": "Conflict: Guardian reported Sadiq Abubakar won the primary; the INEC list report names Ardo Babayo Kumo. Unresolved."},
+    {"name": "Jonga Yahaya Gabakau / Ibrahim Mallam Shuaibu", "office": "Governor, Yobe", "reason": "Conflict between the party's Sept statement and the INEC list report; no second source found."},
+    {"name": "Abdu Sidi Bomi", "office": "Governor, Niger", "reason": "Only the party statement; Niger did not appear in the INEC list report read."},
+    {"name": "Prof. James Ene-Nwannaji", "office": "Governor, Enugu", "reason": "Factional primary winner; withdrew his suit and backed Chinyeaka Ohaa, who is on INEC's list."},
+    {"name": "Enugu Anih-faction list (Ugochi Ohajekwe, Chika Obetta, Celelia Ikechukwu, Stephen Ugwuoke, Chimezie Nwodo, Kene Nnadi, Felix Ijegalu, Onyebuchi Nwabueze)", "office": "Senate and House of Reps, Enugu", "reason": "From the factional parallel primary; national leadership had not endorsed it."},
+    {"name": "Ugoeze Elizabeth Ndidiamaka Obioma", "office": "House of Reps, Bende", "reason": "Reported by one smaller outlet only; held back pending a second source."},
+    {"name": "Oladele Egbayelo", "office": "House of Reps, Apapa", "reason": "Said he accepted a party decision to contest Apapa; no report of him winning that primary."},
+    {"name": "AbdulAziz Ganduje", "office": "House of Reps, Kano", "reason": "Only declared interest and bought a form."},
+    {"name": "Ojekunle Abigail Olanike", "office": "Senate, Oyo", "reason": "On INEC's senate list per Legit.ng, but the district was not found."},
+    {"name": "LGA chairman and councillor candidates", "office": "Local government", "reason": "None found; local elections are run by State Independent Electoral Commissions on separate timetables."}
+  ]
+}

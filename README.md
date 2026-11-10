@@ -258,6 +258,9 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
   nothing; places missing from a newer file become inactive. `python manage.py match_geography --dry-run` reports how many existing memberships,
   PVC checks and candidates match exactly; without `--dry-run` it adds the links (people's own text is never changed).
   `data/geo/sample.csv` is invented test data, not INEC's list.
+- **Candidate import:** `python manage.py import_candidates [--file data/candidates/ndc_2027.json] [--dry-run] [--list]` loads
+  researched candidate profiles as unverified drafts for admin review (50 NDC 2027 candidates; see `data/candidates/README.md`).
+  Safe to run again: it never changes a verified, published or hand-made record.
 
 ## Communities (spec 17)
 
