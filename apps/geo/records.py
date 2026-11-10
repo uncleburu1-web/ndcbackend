@@ -13,7 +13,7 @@ from django.utils import timezone
 from apps.core.exceptions import ServiceError
 
 from . import services
-from .models import Change, PollingUnit
+from .models import Change, Lga, PollingUnit
 
 KINDS = ("membership", "pvc")
 BATCH = 500
@@ -68,9 +68,11 @@ def set_choice(obj, kind, state, choice, *, source="chosen", fields=("lga", "war
 def _needs_q(kind):
     """Records with a location but no link the person or an officer has confirmed, or pointing at a retired place."""
     retired = Q(geo_polling_unit__active=False) | Q(geo_ward__active=False) | Q(geo_lga__active=False)
+    # Only states whose INEC list is loaded: there is nothing to choose from elsewhere, so nobody is asked (or notified).
+    loaded = Q(state__in=Lga.objects.filter(active=True).values("state__slug"))
     if kind == "membership":
-        return (~Q(lga="") & Q(geo_source__in=["", "matched"])) | retired
-    return ((~Q(lga="") & Q(geo_source__in=["", "matched"]) & Q(pending_geo_lga__isnull=True))
+        return (~Q(lga="") & Q(geo_source__in=["", "matched"]) & loaded) | retired
+    return ((~Q(lga="") & Q(geo_source__in=["", "matched"]) & Q(pending_geo_lga__isnull=True) & loaded)
             | (retired & Q(pending_geo_lga__isnull=True)))
 
 

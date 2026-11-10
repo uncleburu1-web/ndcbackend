@@ -56,7 +56,14 @@ def children(level, parent, q=None, limit=LIMIT, include_inactive=False):
     """Active rows under a parent (§12.1). `parent` is a state slug for LGAs, else the parent's ID."""
     limit = max(1, min(int(limit or LIMIT), 100))
     if level == "lga":
-        st = get_state(parent)
+        st = State.objects.filter(slug=parent).first()
+        if st is None:
+            # A real state whose INEC list isn't loaded yet has no LGAs (the forms fall back to typing); only an unknown
+            # slug is "not found".
+            from apps.candidates.reference import State as StateChoice
+            if parent in StateChoice.values:
+                return []
+            raise ServiceError("State not found.", code="not_found", status_code=404)
         qs = Lga.objects.filter(state=st)
         qs = qs if include_inactive else qs.filter(active=True)
         return _typeahead(qs, q, "lga", limit if q else 1000)

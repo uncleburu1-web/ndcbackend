@@ -280,6 +280,9 @@ class PublicApiTests(TestCase):
         self.assertEqual(about["datasets"][0]["polling_units"], 5)
         self.assertEqual(c.get(reverse("geo-unit", kwargs={"code": "99-99-99-999"})).status_code, 404)
         self.assertEqual(c.get(reverse("geo-state-lgas", kwargs={"state": "nowhere"})).status_code, 404)
+        # a real state whose INEC list isn't loaded yet: an empty list, not an error (the forms fall back to typing)
+        r = c.get(reverse("geo-state-lgas", kwargs={"state": "kebbi"}))
+        self.assertEqual((r.status_code, r.data["results"]), (200, []))
         self.assertEqual(c.get(reverse("lga-page", kwargs={"state": "lagos", "lga": "nowhere"})).status_code, 404)
 
     def test_inactive_unit_flagged(self):
@@ -425,6 +428,15 @@ class ConfirmTests(TestCase):
         self.assertEqual(client(self.u).get(reverse("me-geo-confirm")).data["results"], [])
         log = AuditLog.objects.get(action="geo.link_changed")
         self.assertNotIn("Sample", str(log.metadata))
+
+    def test_not_asked_where_the_state_has_no_inec_list(self):
+        other = mk_user("u_kebbi")
+        Membership.objects.create(user=other, status="pending_approval", state="kebbi", full_name="K", lga="Argungu")
+        self.assertEqual(client(other).get(reverse("me-geo-confirm")).data["results"], [])
+        from apps.geo.records import notify_unconfirmed
+
+        notify_unconfirmed(limit=50)
+        self.assertFalse(Membership.objects.filter(user=other, geo_confirm_asked_at__isnull=False).exists())
 
     def test_verified_pvc_choice_waits_for_an_officer(self):
         from apps.pvc.services import verified_location
