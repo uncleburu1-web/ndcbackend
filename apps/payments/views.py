@@ -27,6 +27,7 @@ class _DRFLike:
     def __init__(self, request):
         self._request = request
         self.META = request.META
+        self.headers = request.headers  # newer DRF reads headers in get_ident
         self.user = None
 
 
