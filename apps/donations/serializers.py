@@ -68,7 +68,7 @@ class DonationStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Donation
         fields = ["reference", "status", "status_label", "amount_kobo", "refunded_kobo", "net_kobo", "currency", "designation",
-                  "candidate", "donor_name", "display_choice", "public_label", "channel", "created_at", "paid_at"]
+                  "candidate", "donor_name", "display_choice", "public_label", "channel", "created_at", "paid_at", "is_demo"]
 
     def get_candidate(self, d):
         return _candidate(d)
@@ -81,7 +81,7 @@ class MyDonationSerializer(DonationStatusSerializer):
 
 
 class PublicDonationSerializer(serializers.ModelSerializer):
-    """/finance (§7.1): label, net amount, designation, day. Nothing else, ever."""
+    """/finance (§7.1): label, net amount, designation, day, and whether it's demo data. Nothing else, ever."""
 
     amount_kobo = serializers.IntegerField(source="net_kobo")
     candidate = serializers.SerializerMethodField()
@@ -89,7 +89,7 @@ class PublicDonationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Donation
-        fields = ["public_label", "amount_kobo", "designation", "candidate", "paid_on"]
+        fields = ["public_label", "amount_kobo", "designation", "candidate", "paid_on", "is_demo"]
 
     def get_candidate(self, d):
         return _candidate(d)
@@ -109,7 +109,7 @@ class AdminDonationSerializer(serializers.ModelSerializer):
         fields = ["id", "reference", "provider", "provider_reference", "status", "status_label", "review_reason", "amount_kobo",
                   "refunded_kobo", "net_kobo", "currency", "designation", "candidate", "election_year", "donor_name", "donor_email",
                   "donor_phone", "donor_state", "donor_address", "display_choice", "public_label", "declarations", "channel",
-                  "donor_user_email", "created_at", "paid_at", "refunded_at", "last_verified_at"]
+                  "donor_user_email", "created_at", "paid_at", "refunded_at", "last_verified_at", "is_demo"]
 
     def get_candidate(self, d):
         return _candidate(d)

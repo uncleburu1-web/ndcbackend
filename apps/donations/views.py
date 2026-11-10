@@ -138,6 +138,13 @@ def _net_total(qs):
     return {"total_kobo": (agg["a"] or 0) - (agg["r"] or 0), "count": agg["n"]}
 
 
+def _by_candidate(qs):
+    rows = (qs.filter(designation=Designation.CANDIDATE).values("candidate__slug", "candidate__full_name")
+            .annotate(a=Sum("amount_kobo"), r=Sum("refunded_kobo"), n=Count("id")).order_by("candidate__full_name"))
+    return [{"slug": r["candidate__slug"], "full_name": r["candidate__full_name"], "total_kobo": (r["a"] or 0) - (r["r"] or 0),
+             "count": r["n"]} for r in rows]
+
+
 class FinanceDonationsView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -155,15 +162,20 @@ class FinanceSummaryView(APIView):
     throttle_classes = [FinanceThrottle]
 
     def get(self, request):
+        # Real totals never include demo data. `demo` is null unless simulated rows exist (local previews only).
         ok = Donation.objects.filter(status=S.SUCCESSFUL)
-        rows = (ok.filter(designation=Designation.CANDIDATE).values("candidate__slug", "candidate__full_name")
-                .annotate(a=Sum("amount_kobo"), r=Sum("refunded_kobo"), n=Count("id")).order_by("candidate__full_name"))
+        real, demo = ok.filter(is_demo=False), ok.filter(is_demo=True)
+        has_demo = demo.exists()
         return _public(Response({
-            "overall": _net_total(ok),
-            "filtered": _net_total(_public_qs(request)),
-            "party": _net_total(ok.filter(designation=Designation.PARTY)),
-            "candidates": [{"slug": r["candidate__slug"], "full_name": r["candidate__full_name"],
-                            "total_kobo": (r["a"] or 0) - (r["r"] or 0), "count": r["n"]} for r in rows],
+            "overall": _net_total(real),
+            "filtered": _net_total(_public_qs(request).filter(is_demo=False)),
+            "party": _net_total(real.filter(designation=Designation.PARTY)),
+            "candidates": _by_candidate(real),
+            "demo": {
+                "overall": _net_total(demo),
+                "filtered": _net_total(_public_qs(request).filter(is_demo=True)),
+                "candidates": _by_candidate(demo),
+            } if has_demo else None,
         }))
 
 
@@ -197,7 +209,9 @@ class AdminDonationList(APIView):
         paginator = Page20()
         page = paginator.paginate_queryset(qs, request, view=self)
         response = paginator.get_paginated_response(AdminDonationSerializer(page, many=True).data)
-        response.data["totals"] = {"successful": _net_total(qs.filter(status=S.SUCCESSFUL)), "review": qs.filter(status=S.REVIEW).count()}
+        real = qs.filter(is_demo=False)  # demo data is listed (badged) but never counted
+        response.data["totals"] = {"successful": _net_total(real.filter(status=S.SUCCESSFUL)), "review": real.filter(status=S.REVIEW).count(),
+                                   "demo": _net_total(qs.filter(is_demo=True, status=S.SUCCESSFUL))}
         return _private(response)
 
 
@@ -246,7 +260,7 @@ class AdminDonationExport(APIView):
     permission_classes = [IsFinanceViewer]
 
     def get(self, request):
-        qs = _admin_qs(request)
+        qs = _admin_qs(request).filter(is_demo=False)  # financial records only: demo data is never exported
         count = qs.count()
         filters = {k: v for k, v in request.query_params.items() if k in ("status", "designation", "candidate", "date_from", "date_to", "q")}
         record(AuditLog.Action.DONATION_EXPORTED, actor=request.user, request=request, filters=filters, rows=count)

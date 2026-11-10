@@ -31,6 +31,9 @@ class DisplayChoice(models.TextChoices):
     GUEST = "guest", "Guest"
 
 
+DEMO_PREFIX = "NDC-DEMO-"  # real references are NDC- + base32 (no hyphen), so they can never start with this
+
+
 def new_reference() -> str:
     """NDC- + 20 base32 chars (~100 bits): unguessable, so it can key a receipt."""
     return "NDC-" + base64.b32encode(secrets.token_bytes(13)).decode().rstrip("=")[:20]
@@ -67,6 +70,9 @@ class Donation(models.Model):
     paid_at = models.DateTimeField(null=True, blank=True)
     refunded_at = models.DateTimeField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
+    # Simulated data for local previews only (seed_demo_donations). Never a real contribution: excluded from every real
+    # total, limit, export and report, and labelled DEMO wherever it is shown.
+    is_demo = models.BooleanField(default=False, db_index=True)
 
     class Meta:
         ordering = ["-created_at"]
@@ -75,6 +81,8 @@ class Donation(models.Model):
             models.CheckConstraint(condition=Q(refunded_kobo__gte=0) & Q(refunded_kobo__lte=F("amount_kobo")),
                                    name="donations_refund_within_amount"),
             models.CheckConstraint(condition=Q(currency="NGN"), name="donations_ngn_only"),
+            models.CheckConstraint(condition=Q(is_demo=False) | (Q(reference__startswith=DEMO_PREFIX) & Q(provider="demo")),
+                                   name="donations_demo_marked"),
             models.CheckConstraint(
                 condition=(Q(designation="candidate", candidate__isnull=False) | Q(designation="party", candidate__isnull=True)),
                 name="donations_designation_consistent",

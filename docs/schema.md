@@ -206,12 +206,14 @@ Data register: Donations.
 | `paid_at` | timestamptz | yes |  |
 | `refunded_at` | timestamptz | yes |  |
 | `updated_at` | timestamptz |  |  |
+| `is_demo` | boolean |  | indexed |
 
 Constraints:
 
 - `donations_amount_positive`: check amount_kobo > 0
 - `donations_refund_within_amount`: check refunded_kobo ≥ 0 and refunded_kobo ≤ F(amount_kobo)
 - `donations_ngn_only`: check currency = 'NGN'
+- `donations_demo_marked`: check is_demo = False or (reference startswith NDC-DEMO- and provider = 'demo')
 - `donations_designation_consistent`: check (candidate is not null and designation = 'candidate') or (candidate is null and designation = 'party')
 - `donations_donation_paid_shape`: check not (status = 'successful') or paid_at is not null
 - `donations_donation_refund_shape`: check not (status = 'refunded') or (refunded_at is not null and refunded_kobo = F(amount_kobo))

@@ -103,7 +103,8 @@ def _cap(designation: str) -> int:
 def committed_kobo(*, user, email, phone, designation, candidate, election_year, year, include_pending=True, exclude_id=None) -> int:
     """Successful (net) + review (+ pending at start) for the same donor in the same limit period (§6.3)."""
     states = [S.SUCCESSFUL, S.REVIEW] + ([S.PENDING, S.INITIATED] if include_pending else [])
-    qs = Donation.objects.filter(_identity_q(user, email, phone), _period_q(designation, candidate, election_year, year), status__in=states)
+    qs = Donation.objects.filter(_identity_q(user, email, phone), _period_q(designation, candidate, election_year, year), status__in=states,
+                                 is_demo=False)
     if exclude_id:
         qs = qs.exclude(pk=exclude_id)
     agg = qs.aggregate(a=Sum("amount_kobo"), r=Sum("refunded_kobo"))
@@ -272,7 +273,7 @@ def verify_now(d: Donation, *, source, event="", check_refunds=False, payload_sh
 
 def maybe_reverify(d: Donation, *, min_age_seconds=5) -> Donation:
     """Receipt/status reads re-check pending donations, at most every few seconds (§7.1)."""
-    if d.status not in OPEN_STATES:
+    if d.status not in OPEN_STATES or d.is_demo:
         return d
     if d.last_verified_at and (timezone.now() - d.last_verified_at).total_seconds() < min_age_seconds:
         return d
@@ -303,6 +304,9 @@ def handle_webhook(provider_name: str, raw_body: bytes, headers) -> None:
 
 # --------------------------------------------------------------- admin (§4.6)
 def recheck(d: Donation, *, actor, request=None) -> Donation:
+    if d.is_demo:
+        raise ServiceError("This is demo data, not a real payment, so there's nothing to check with the provider.",
+                           code="invalid_transition", status_code=409)
     try:
         updated = verify_now(d, source=DonationEvent.Source.ADMIN_RECHECK, check_refunds=True, allow_review_clear=True)
     except ProviderError as exc:

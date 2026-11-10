@@ -15,8 +15,9 @@ def admin_summary(user, *, now):
         return []
     this, last = weeks(now)
     month = now - timedelta(days=30)
-    review = Donation.objects.filter(status=DonationStatus.REVIEW)
-    ok = Donation.objects.filter(status=DonationStatus.SUCCESSFUL)
+    real = Donation.objects.filter(is_demo=False)  # demo data never counts
+    review = real.filter(status=DonationStatus.REVIEW)
+    ok = real.filter(status=DonationStatus.SUCCESSFUL)
 
     def agg(qs):
         return qs.aggregate(

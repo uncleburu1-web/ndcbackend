@@ -261,12 +261,14 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **Candidate import:** `python manage.py import_candidates [--file data/candidates/ndc_2027.json] [--dry-run] [--list]` loads
   researched candidate profiles as unverified drafts for admin review (50 NDC 2027 candidates; see `data/candidates/README.md`).
   Safe to run again: it never changes a verified, published or hand-made record.
-- **Demo donations (local only):** `python manage.py seed_demo_donations [--count 1500] [--total 557000000] [--remove]` adds
-  anonymous demo donations to preview the Finance pages (references start `NDC-DEMO`). It refuses unless `DEBUG` is on and the
-  database is on this machine, so it can't touch production; `--remove` deletes exactly the demo rows.
-
-## Communities (spec 17)
-
+- **Demo donations (local only):** `python manage.py seed_demo_donations --count 1500 --total 557000000` seeds simulated donations
+  to preview the Finance pages: synthetic names, `example.com/.org/.net` emails, `+23480000…` demo phone numbers, fictional
+  addresses, varied states, named and anonymous donors, the NDC fund and published candidates, dates over `--days` or
+  `--start/--end`. Each row has `is_demo=True` (the database also requires an `NDC-DEMO-` reference and provider `demo`); real
+  totals, donor limits, CSV exports and the admin dashboard exclude them, and the Finance pages label them DEMO DATA. No payment
+  provider, webhook or receipt is involved. It refuses unless `DEBUG` is on and the database is on this machine. Rerunning with
+  the same numbers does nothing; `--replace` swaps them, `--remove` deletes only demo rows. It reconciles count and kobo total
+  in the database before committing.
 - **Setup:** after `migrate`, run `python manage.py sync_communities`. It creates the national and 37 state communities and, from
   `apps/geo`, one per LGA, ward (registration area) and polling unit; run it again after every `load_geography` (`--dry-run` shows
   what would change). Running it twice changes nothing; communities whose geography went inactive become read-only.
