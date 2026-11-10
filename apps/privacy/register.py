@@ -201,7 +201,11 @@ NOT_PERSONAL = {
     "geo.Lga": "INEC reference data (spec 16 §8)",
     "geo.Ward": "INEC reference data (spec 16 §8)",
     "geo.PollingUnit": "INEC reference data (spec 16 §8)",
-    "geo.Dataset": "a record of each geography load (spec 16 §8)",
+    "geo.Dataset": "a record of each geography load (spec 16 §8); the uploaded file is reference data (spec 19 §17.1)",
+    "geo.Constituency": "INEC reference data (spec 19 §5)",
+    "geo.ConstituencyArea": "INEC reference data (spec 19 §5)",
+    "geo.Alias": "other names for places (spec 19 §4.5)",
+    "geo.Change": "what each geography file changed (spec 19 §4.4)",
     "communities.Community": "communities themselves are geography, with counts only (spec 17 §17.2)",
 }
 

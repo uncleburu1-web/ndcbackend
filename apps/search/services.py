@@ -177,6 +177,26 @@ def search(q, kind, *, page=1, size=20, **filters):
     return _run(go)
 
 
+def search_places(q, *, state=None, limit=5):
+    """Spec 19 §9: states and LGAs by name (and LGA aliases). Reference data: no re-check beyond active rows."""
+    from .index import GEO_KINDS
+
+    q = clean_query(q)
+
+    def go():
+        folded = " ".join(tokens(q)[0])
+        query = _tsquery(q)
+        qs = SearchEntry.objects.filter(kind__in=GEO_KINDS).annotate(sim=TrigramStrictWordSimilarity(folded, "folded_title"))
+        qs = qs.filter(Q(document=query) | Q(sim__gt=SIMILAR))
+        if state:
+            qs = qs.filter(state=state)
+        qs = qs.annotate(score=Coalesce(SearchRank(F("document"), query), Value(0.0), output_field=FloatField()) + F("sim"))
+        rows = qs.order_by("-score", "kind", "title")
+        return rows.count(), list(rows[:limit])
+
+    return _run(go)
+
+
 def words_for(q):
     return tokens(q)[0]
 

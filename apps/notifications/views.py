@@ -40,6 +40,8 @@ NOTIFICATION = inline_serializer("Notification", {
     "event": inline_serializer("NotificationEvent", {"id": S.UUIDField(), "title": S.CharField(), "starts_at": S.DateTimeField(),
                                                       "status": S.CharField(), "organiser": S.CharField()}, required=False),
     "volunteer_update": inline_serializer("NotificationVolunteerUpdate", {"text": S.CharField()}, required=False),
+    "geo": inline_serializer("NotificationGeo", {"record": S.ChoiceField(choices=["membership", "pvc"]),
+                                                  "change": S.ChoiceField(choices=["", "retired", "moved"])}, required=False),
 })
 NOTIFICATION_PAGE = inline_serializer("NotificationPage", {"count": S.IntegerField(), "next": S.CharField(allow_null=True),
                                                            "previous": S.CharField(allow_null=True), "results": S.ListField(child=NOTIFICATION)})
@@ -105,6 +107,9 @@ def item(n, request=None):
         out["candidate"] = {"slug": c.slug, "full_name": c.full_name, "photo": None}
     if n.volunteer_update_id:
         out["volunteer_update"] = {"text": n.volunteer_update.text}
+    if n.kind in ("geo_confirm", "geo_unit_changed"):  # spec 19 §10: which record, and what happened; never the unit
+        rec, _, ch = (n.decision or "").partition(".")
+        out["geo"] = {"record": "pvc" if rec == "pvc" else "membership", "change": {"ret": "retired", "mov": "moved"}.get(ch, "")}
     return out
 
 

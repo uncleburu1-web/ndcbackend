@@ -1,4 +1,7 @@
-"""Exact (folded) matching of free text to the geography tables. Links are only ever added, never overwritten."""
+"""Exact (folded) matching of free text to the geography tables. Links are only ever added, never overwritten.
+
+Spec 19 §12.2: links written here are `geo_source = matched` (the person is then asked to confirm, §8.1); records
+someone chose, an officer confirmed, or that were marked "not listed" are never touched."""
 from django.db import transaction
 
 from apps.search.text import fold
@@ -39,6 +42,9 @@ def match_all(dry_run=False) -> dict:
         for name, M, lf, wf, pf in targets:
             r = {"checked": 0, "lga": 0, "ward": 0, "polling_unit": 0}
             qs = M.objects.filter(geo_lga__isnull=True).exclude(**{lf: ""})
+            has_source = hasattr(M, "geo_source")
+            if has_source:
+                qs = qs.exclude(geo_source="review")
             for obj in qs.iterator():
                 r["checked"] += 1
                 lga, ward, pu = _match_one(obj.state, getattr(obj, lf), getattr(obj, wf) if wf else "", getattr(obj, pf) if pf else "")
@@ -53,6 +59,8 @@ def match_all(dry_run=False) -> dict:
                     fields["geo_polling_unit"] = pu
                     r["polling_unit"] += 1
                 if fields and not dry_run:
+                    if has_source:
+                        fields["geo_source"] = "matched"
                     M.objects.filter(pk=obj.pk).update(**fields)
                     if name == "pvc_records":  # a new link can place a verified voter in communities (spec 17 §5.2)
                         from apps.core import outbox

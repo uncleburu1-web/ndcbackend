@@ -1,6 +1,8 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from apps.candidates.reference import State
+from apps.pvc.serializers import GeoPlaceSerializer
 
 from .models import Membership, MembershipPayment, Sex
 
@@ -16,6 +18,11 @@ class DetailsSerializer(serializers.Serializer):
     lga = serializers.CharField(max_length=120, required=False, allow_blank=True)
     ward = serializers.CharField(max_length=120, required=False, allow_blank=True)
     polling_unit = serializers.CharField(max_length=160, required=False, allow_blank=True)
+    # spec 19 §7.2: the picker's choice; the text fields are written from the chosen names
+    lga_id = serializers.IntegerField(required=False, allow_null=True)
+    ward_id = serializers.IntegerField(required=False, allow_null=True)
+    polling_unit_id = serializers.IntegerField(required=False, allow_null=True)
+    geo_not_listed = serializers.BooleanField(required=False, help_text="\"My place isn't listed\": keep the text, review it")
     nin = serializers.CharField(max_length=20, required=False, allow_blank=True, write_only=True)
     declarations = serializers.DictField(child=serializers.BooleanField(), required=False)
 
@@ -36,12 +43,19 @@ class MyMembershipSerializer(serializers.ModelSerializer):
     state_label = serializers.CharField(source="get_state_display")
     status_label = serializers.CharField(source="get_status_display")
     latest_payment = serializers.SerializerMethodField()
+    place = serializers.SerializerMethodField()
 
     class Meta:
         model = Membership
         fields = ["status", "status_label", "full_name", "sex", "date_of_birth", "address", "state", "state_label", "lga", "ward",
                   "polling_unit", "nin_masked", "has_photo", "declarations", "membership_number", "submitted_at", "activated_at",
-                  "decision_reason", "cancel_reason", "latest_payment"]
+                  "decision_reason", "cancel_reason", "latest_payment", "geo_source", "place"]
+
+    @extend_schema_field(GeoPlaceSerializer)
+    def get_place(self, m):
+        from apps.geo.records import place
+
+        return place(m.geo_lga, m.geo_ward, m.geo_polling_unit)
 
     def get_nin_masked(self, m):
         return f"•••• {m.nin_last4}" if m.nin_last4 else ""

@@ -11857,6 +11857,7 @@
                     "anyone"
                 ],
                 "x-error-codes": [
+                    "geo_mismatch",
                     "not_found",
                     "server_error",
                     "storage_unavailable",
@@ -11908,6 +11909,7 @@
                     "anyone"
                 ],
                 "x-error-codes": [
+                    "geo_mismatch",
                     "not_found",
                     "server_error",
                     "storage_unavailable",
@@ -11959,6 +11961,7 @@
                     "anyone"
                 ],
                 "x-error-codes": [
+                    "geo_mismatch",
                     "not_found",
                     "server_error",
                     "storage_unavailable",
@@ -12013,6 +12016,7 @@
                     "anyone"
                 ],
                 "x-error-codes": [
+                    "geo_mismatch",
                     "not_found",
                     "server_error",
                     "storage_unavailable"
@@ -12060,6 +12064,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -12108,6 +12113,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -12183,6 +12189,7 @@
                     "anyone"
                 ],
                 "x-error-codes": [
+                    "geo_mismatch",
                     "not_found",
                     "server_error",
                     "storage_unavailable",
@@ -12241,6 +12248,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -12289,6 +12297,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -12363,6 +12372,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -12429,6 +12439,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -12511,6 +12522,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -12568,6 +12580,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -12652,6 +12665,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -12737,6 +12751,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -12822,6 +12837,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -12907,6 +12923,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -12978,6 +12995,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -13061,6 +13079,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -13149,6 +13168,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -13206,6 +13226,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "not_authenticated",
                     "not_found",
                     "server_error",
@@ -13251,6 +13272,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -13290,6 +13312,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -13355,6 +13378,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -13414,6 +13438,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -13489,6 +13514,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -13539,6 +13565,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -13616,6 +13643,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -13694,6 +13722,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -13772,6 +13801,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -13850,6 +13880,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -13914,6 +13945,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -13990,6 +14022,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -14071,6 +14104,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -14121,6 +14155,7 @@
                 "x-error-codes": [
                     "account_deactivated",
                     "auth_unavailable",
+                    "geo_mismatch",
                     "mfa_required",
                     "not_authenticated",
                     "not_found",
@@ -14782,10 +14817,1286 @@
                     "server_error"
                 ]
             }
+        },
+        "/api/v1/geo/states/": {
+            "get": {
+                "operationId": "geo_states_get",
+                "summary": "The 36 states and the FCT, with capitals (spec 19 §13.1)",
+                "tags": [
+                    "geo"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeoStateList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "geo_file_invalid",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "geo_lookup",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/geo/states/{state}/lgas/": {
+            "get": {
+                "operationId": "geo_state_lgas_get",
+                "summary": "A state's LGAs (area councils in the FCT), active only",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Type-ahead over names and aliases (20 results)"
+                    },
+                    {
+                        "in": "path",
+                        "name": "state",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "geo"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeoLgaList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "geo_file_invalid",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "geo_lookup",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/geo/lgas/{id}/wards/": {
+            "get": {
+                "operationId": "geo_lga_wards_get",
+                "summary": "An LGA's wards (INEC registration areas), with how many polling units each has",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Type-ahead over names and aliases (20 results)"
+                    }
+                ],
+                "tags": [
+                    "geo"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeoWardList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "geo_file_invalid",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "geo_lookup",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/geo/wards/{id}/polling-units/": {
+            "get": {
+                "operationId": "geo_ward_units_get",
+                "summary": "A ward's polling units (INEC's names and codes)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Type-ahead over names and aliases (20 results)"
+                    }
+                ],
+                "tags": [
+                    "geo"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeoPollingUnitList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "geo_file_invalid",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "geo_lookup",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/geo/polling-units/": {
+            "get": {
+                "operationId": "geo_unit_finder_get",
+                "summary": "Polling units whose code starts with what was typed (the finder, §6.4); at least the state and LGA parts",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "code",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "geo"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeoPollingUnitFound"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "geo_file_invalid",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "geo_lookup",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/geo/polling-units/{code}/": {
+            "get": {
+                "operationId": "geo_unit_get",
+                "summary": "One polling unit by INEC code (e.g. 24-07-05-004), with its ward, LGA and state",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "code",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "geo"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PollingUnitDetailSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "geo_file_invalid",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "geo_lookup",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/geo/constituencies/": {
+            "get": {
+                "operationId": "geo_constituencies_get",
+                "summary": "Constituencies with the LGAs and wards they cover",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "kind",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "federal_constituency",
+                                "senatorial_district",
+                                "state_constituency"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "state",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "geo"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeoConstituencyList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "geo_file_invalid",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "geo_lookup",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/geo/about/": {
+            "get": {
+                "operationId": "geo_about_get",
+                "summary": "Which INEC files are loaded: source, publication date and counts",
+                "tags": [
+                    "geo"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AboutSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "geo_file_invalid",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "geo_lookup",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/states/{state}/lgas/{lga}/": {
+            "get": {
+                "operationId": "lga_page_get",
+                "summary": "The LGA page: candidates standing here, upcoming events, community, wards",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "lga",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "state",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "states"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LgaPageSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "geo_file_invalid",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "geo_lookup",
+                        "rate": "120/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/geo-confirm/": {
+            "get": {
+                "operationId": "me_geo_confirm_get",
+                "summary": "Your membership and PVC records that need you to confirm where you vote, with suggestions",
+                "tags": [
+                    "me:geo-confirm"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeoConfirmList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "geo_file_invalid",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/me/geo-confirm/{kind}/": {
+            "post": {
+                "operationId": "me_geo_confirm_kind_post",
+                "summary": "Confirm or choose where you vote for one record (membership or pvc)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "kind",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "me:geo-confirm"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConfirmRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConfirmRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConfirmRequestRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConfirmResult"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "geo_file_invalid",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "profile_write",
+                        "rate": "20/min",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/geography/datasets/": {
+            "get": {
+                "operationId": "admin_geo_datasets_get",
+                "summary": "Geography files: previewed and applied, newest first",
+                "tags": [
+                    "admin:geography"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeoDatasetList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "geo_file_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            },
+            "post": {
+                "operationId": "admin_geo_datasets_post",
+                "summary": "Upload a geography file (CSV, ≤ 50 MB, private storage) and preview it",
+                "tags": [
+                    "admin:geography"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DatasetUploadRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DatasetUploadRequest"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DatasetUploadRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DatasetDetailSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "geo_file_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "admin_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/geography/datasets/{id}/": {
+            "get": {
+                "operationId": "admin_geo_dataset_get",
+                "summary": "One geography file with its preview report",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:geography"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DatasetDetailSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "geo_file_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/admin/geography/datasets/{id}/apply/": {
+            "post": {
+                "operationId": "admin_geo_dataset_apply_post",
+                "summary": "Apply a previewed file in one transaction; the 95% rule needs a second admin (`confirm_second`)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:geography"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApplyRequestRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApplyRequestRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApplyRequestRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DatasetDetailSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "geo_file_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "admin_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/geography/datasets/{id}/changes/": {
+            "get": {
+                "operationId": "admin_geo_dataset_changes_get",
+                "summary": "What applying a file changed (100 a page)",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "action",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "level",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin:geography"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChangePage"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "geo_file_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/admin/geography/review/": {
+            "get": {
+                "operationId": "admin_geo_review_get",
+                "summary": "Records with free text but no link, \"not listed\", a retired unit, or a person's choice waiting",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "kind",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "membership",
+                                "pvc"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "state",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "why",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "not_listed",
+                                "person_choice",
+                                "retired",
+                                "unlinked"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin:geography"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReviewPage"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "Membership officers (memberships), PVC officers (PVC checks) and system admins (all)"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "geo_file_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/admin/geography/review/{kind}/{id}/": {
+            "post": {
+                "operationId": "admin_geo_review_action_post",
+                "summary": "Link a record to a place, accept a person's choice (PVC), or ask the person (§8.1 notice)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "kind",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:geography"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReviewActionRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReviewActionRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReviewActionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReviewItemSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "Membership officers (memberships), PVC officers (PVC checks) and system admins (all)"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "geo_file_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "admin_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/geography/aliases/": {
+            "get": {
+                "operationId": "admin_geo_aliases_get",
+                "summary": "Other names for places (renames and admin-added), used by type-ahead and suggestions only",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "state",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "admin:geography"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeoAliasList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "geo_file_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            },
+            "post": {
+                "operationId": "admin_geo_aliases_post",
+                "summary": "Add another name for an LGA, ward or polling unit",
+                "tags": [
+                    "admin:geography"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AliasCreateRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AliasCreateRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AliasCreateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AliasSchema"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "geo_file_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "admin_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/geography/aliases/{id}/": {
+            "delete": {
+                "operationId": "admin_geo_alias_delete",
+                "summary": "Remove an alias",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:geography"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Response (untyped; see docs/api.md)"
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "geo_file_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "admin_write",
+                        "rate": "60/hour",
+                        "key": "user"
+                    }
+                ]
+            }
         }
     },
     "components": {
         "schemas": {
+            "AboutSchema": {
+                "type": "object",
+                "properties": {
+                    "datasets": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DatasetPublicSchema"
+                        }
+                    },
+                    "inec_url": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "datasets",
+                    "inec_url"
+                ]
+            },
+            "ActionEnum": {
+                "enum": [
+                    "link",
+                    "accept",
+                    "ask"
+                ],
+                "type": "string"
+            },
             "AddressVisibilityEnum": {
                 "enum": [
                     "public",
@@ -14898,6 +16209,76 @@
                     "results"
                 ]
             },
+            "AliasCreateRequest": {
+                "type": "object",
+                "properties": {
+                    "level": {
+                        "$ref": "#/components/schemas/GeoPlaceLevelEnum"
+                    },
+                    "target_id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                    }
+                },
+                "required": [
+                    "level",
+                    "name",
+                    "target_id"
+                ]
+            },
+            "AliasSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "level": {
+                        "$ref": "#/components/schemas/GeoPlaceLevelEnum"
+                    },
+                    "target_id": {
+                        "type": "integer"
+                    },
+                    "target_name": {
+                        "type": "string"
+                    },
+                    "target_code": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "id",
+                    "level",
+                    "name",
+                    "source",
+                    "target_code",
+                    "target_id",
+                    "target_name"
+                ]
+            },
+            "ApplyRequestRequest": {
+                "type": "object",
+                "properties": {
+                    "confirm_second": {
+                        "type": "boolean",
+                        "description": "The second system admin confirms (the 95% rule)"
+                    }
+                }
+            },
             "AuthorSchema": {
                 "type": "object",
                 "properties": {
@@ -14957,6 +16338,51 @@
                     "message"
                 ]
             },
+            "CandidateGroupSchema": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "An office (lga_chairman, councillor) or a constituency's slug"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "position": {
+                        "type": "string"
+                    },
+                    "constituency": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Constituency code when the group is a constituency"
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {}
+                        }
+                    },
+                    "see_all": {
+                        "type": "string",
+                        "description": "Path to /candidates filtered to this group"
+                    }
+                },
+                "required": [
+                    "constituency",
+                    "key",
+                    "label",
+                    "position",
+                    "results",
+                    "see_all",
+                    "total"
+                ]
+            },
             "CaseHideRequestRequest": {
                 "type": "object",
                 "properties": {
@@ -14965,6 +16391,65 @@
                         "minLength": 1
                     }
                 }
+            },
+            "ChangeEnum": {
+                "enum": [
+                    "retired",
+                    "moved"
+                ],
+                "type": "string"
+            },
+            "ChangePage": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "type": "integer"
+                    },
+                    "next": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ChangeSchema"
+                        }
+                    }
+                },
+                "required": [
+                    "count",
+                    "next",
+                    "results"
+                ]
+            },
+            "ChangeSchema": {
+                "type": "object",
+                "properties": {
+                    "level": {
+                        "type": "string"
+                    },
+                    "action": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "old_value": {
+                        "type": "string"
+                    },
+                    "new_value": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "action",
+                    "code",
+                    "level",
+                    "new_value",
+                    "old_value"
+                ]
             },
             "CheckinRequestRequest": {
                 "type": "object",
@@ -15308,6 +16793,132 @@
                     "state"
                 ]
             },
+            "ConfirmItemSchema": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "$ref": "#/components/schemas/GeoRecordKindEnum"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "typed": {
+                        "$ref": "#/components/schemas/TypedSchema"
+                    },
+                    "current": {
+                        "$ref": "#/components/schemas/PlaceSchema"
+                    },
+                    "retired": {
+                        "type": "boolean"
+                    },
+                    "suggestion": {
+                        "$ref": "#/components/schemas/SuggestionSchema"
+                    }
+                },
+                "required": [
+                    "current",
+                    "kind",
+                    "retired",
+                    "state",
+                    "suggestion",
+                    "typed"
+                ]
+            },
+            "ConfirmRequestRequest": {
+                "type": "object",
+                "properties": {
+                    "lga_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "ward_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "polling_unit_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "geo_not_listed": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "ConfirmResult": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "type": "string"
+                    },
+                    "geo_source": {
+                        "type": "string"
+                    },
+                    "waits_for_officer": {
+                        "type": "boolean",
+                        "description": "A verified PVC check: an officer accepts the change before communities use it"
+                    },
+                    "place": {
+                        "$ref": "#/components/schemas/PlaceSchema"
+                    }
+                },
+                "required": [
+                    "geo_source",
+                    "kind",
+                    "place",
+                    "waits_for_officer"
+                ]
+            },
+            "ConstituencySchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/GeoConstituencyKindEnum"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "lga_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "ward_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "required": [
+                    "code",
+                    "id",
+                    "kind",
+                    "lga_ids",
+                    "name",
+                    "slug",
+                    "state",
+                    "ward_ids"
+                ]
+            },
             "CountsSchema": {
                 "type": "object",
                 "properties": {
@@ -15337,6 +16948,297 @@
                     "unavailable"
                 ],
                 "type": "string"
+            },
+            "DatasetAdminSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/GeoDatasetKindEnum"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/GeoDatasetStatusEnum"
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "published_on": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date"
+                    },
+                    "notes": {
+                        "type": "string"
+                    },
+                    "checksum": {
+                        "type": "string"
+                    },
+                    "loaded_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "applied_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "applied_by": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "first_approval_by": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "states": {
+                        "type": "integer"
+                    },
+                    "lgas": {
+                        "type": "integer"
+                    },
+                    "wards": {
+                        "type": "integer"
+                    },
+                    "polling_units": {
+                        "type": "integer"
+                    },
+                    "constituencies": {
+                        "type": "integer"
+                    },
+                    "deactivated": {
+                        "type": "integer"
+                    },
+                    "changes": {
+                        "type": "integer"
+                    },
+                    "error_count": {
+                        "type": "integer"
+                    },
+                    "needs_second_admin": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "applied_at",
+                    "applied_by",
+                    "changes",
+                    "checksum",
+                    "constituencies",
+                    "deactivated",
+                    "error_count",
+                    "first_approval_by",
+                    "id",
+                    "kind",
+                    "lgas",
+                    "loaded_at",
+                    "needs_second_admin",
+                    "notes",
+                    "polling_units",
+                    "published_on",
+                    "source",
+                    "states",
+                    "status",
+                    "wards"
+                ]
+            },
+            "DatasetDetailSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "kind": {
+                        "$ref": "#/components/schemas/GeoDatasetKindEnum"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/GeoDatasetStatusEnum"
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "published_on": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date"
+                    },
+                    "notes": {
+                        "type": "string"
+                    },
+                    "checksum": {
+                        "type": "string"
+                    },
+                    "loaded_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "applied_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "applied_by": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "first_approval_by": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "states": {
+                        "type": "integer"
+                    },
+                    "lgas": {
+                        "type": "integer"
+                    },
+                    "wards": {
+                        "type": "integer"
+                    },
+                    "polling_units": {
+                        "type": "integer"
+                    },
+                    "constituencies": {
+                        "type": "integer"
+                    },
+                    "deactivated": {
+                        "type": "integer"
+                    },
+                    "changes": {
+                        "type": "integer"
+                    },
+                    "error_count": {
+                        "type": "integer"
+                    },
+                    "needs_second_admin": {
+                        "type": "boolean"
+                    },
+                    "preview": {
+                        "description": "The §4.3 report: counts, lists (first 500 of each), errors with line numbers, affected counts"
+                    }
+                },
+                "required": [
+                    "applied_at",
+                    "applied_by",
+                    "changes",
+                    "checksum",
+                    "constituencies",
+                    "deactivated",
+                    "error_count",
+                    "first_approval_by",
+                    "id",
+                    "kind",
+                    "lgas",
+                    "loaded_at",
+                    "needs_second_admin",
+                    "notes",
+                    "polling_units",
+                    "preview",
+                    "published_on",
+                    "source",
+                    "states",
+                    "status",
+                    "wards"
+                ]
+            },
+            "DatasetPublicSchema": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "$ref": "#/components/schemas/GeoDatasetKindEnum"
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "published_on": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date"
+                    },
+                    "applied_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "states": {
+                        "type": "integer"
+                    },
+                    "lgas": {
+                        "type": "integer"
+                    },
+                    "wards": {
+                        "type": "integer"
+                    },
+                    "polling_units": {
+                        "type": "integer"
+                    },
+                    "constituencies": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "applied_at",
+                    "constituencies",
+                    "kind",
+                    "lgas",
+                    "polling_units",
+                    "published_on",
+                    "source",
+                    "states",
+                    "wards"
+                ]
+            },
+            "DatasetUploadRequest": {
+                "type": "object",
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "binary"
+                    },
+                    "kind": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/GeoDatasetKindEnum"
+                            }
+                        ],
+                        "default": "polling_units"
+                    },
+                    "source": {
+                        "type": "string",
+                        "maxLength": 300
+                    },
+                    "published_on": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date"
+                    },
+                    "notes": {
+                        "type": "string",
+                        "maxLength": 2000
+                    }
+                },
+                "required": [
+                    "file"
+                ]
             },
             "EventActionRequestRequest": {
                 "type": "object",
@@ -15859,10 +17761,10 @@
                     },
                     "geo_lga": {
                         "type": [
-                            "string",
+                            "integer",
                             "null"
                         ],
-                        "format": "uuid"
+                        "description": "The LGA picker's choice (spec 19 §7.2); lga_text is written from it"
                     },
                     "online_url": {
                         "type": "string"
@@ -15931,6 +17833,171 @@
                     "next",
                     "pinned",
                     "previous",
+                    "results"
+                ]
+            },
+            "GeoAliasList": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AliasSchema"
+                        }
+                    }
+                },
+                "required": [
+                    "results"
+                ]
+            },
+            "GeoConfirmList": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ConfirmItemSchema"
+                        }
+                    }
+                },
+                "required": [
+                    "results"
+                ]
+            },
+            "GeoConstituencyKindEnum": {
+                "enum": [
+                    "senatorial_district",
+                    "federal_constituency",
+                    "state_constituency"
+                ],
+                "type": "string"
+            },
+            "GeoConstituencyList": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ConstituencySchema"
+                        }
+                    }
+                },
+                "required": [
+                    "results"
+                ]
+            },
+            "GeoDatasetKindEnum": {
+                "enum": [
+                    "polling_units",
+                    "senatorial_districts",
+                    "federal_constituencies",
+                    "state_constituencies"
+                ],
+                "type": "string"
+            },
+            "GeoDatasetList": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DatasetAdminSchema"
+                        }
+                    }
+                },
+                "required": [
+                    "results"
+                ]
+            },
+            "GeoDatasetStatusEnum": {
+                "enum": [
+                    "previewed",
+                    "applied"
+                ],
+                "type": "string"
+            },
+            "GeoLgaList": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LgaSchema"
+                        }
+                    }
+                },
+                "required": [
+                    "results"
+                ]
+            },
+            "GeoPlaceLevelEnum": {
+                "enum": [
+                    "lga",
+                    "ward",
+                    "polling_unit"
+                ],
+                "type": "string"
+            },
+            "GeoPollingUnitFound": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PollingUnitDetailSchema"
+                        }
+                    }
+                },
+                "required": [
+                    "results"
+                ]
+            },
+            "GeoPollingUnitList": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PollingUnitSchema"
+                        }
+                    }
+                },
+                "required": [
+                    "results"
+                ]
+            },
+            "GeoRecordKindEnum": {
+                "enum": [
+                    "membership",
+                    "pvc"
+                ],
+                "type": "string"
+            },
+            "GeoStateList": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/StateSchema"
+                        }
+                    }
+                },
+                "required": [
+                    "results"
+                ]
+            },
+            "GeoWardList": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/WardSchema"
+                        }
+                    }
+                },
+                "required": [
                     "results"
                 ]
             },
@@ -16095,6 +18162,133 @@
                     "polling_unit"
                 ],
                 "type": "string"
+            },
+            "LgaCommunitySchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "members": {
+                        "type": "string",
+                        "description": "Banded (spec 17 §4.4)"
+                    }
+                },
+                "required": [
+                    "id",
+                    "members",
+                    "name",
+                    "path"
+                ]
+            },
+            "LgaPageSchema": {
+                "type": "object",
+                "properties": {
+                    "state": {
+                        "type": "string"
+                    },
+                    "state_label": {
+                        "type": "string"
+                    },
+                    "lga": {
+                        "$ref": "#/components/schemas/LgaSchema"
+                    },
+                    "area_council": {
+                        "type": "boolean",
+                        "description": "FCT: say \"Area council\""
+                    },
+                    "election_year": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "groups": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CandidateGroupSchema"
+                        }
+                    },
+                    "events": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {}
+                        }
+                    },
+                    "community": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/LgaCommunitySchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "wards": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/WardSchema"
+                        }
+                    },
+                    "about": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/DatasetPublicSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "about",
+                    "area_council",
+                    "community",
+                    "election_year",
+                    "events",
+                    "groups",
+                    "lga",
+                    "state",
+                    "state_label",
+                    "wards"
+                ]
+            },
+            "LgaSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "active",
+                    "code",
+                    "id",
+                    "name",
+                    "slug"
+                ]
             },
             "MarkedRead": {
                 "type": "object",
@@ -16469,6 +18663,9 @@
                     },
                     "volunteer_update": {
                         "$ref": "#/components/schemas/NotificationVolunteerUpdate"
+                    },
+                    "geo": {
+                        "$ref": "#/components/schemas/NotificationGeo"
                     }
                 },
                 "required": [
@@ -16665,6 +18862,28 @@
                     "title"
                 ]
             },
+            "NotificationGeo": {
+                "type": "object",
+                "properties": {
+                    "record": {
+                        "$ref": "#/components/schemas/GeoRecordKindEnum"
+                    },
+                    "change": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ChangeEnum"
+                            },
+                            {
+                                "$ref": "#/components/schemas/BlankEnum"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "change",
+                    "record"
+                ]
+            },
             "NotificationKindEnum": {
                 "enum": [
                     "announcement",
@@ -16688,7 +18907,9 @@
                     "event_waitlist",
                     "candidate_event",
                     "volunteer_decision",
-                    "volunteer_update"
+                    "volunteer_update",
+                    "geo_confirm",
+                    "geo_unit_changed"
                 ],
                 "type": "string"
             },
@@ -17076,7 +19297,7 @@
                             "string",
                             "null"
                         ],
-                        "format": "uuid"
+                        "description": "The linked LGA's ID as text (18 published it as a string; spec 19 keeps that)"
                     },
                     "online_url_value": {
                         "type": "string"
@@ -17420,10 +19641,10 @@
                     },
                     "geo_lga": {
                         "type": [
-                            "string",
+                            "integer",
                             "null"
                         ],
-                        "format": "uuid"
+                        "description": "The LGA picker's choice (spec 19 §7.2); lga_text is written from it"
                     },
                     "online_url": {
                         "type": "string"
@@ -17539,6 +19760,116 @@
                     "id",
                     "published_at",
                     "title"
+                ]
+            },
+            "PlaceSchema": {
+                "type": "object",
+                "properties": {
+                    "lga": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/_PlaceItem"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "ward": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/_PlaceItem"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "polling_unit": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/_PlaceItem"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "lga",
+                    "polling_unit",
+                    "ward"
+                ]
+            },
+            "PollingUnitDetailSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "delimitation": {
+                        "type": "string",
+                        "description": "INEC's code: state-LGA-ward-unit, e.g. 24-07-05-004"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "description": "False: no longer in INEC's current list"
+                    },
+                    "ward": {
+                        "$ref": "#/components/schemas/_Ref"
+                    },
+                    "lga": {
+                        "$ref": "#/components/schemas/_LgaRef"
+                    },
+                    "state": {
+                        "$ref": "#/components/schemas/_StateRef"
+                    },
+                    "inec_url": {
+                        "type": "string",
+                        "description": "INEC's polling-unit locator: the official answer"
+                    }
+                },
+                "required": [
+                    "active",
+                    "code",
+                    "delimitation",
+                    "id",
+                    "inec_url",
+                    "lga",
+                    "name",
+                    "state",
+                    "ward"
+                ]
+            },
+            "PollingUnitSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "delimitation": {
+                        "type": "string",
+                        "description": "INEC's code: state-LGA-ward-unit, e.g. 24-07-05-004"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "code",
+                    "delimitation",
+                    "id",
+                    "name"
                 ]
             },
             "PositionEnum": {
@@ -17926,6 +20257,145 @@
                     "reason"
                 ]
             },
+            "ReviewActionRequest": {
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "$ref": "#/components/schemas/ActionEnum"
+                    },
+                    "lga_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "ward_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "polling_unit_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "action"
+                ]
+            },
+            "ReviewGroupSchema": {
+                "type": "object",
+                "properties": {
+                    "state": {
+                        "type": "string"
+                    },
+                    "lga": {
+                        "type": "string"
+                    },
+                    "count": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "count",
+                    "lga",
+                    "state"
+                ]
+            },
+            "ReviewItemSchema": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "$ref": "#/components/schemas/GeoRecordKindEnum"
+                    },
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "typed": {
+                        "$ref": "#/components/schemas/TypedSchema"
+                    },
+                    "why": {
+                        "$ref": "#/components/schemas/WhyEnum"
+                    },
+                    "current": {
+                        "$ref": "#/components/schemas/PlaceSchema"
+                    },
+                    "pending": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/PlaceSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "suggestion": {
+                        "$ref": "#/components/schemas/SuggestionSchema"
+                    },
+                    "record_url": {
+                        "type": "string",
+                        "description": "The record's own admin page (names are shown only there)"
+                    }
+                },
+                "required": [
+                    "current",
+                    "id",
+                    "kind",
+                    "pending",
+                    "record_url",
+                    "state",
+                    "suggestion",
+                    "typed",
+                    "why"
+                ]
+            },
+            "ReviewPage": {
+                "type": "object",
+                "properties": {
+                    "kinds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "count": {
+                        "type": "integer"
+                    },
+                    "next": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "groups": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ReviewGroupSchema"
+                        }
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ReviewItemSchema"
+                        }
+                    }
+                },
+                "required": [
+                    "count",
+                    "groups",
+                    "kinds",
+                    "next",
+                    "results"
+                ]
+            },
             "RolesEnum": {
                 "enum": [
                     "canvassing",
@@ -17940,6 +20410,98 @@
                 ],
                 "type": "string"
             },
+            "StateSchema": {
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "capital": {
+                        "type": "string"
+                    },
+                    "lgas": {
+                        "type": "integer",
+                        "description": "Active LGAs (area councils in the FCT) in the loaded list"
+                    }
+                },
+                "required": [
+                    "capital",
+                    "code",
+                    "lgas",
+                    "name",
+                    "slug"
+                ]
+            },
+            "SuggestItem": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "score": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                },
+                "required": [
+                    "code",
+                    "id",
+                    "name",
+                    "score"
+                ]
+            },
+            "SuggestionSchema": {
+                "type": "object",
+                "properties": {
+                    "lga": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/SuggestItem"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "ward": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/SuggestItem"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "polling_unit": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/SuggestItem"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "lga",
+                    "polling_unit",
+                    "ward"
+                ]
+            },
             "TypeEnum": {
                 "enum": [
                     "rally",
@@ -17950,6 +20512,25 @@
                     "other"
                 ],
                 "type": "string"
+            },
+            "TypedSchema": {
+                "type": "object",
+                "properties": {
+                    "lga": {
+                        "type": "string"
+                    },
+                    "ward": {
+                        "type": "string"
+                    },
+                    "polling_unit": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "lga",
+                    "polling_unit",
+                    "ward"
+                ]
             },
             "UnreadCount": {
                 "type": "object",
@@ -18238,10 +20819,9 @@
                     },
                     "geo_lga": {
                         "type": [
-                            "string",
+                            "integer",
                             "null"
-                        ],
-                        "format": "uuid"
+                        ]
                     },
                     "availability": {
                         "type": "array",
@@ -18400,6 +20980,29 @@
                     "results"
                 ]
             },
+            "WardSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "polling_units": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "code",
+                    "id",
+                    "name",
+                    "polling_units"
+                ]
+            },
             "WebhookCounts": {
                 "type": "object",
                 "properties": {
@@ -18520,6 +21123,15 @@
                 ],
                 "type": "string"
             },
+            "WhyEnum": {
+                "enum": [
+                    "unlinked",
+                    "not_listed",
+                    "retired",
+                    "person_choice"
+                ],
+                "type": "string"
+            },
             "WritePostSchemaRequest": {
                 "type": "object",
                 "properties": {
@@ -18538,6 +21150,94 @@
                 },
                 "required": [
                     "body"
+                ]
+            },
+            "_LgaRef": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "active",
+                    "code",
+                    "id",
+                    "name",
+                    "slug"
+                ]
+            },
+            "_PlaceItem": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "active",
+                    "code",
+                    "id",
+                    "name"
+                ]
+            },
+            "_Ref": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "code",
+                    "id",
+                    "name"
+                ]
+            },
+            "_StateRef": {
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "code",
+                    "name",
+                    "slug"
                 ]
             },
             "Error": {
@@ -18702,6 +21402,26 @@
         "export_unavailable": {
             "status": 503,
             "meaning": "The data download couldn't be prepared.",
+            "web_handling": false
+        },
+        "geo_file_invalid": {
+            "status": 400,
+            "meaning": "The geography file failed its checks; see `errors` (with line numbers).",
+            "web_handling": false
+        },
+        "geo_inactive": {
+            "status": 400,
+            "meaning": "The chosen place is no longer in INEC's current list; see `field`.",
+            "web_handling": false
+        },
+        "geo_mismatch": {
+            "status": 400,
+            "meaning": "The chosen ward isn't in the LGA, or the LGA isn't in the state; see `field`.",
+            "web_handling": false
+        },
+        "geo_second_admin_required": {
+            "status": 409,
+            "meaning": "The file has fewer than 95% of the active polling units; a second system admin must apply it.",
             "web_handling": false
         },
         "invalid_filter": {
@@ -19135,6 +21855,11 @@
             "key": "user",
             "purpose": "Follow, unfollow and bell changes (04)",
             "rate": "60/min"
+        },
+        "geo_lookup": {
+            "key": "ip",
+            "purpose": "Geography lookups for pickers and pages: 120 a minute (19)",
+            "rate": "120/min"
         },
         "media_sign": {
             "key": "user",

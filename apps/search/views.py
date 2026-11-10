@@ -83,6 +83,25 @@ def _events(entries, words, request):
     return out
 
 
+def _places(entries):
+    """Spec 19 §9: "Ikeja, Lagos State" → /states/lagos/ikeja. Rebuilt from active rows, never from the entry alone."""
+    from apps.geo.models import Lga
+    from apps.geo.models import State as GeoState
+
+    from .index import geo_id
+
+    states = {geo_id(Kind.STATE, s.pk): s for s in GeoState.objects.all()}
+    lgas = {geo_id(Kind.LGA, l_.pk): l_ for l_ in Lga.objects.filter(active=True).select_related("state")}
+    out = []
+    for e in entries:
+        if e.kind == Kind.STATE and e.object_id in states:
+            out.append({"kind": "state", "title": e.title, "state": e.state, "url": f"/states/{states[e.object_id].slug}"})
+        elif e.kind == Kind.LGA and e.object_id in lgas:
+            l_ = lgas[e.object_id]
+            out.append({"kind": "lga", "title": e.title, "state": e.state, "url": f"/states/{l_.state.slug}/{l_.slug}"})
+    return out
+
+
 def _render(kind, entries, words, request):
     if kind == Kind.CANDIDATE:
         return _candidates(entries, request)
@@ -108,6 +127,8 @@ class SearchView(_Public):
                 count, rows, d = services.search(q, kind, page=1, size=5, **filters)
                 out[name] = {"count": count, "results": _render(kind, rows, words, request)}
                 dym = dym or d
+            n, places = services.search_places(q, state=filters["state"])  # spec 19 §9
+            out["places"] = {"count": n, "results": _places(places)}
             return Response({**out, "did_you_mean": dym, "election_year": filters["year"]})
         try:
             page = max(1, int(qp.get("page", 1)))
@@ -141,8 +162,9 @@ class SuggestView(_Public):
                 if p:
                     out_titles.append({"type": "post", "title": p.title, "candidate": p.candidate.full_name,
                                        "url": f"/candidates/{p.candidate.slug}/posts/{p.id}"})
+        _, places = services.search_places(request.query_params.get("q", ""), limit=3)  # spec 19 §9
         return Response({"candidates": PublicCandidateListSerializer(objs, many=True, context={"request": request}).data,
-                         "titles": out_titles})
+                         "titles": out_titles, "places": _places(places)})
 
 
 def _state_list():
@@ -192,4 +214,41 @@ class StateDetailView(_Public):
             "news": PublicArticleSerializer(news, many=True, context={"request": request}).data,
             "posts": FeedPostSerializer(posts, many=True, context={"request": request}).data,
             "events": [card(e) for e in upcoming(state=state, limit=5)],  # spec 18 §5
+            **_geography(state, cands),  # spec 19 §6.1
         })
+
+
+def _geography(state, cands):
+    """Spec 19 §6.1: the state's LGAs with counts, its constituencies, the capital and "About this data"."""
+    from django.utils import timezone
+
+    from apps.events.models import EventStatus
+    from apps.events.services import public_events
+    from apps.geo import services as geo
+    from apps.geo.models import Constituency, Lga
+    from apps.geo.models import State as GeoState
+
+    st = GeoState.objects.filter(slug=state).first()
+    if st is None:
+        return {"capital": "", "area_councils": state == "fct", "lgas": [], "constituencies": [], "about": None}
+    lgas = list(Lga.objects.filter(state=st, active=True).order_by("name"))
+    cons = list(Constituency.objects.filter(state=st, active=True).prefetch_related("areas__ward").order_by("kind", "name"))
+    covers = {}  # constituency → the LGA IDs it touches
+    for c in cons:
+        covers[c.pk] = {a.lga_id or a.ward.lga_id for a in c.areas.all()}
+    local = dict(cands.filter(geo_lga__in=lgas).values_list("geo_lga").annotate(n=Count("id")))
+    by_con = dict(cands.filter(geo_constituency__in=cons).values_list("geo_constituency").annotate(n=Count("id")))
+    events = dict(public_events().filter(status=EventStatus.PUBLISHED, ends_at__gt=timezone.now(), geo_lga__in=lgas)
+                  .values_list("geo_lga").annotate(n=Count("id")))
+    out_lgas = []
+    for l_ in lgas:
+        n = local.get(l_.pk, 0) + sum(by_con.get(c.pk, 0) for c in cons if l_.pk in covers[c.pk])
+        out_lgas.append({"id": l_.pk, "code": l_.code, "name": l_.name, "slug": l_.slug, "candidates": n, "events": events.get(l_.pk, 0)})
+    names = {l_.pk: l_.name for l_ in lgas}
+    about = next((d for d in geo.current_datasets() if d.kind == "polling_units"), None)
+    return {
+        "capital": st.capital, "area_councils": state == "fct", "lgas": out_lgas,
+        "constituencies": [{"id": c.pk, "kind": c.kind, "code": c.code, "name": c.name, "candidates": by_con.get(c.pk, 0),
+                            "lgas": sorted(names[i] for i in covers[c.pk] if i in names)} for c in cons],
+        "about": {"source": about.source, "published_on": about.published_on, "polling_units": about.polling_units} if about else None,
+    }

@@ -14,6 +14,17 @@ class PvcStatus(models.TextChoices):
     REJECTED = "rejected", "Rejected"
 
 
+class GeoSource(models.TextChoices):
+    """Spec 19 §11.2. Community placement uses only `officer` and `matched` links (§8.1)."""
+    MATCHED = "matched", "Exact match"
+    CHOSEN = "chosen", "Chosen by the person"
+    OFFICER = "officer", "Confirmed by an officer"
+    REVIEW = "review", "Not listed (needs review)"
+
+
+PLACEMENT_SOURCES = (GeoSource.OFFICER, GeoSource.MATCHED)
+
+
 class PvcVerification(models.Model):
     """One current record per user. Withdrawn submissions are deleted outright (spec 06 §10)."""
 
@@ -29,6 +40,12 @@ class PvcVerification(models.Model):
     geo_lga = models.ForeignKey("geo.Lga", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     geo_ward = models.ForeignKey("geo.Ward", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     geo_polling_unit = models.ForeignKey("geo.PollingUnit", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    geo_source = models.CharField(max_length=8, choices=GeoSource.choices, blank=True, default="")  # spec 19 §7.3
+    # spec 19 §8.1: on a verified check, the person's own choice waits here until an officer accepts it
+    pending_geo_lga = models.ForeignKey("geo.Lga", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    pending_geo_ward = models.ForeignKey("geo.Ward", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    pending_geo_polling_unit = models.ForeignKey("geo.PollingUnit", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    geo_confirm_asked_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=12, choices=PvcStatus.choices, default=PvcStatus.PENDING, db_index=True)
     reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     reviewed_at = models.DateTimeField(null=True, blank=True)
@@ -45,6 +62,7 @@ class PvcVerification(models.Model):
             models.CheckConstraint(condition=Q(status="pending") | Q(reviewed_at__isnull=False), name="pvc_pvcverification_review_shape"),
             choice_check("status", PvcStatus.values, "pvc_status_valid"),
             state_check("state", "pvc_state_valid", allow_blank=False),
+            choice_check("geo_source", [*GeoSource.values, ""], "pvc_geo_source_valid"),
         ]
 
     def __str__(self):

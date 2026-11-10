@@ -563,10 +563,13 @@ class MigrationTests(TransactionTestCase):
         # core 0005 (spec 16 triggers) depends on the newer news/posts/moderation migrations too
         # communities 0002 (spec 17) needs core 0005; news 0006 needs communities
         # events and volunteers 0002 (spec 18 history triggers) need core 0005 too
+        # geo 0003 (spec 19 history trigger) needs core 0005, and membership, pvc and candidates' spec 19 fields need geo 0003
         others = [n for n in leaves if n[0] not in {"moderation", "news", "posts", "notifications", "media", "core", "communities", "events",
-                                                    "volunteers"}] + [
+                                                    "volunteers", "geo", "membership", "pvc", "candidates"}] + [
             ("media", "0001_initial"), ("core", "0004_outbox_constraints_prune_index"), ("communities", "0001_initial"),
-            ("events", "0001_initial"), ("volunteers", "0001_initial")]
+            ("events", "0001_initial"), ("volunteers", "0001_initial"), ("geo", "0002_spec19_geography"),
+            ("membership", "0002_state_field_constraints_geo_links"), ("pvc", "0003_state_field_constraints_geo_links"),
+            ("candidates", "0003_state_field_constraints_geo_links")]
         old = MigrationExecutor(connection).loader.project_state(before + others).apps
         U, Art, Cand, Post = (old.get_model("accounts", "User"), old.get_model("news", "Article"), old.get_model("candidates", "Candidate"),
                               old.get_model("posts", "CandidatePost"))

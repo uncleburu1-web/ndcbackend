@@ -89,7 +89,7 @@ CAMPAIGN_ROW = inline_serializer("VolunteerApplicationRow", {"id": DS.UUIDField(
                                                              "decided_at": DS.DateTimeField(allow_null=True)})
 APPLY = inline_serializer("VolunteerApply", {"roles": DS.ListField(child=DS.ChoiceField(Role.choices)), "state": DS.CharField(),
                                              "lga_text": DS.CharField(required=False, allow_blank=True),
-                                             "geo_lga": DS.UUIDField(required=False, allow_null=True),
+                                             "geo_lga": DS.IntegerField(required=False, allow_null=True),
                                              "availability": DS.ListField(child=DS.ChoiceField(Availability.choices), required=False),
                                              "note": DS.CharField(required=False, allow_blank=True), "share_phone": DS.BooleanField(required=False)})
 

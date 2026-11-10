@@ -58,8 +58,10 @@ class MyPvc(_Private):
         ser = PvcSubmitSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         v = ser.validated_data
-        rec = services.submit(request.user, vin=v["vin"], surname=v["surname"], state=v["state"], lga=v["lga"],
-                              polling_unit=v.get("polling_unit", ""), request=request)
+        from apps.geo.records import read_choice
+
+        rec = services.submit(request.user, vin=v["vin"], surname=v["surname"], state=v["state"], lga=v.get("lga", ""),
+                              polling_unit=v.get("polling_unit", ""), geo=read_choice(request.data), request=request)
         return Response(MyPvcSerializer(rec).data, status=status.HTTP_200_OK)
 
     def delete(self, request):
@@ -111,7 +113,8 @@ class AdminPvcList(_Private):
     permission_classes = [PvcOfficer]
 
     def get(self, request):
-        qs = PvcVerification.objects.select_related("user", "reviewed_by").order_by("created_at")
+        qs = (PvcVerification.objects.select_related("user", "reviewed_by", "geo_lga", "geo_ward", "geo_polling_unit", "pending_geo_lga",
+                                                     "pending_geo_ward", "pending_geo_polling_unit").order_by("created_at"))
         st = F.choice(request, "status", [*PvcStatus.values, "all"], default="pending")
         if st in PvcStatus.values:
             qs = qs.filter(status=st)
@@ -152,7 +155,11 @@ class AdminPvcAction(_Private):
         if self.action_name == "reveal":
             return Response({"vin": services.reveal_vin(rec, request.user, request=request)})
         if self.action_name == "verify":
-            rec = services.verify(rec, request.user, note=str(request.data.get("note", ""))[:300], request=request)
+            from apps.geo.services import chain_ids
+
+            ids = chain_ids(request.data)
+            rec = services.verify(rec, request.user, note=str(request.data.get("note", ""))[:300], request=request,
+                                  geo=ids if ids["lga"] else None)
         else:
             rec = services.reject(rec, request.user, str(request.data.get("reason", "")), request=request)
         return Response(AdminPvcSerializer(rec, context={"request": request}).data)

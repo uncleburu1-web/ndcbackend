@@ -16,6 +16,8 @@ class Kind(models.TextChoices):
     ARTICLE = "article", "News"
     POST = "post", "Candidate post"
     EVENT = "event", "Event"  # spec 18 §5: published, not-yet-ended events
+    STATE = "state", "State"  # spec 19 §9: reference data, from active rows
+    LGA = "lga", "Local government area"
 
 
 class SearchEntry(models.Model):

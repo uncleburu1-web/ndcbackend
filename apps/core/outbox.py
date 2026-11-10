@@ -48,7 +48,8 @@ def _load():
                 "apps.communities.outbox_handlers",
                 "apps.events.outbox_handlers",
                 "apps.volunteers.outbox_handlers",
-                "apps.accounts.outbox_handlers"):
+                "apps.accounts.outbox_handlers",
+                "apps.geo.outbox_handlers"):
         try:
             importlib.import_module(mod)
         except ModuleNotFoundError:

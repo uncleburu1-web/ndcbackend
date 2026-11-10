@@ -130,9 +130,18 @@ def save_details(user, data: dict, *, request=None) -> Membership:
             m.decided_by, m.decision_reason, m.cancelled_at, m.cancelled_by, m.cancel_reason = None, "", None, None, ""
         elif m.status not in EDITABLE:
             raise ServiceError("Your application can't be changed at this stage.", code="invalid_transition", status_code=409)
+        before = (m.state, m.lga, m.ward, m.polling_unit)
         for f in ("full_name", "sex", "address", "state", "lga", "ward", "polling_unit"):
             if f in data:
                 setattr(m, f, " ".join(str(data[f]).split()))
+        from apps.geo.records import read_choice, set_choice
+
+        choice = read_choice(data)
+        if choice is not None:  # spec 19 §7.3: chosen from the list (chain checked), or "not listed" for review
+            set_choice(m, "membership", m.state, choice)
+        elif (m.state, m.lga, m.ward, m.polling_unit) != before:  # typed changes: the old links no longer describe the text
+            m.geo_lga = m.geo_ward = m.geo_polling_unit = None
+            m.geo_source = ""
         if "date_of_birth" in data:
             dob = data["date_of_birth"]
             if dob and age_on(dob) < 18:

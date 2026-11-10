@@ -54,7 +54,11 @@ class LoadTests(TestCase):
 
     def test_command(self):
         out = io.StringIO()
-        call_command("load_geography", str(Path(settings.BASE_DIR) / "data" / "geo" / "sample.csv"), "--source", "sample", stdout=out)
+        path = str(Path(settings.BASE_DIR) / "data" / "geo" / "sample.csv")
+        call_command("load_geography", path, "--source", "sample", stdout=out)  # spec 19: preview by default
+        self.assertEqual(PollingUnit.objects.count(), 0)
+        self.assertIn("Previewed", out.getvalue())
+        call_command("load_geography", path, "--source", "sample", "--apply", stdout=out)
         self.assertEqual(PollingUnit.objects.count(), 5)
 
 

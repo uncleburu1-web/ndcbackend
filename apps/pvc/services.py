@@ -13,7 +13,7 @@ from apps.audit.services import record
 from apps.core import crypto
 from apps.core.exceptions import ServiceError
 
-from .models import PvcEvent, PvcStatus, PvcVerification
+from .models import GeoSource, PvcEvent, PvcStatus, PvcVerification
 
 VIN_RE = re.compile(r"^[A-Z0-9]{19}$|^[A-Z0-9]{10}$")
 
@@ -64,9 +64,12 @@ def verified_location(user):
     if user is None or not getattr(user, "pk", None):
         return None
     rec = (PvcVerification.objects.filter(user=user, status=PvcStatus.SUCCESSFUL)
-           .select_related("geo_polling_unit__ward__lga").only("state", "geo_lga_id", "geo_ward_id", "geo_polling_unit").first())
+           .select_related("geo_polling_unit__ward__lga").only("state", "geo_source", "geo_lga_id", "geo_ward_id", "geo_polling_unit").first())
     if rec is None or not rec.state:
         return None
+    if rec.geo_source in (GeoSource.CHOSEN, GeoSource.REVIEW):
+        # spec 19 §8.1: only officer-confirmed or exact-match links place people below state level
+        return rec.state, None, None, None
     pu = rec.geo_polling_unit
     ward_id = rec.geo_ward_id or (pu.ward_id if pu else None)
     lga_id = rec.geo_lga_id or (pu.ward.lga_id if pu else None)
@@ -84,7 +87,8 @@ def _event(user, kind, actor=None, note=""):
     PvcEvent.objects.create(user=user, kind=kind, actor=actor, note=note[:300])
 
 
-def submit(user, *, vin: str, surname: str, state: str, lga: str, polling_unit: str = "", request=None) -> PvcVerification:
+def submit(user, *, vin: str, surname: str, state: str, lga: str = "", polling_unit: str = "", geo=None, request=None) -> PvcVerification:
+    """`geo` is the picker's choice (spec 19 §7.2: state and LGA required; ward and unit optional), or None for typed text."""
     from apps.privacy.consent import require_consent
 
     require_consent(user, "pvc_check")  # spec 14 §4.2
@@ -101,6 +105,14 @@ def submit(user, *, vin: str, surname: str, state: str, lga: str, polling_unit: 
         rec.surname = " ".join(surname.split())[:80]
         rec.state, rec.lga, rec.polling_unit = state, " ".join(lga.split())[:120], polling_unit.strip()[:160]
         rec.geo_lga, rec.geo_ward, rec.geo_polling_unit = None, None, None  # new details: match_geography links them again (spec 17)
+        rec.pending_geo_lga = rec.pending_geo_ward = rec.pending_geo_polling_unit = None
+        rec.geo_source, rec.geo_confirm_asked_at = "", None
+        if geo is not None:
+            from apps.geo.records import set_choice
+
+            set_choice(rec, "pvc", state, geo, fields=("lga", "polling_unit"))  # spec 19 §7.3 (chain checked; text from names)
+        if not rec.lga:
+            raise ServiceError("Enter the LGA you registered in.", code="validation_error", status_code=400)
         rec.status = PvcStatus.PENDING  # new details always need a fresh check (clears a past verification)
         rec.reviewed_by, rec.reviewed_at, rec.reason = None, None, ""
         rec.show_badge = False  # a new check switches the public badge off (spec 08 §5.1)
@@ -125,7 +137,7 @@ def withdraw(user) -> None:
         _event(user, PvcEvent.Kind.WITHDRAWN)
 
 
-def _decide(rec_id, officer, to, reason, request):
+def _decide(rec_id, officer, to, reason, request, geo=None):
     from apps.notifications.services import notify_pvc_decision
 
     with transaction.atomic():
@@ -135,18 +147,27 @@ def _decide(rec_id, officer, to, reason, request):
         if rec.status != PvcStatus.PENDING:
             raise ServiceError("This check has already been decided.", code="invalid_transition", status_code=409)
         rec.status, rec.reviewed_by, rec.reviewed_at, rec.reason = to, officer, timezone.now(), reason[:300]
+        if geo is not None and to == PvcStatus.SUCCESSFUL and not geo.get("polling_unit"):
+            raise ServiceError("Choose the polling unit INEC's checker showed.", code="validation_error", status_code=400)
+        if geo is not None and to == PvcStatus.SUCCESSFUL:
+            # spec 19 §8.2: the officer confirms or corrects the polling unit from INEC's checker; communities use this link
+            from apps.geo.records import set_choice
+
+            set_choice(rec, "pvc", rec.state, {**geo, "not_listed": False}, source=GeoSource.OFFICER, fields=("lga", "polling_unit"))
+            rec.pending_geo_lga = rec.pending_geo_ward = rec.pending_geo_polling_unit = None
         rec.save()
         _event(rec.user, PvcEvent.Kind.VERIFIED if to == PvcStatus.SUCCESSFUL else PvcEvent.Kind.REJECTED, officer, reason)
         # Same transaction: the decision and the user's notification commit together (spec 08 §11).
         notify_pvc_decision(rec.user, "verified" if to == PvcStatus.SUCCESSFUL else "rejected")
         _placement_changed(rec.user)  # spec 17 §5.2
     action = AuditLog.Action.PVC_VERIFIED if to == PvcStatus.SUCCESSFUL else AuditLog.Action.PVC_REJECTED
-    record(action, target=rec, actor=officer, request=request, reason=reason[:300])
+    record(action, target=rec, actor=officer, request=request, reason=reason[:300],
+           **({"geo_confirmed": True} if geo is not None and to == PvcStatus.SUCCESSFUL else {}))
     return rec
 
 
-def verify(rec, officer, note="", request=None):
-    return _decide(rec.pk, officer, PvcStatus.SUCCESSFUL, note, request)
+def verify(rec, officer, note="", request=None, geo=None):
+    return _decide(rec.pk, officer, PvcStatus.SUCCESSFUL, note, request, geo=geo)
 
 
 def reject(rec, officer, reason, request=None):

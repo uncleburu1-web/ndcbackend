@@ -79,7 +79,7 @@ Data register: Security and audit records.
 | `id` | uuid |  | primary key |
 | `actor_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
 | `actor_label` | varchar(32) |  |  |
-| `action` | varchar(48) |  | one of 106 values; indexed |
+| `action` | varchar(48) |  | one of 110 values; indexed |
 | `target_type` | varchar(64) |  |  |
 | `target_id` | varchar(64) |  | indexed |
 | `metadata` | jsonb |  | per-action details from an allow-list; displayed, never joined |
@@ -117,6 +117,7 @@ Data register: Candidate profiles.
 | `ward_name` | varchar(120) |  |  |
 | `geo_lga_id` | → | yes | → `geo.Lga`, on delete PROTECT (reference data is deactivated, never deleted) |
 | `geo_ward_id` | → | yes | → `geo.Ward`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `geo_constituency_id` | → | yes | → `geo.Constituency`, on delete PROTECT (reference data is deactivated, never deleted) |
 | `biography` | text |  |  |
 | `campaign_summary` | text |  |  |
 | `priorities` | jsonb |  | a short ordered list of the candidate's own words, always read with the profile |
@@ -270,6 +271,8 @@ Data register: NDC membership.
 | `geo_lga_id` | → | yes | → `geo.Lga`, on delete PROTECT (reference data is deactivated, never deleted) |
 | `geo_ward_id` | → | yes | → `geo.Ward`, on delete PROTECT (reference data is deactivated, never deleted) |
 | `geo_polling_unit_id` | → | yes | → `geo.PollingUnit`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `geo_source` | varchar(8) |  | one of matched, chosen, review |
+| `geo_confirm_asked_at` | timestamptz | yes |  |
 | `nin_encrypted` | bytea |  |  |
 | `nin_last4` | varchar(4) |  |  |
 | `photo` | varchar(200) |  |  |
@@ -291,6 +294,7 @@ Constraints:
 - `membership_membership_cancel_shape`: check not (status = 'cancelled') or cancelled_at is not null
 - `membership_status_valid`: check status in (draft, payment_pending, pending_approval, active, rejected, cancelled, refunded)
 - `membership_state_valid`: check state in (37 values) or state = ''
+- `membership_geo_source_valid`: check geo_source in (matched, chosen, review, )
 
 ### `membership.MembershipEvent` — `membership_membershipevent`
 
@@ -450,6 +454,11 @@ Data register: PVC check.
 | `geo_lga_id` | → | yes | → `geo.Lga`, on delete PROTECT (reference data is deactivated, never deleted) |
 | `geo_ward_id` | → | yes | → `geo.Ward`, on delete PROTECT (reference data is deactivated, never deleted) |
 | `geo_polling_unit_id` | → | yes | → `geo.PollingUnit`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `geo_source` | varchar(8) |  | one of matched, chosen, officer, review |
+| `pending_geo_lga_id` | → | yes | → `geo.Lga`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `pending_geo_ward_id` | → | yes | → `geo.Ward`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `pending_geo_polling_unit_id` | → | yes | → `geo.PollingUnit`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `geo_confirm_asked_at` | timestamptz | yes |  |
 | `status` | varchar(12) |  | one of pending, successful, rejected; indexed |
 | `reviewed_by_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
 | `reviewed_at` | timestamptz | yes |  |
@@ -464,6 +473,7 @@ Constraints:
 - `pvc_pvcverification_review_shape`: check status = 'pending' or reviewed_at is not null
 - `pvc_status_valid`: check status in (pending, successful, rejected)
 - `pvc_state_valid`: check state in (37 values)
+- `pvc_geo_source_valid`: check geo_source in (matched, chosen, officer, review, )
 
 Indexes:
 
@@ -821,7 +831,7 @@ Data register: Notifications.
 |---|---|---|---|
 | `id` | uuid |  | primary key |
 | `recipient_id` | → |  | → `accounts.User`, on delete CASCADE (owner of private data; erased through the owning service) |
-| `kind` | varchar(32) |  | one of 22 values |
+| `kind` | varchar(32) |  | one of 24 values |
 | `article_id` | → | yes | → `news.Article`, on delete CASCADE (a notice about deleted content is meaningless) |
 | `candidate_post_id` | → | yes | → `posts.CandidatePost`, on delete CASCADE (a notice about deleted content is meaningless) |
 | `case_id` | → | yes | → `moderation.Case`, on delete CASCADE (a notice about deleted content is meaningless) |
@@ -845,7 +855,7 @@ Constraints:
 - `notif_one_announcement`: unique (recipient, article) where kind = 'announcement'
 - `notif_one_candidate_post`: unique (recipient, candidate_post) where kind = 'candidate_post'
 - `notif_one_donation_receipt`: unique (recipient, donation) where kind = 'donation_receipt'
-- `notif_target_by_kind`: check (article is not null and candidate_post is null and kind in (announcement, news_decision)) or (article is null and candidate_post is null and kind = 'pvc_decision') or (article is null and candidate_post is not null and kind = 'candidate_post') or (article is null and candidate_post is null and kind in (report_outcome, content_removed, account_warning, submissions_paused, appeal_decision)) or (article is null and candidate_post is null and kind in (security_notice, privacy_request_update)) or (article is null and candidate_post is null and kind in (membership_decision, donation_receipt)) or (article is null and candidate_post is null and community_post is not null and kind in (community_reply, community_post)) or (article is null and candidate_post is null and community_post is null and kind = 'community_placed') or (article is null and candidate_post is null and event is not null and kind in (event_update, event_reminder, event_waitlist, candidate_event)) or (article is null and candidate is not null and candidate_post is null and kind = 'volunteer_decision') or (article is null and candidate is not null and candidate_post is null and kind = 'volunteer_update' and volunteer_update is not null)
+- `notif_target_by_kind`: check (article is not null and candidate_post is null and kind in (announcement, news_decision)) or (article is null and candidate_post is null and kind = 'pvc_decision') or (article is null and candidate_post is not null and kind = 'candidate_post') or (article is null and candidate_post is null and kind in (report_outcome, content_removed, account_warning, submissions_paused, appeal_decision)) or (article is null and candidate_post is null and kind in (security_notice, privacy_request_update)) or (article is null and candidate_post is null and kind in (membership_decision, donation_receipt)) or (article is null and candidate_post is null and community_post is not null and kind in (community_reply, community_post)) or (article is null and candidate_post is null and community_post is null and kind = 'community_placed') or (article is null and candidate_post is null and event is not null and kind in (event_update, event_reminder, event_waitlist, candidate_event)) or (article is null and candidate is not null and candidate_post is null and kind = 'volunteer_decision') or (article is null and candidate is not null and candidate_post is null and kind = 'volunteer_update' and volunteer_update is not null) or (article is null and candidate_post is null and kind in (geo_confirm, geo_unit_changed))
 - `notif_one_candidate_event`: unique (recipient, event) where kind = 'candidate_event'
 - `notif_one_volunteer_update`: unique (recipient, volunteer_update) where kind = 'volunteer_update'
 - `notif_one_community_post`: unique (recipient, community_post) where kind = 'community_post'
@@ -1022,24 +1032,126 @@ Data register: Incident and access records.
 
 ## Geography
 
-### `geo.Dataset` — `geo_dataset`
+### `geo.Alias` — `geo_alias`
 
-Which file the rows came from, and what loading it changed.
+Another name people use for an LGA, ward or polling unit (spec 19 §4.5). Suggestions and type-ahead only.
 
 Data register: Not personal.
 
 | Column | Type | Null | Notes |
 |---|---|---|---|
 | `id` | bigint (auto) |  | primary key |
+| `lga_id` | → | yes | → `geo.Lga`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `ward_id` | → | yes | → `geo.Ward`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `polling_unit_id` | → | yes | → `geo.PollingUnit`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `name` | varchar(200) |  |  |
+| `folded_name` | varchar(200) |  |  |
+| `source` | varchar(10) |  | one of rename, admin |
+| `created_at` | timestamptz |  |  |
+
+Constraints:
+
+- `geo_alias_one_target`: check (lga is not null and polling_unit is null and ward is null) or (lga is null and polling_unit is null and ward is not null) or (lga is null and polling_unit is not null and ward is null)
+
+Indexes:
+
+- `geo_alias_name_trgm`: (folded_name)
+
+### `geo.Change` — `geo_change`
+
+What applying a dataset changed (spec 19 §4.4). Append-only, enforced by the database.
+
+Data register: Not personal.
+
+| Column | Type | Null | Notes |
+|---|---|---|---|
+| `id` | bigint (auto) |  | primary key |
+| `dataset_id` | → |  | → `geo.Dataset`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `level` | varchar(14) |  | one of state, lga, ward, polling_unit, constituency |
+| `action` | varchar(10) |  | one of added, renamed, retired, moved, restored, areas |
+| `code` | varchar(40) |  |  |
+| `old_value` | varchar(200) |  |  |
+| `new_value` | varchar(200) |  |  |
+| `created_at` | timestamptz |  |  |
+
+Indexes:
+
+- `geo_change_dataset_level`: (dataset, level)
+
+### `geo.Constituency` — `geo_constituency`
+
+A senatorial district, federal constituency or state constituency (spec 19 §5), made of whole LGAs or of wards.
+
+Data register: Not personal.
+
+| Column | Type | Null | Notes |
+|---|---|---|---|
+| `id` | bigint (auto) |  | primary key |
+| `kind` | varchar(24) |  | one of senatorial_district, federal_constituency, state_constituency |
+| `state_id` | → |  | → `geo.State`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `code` | varchar(20) |  |  |
+| `name` | varchar(160) |  |  |
+| `folded_name` | varchar(160) |  |  |
+| `slug` | varchar(170) |  | indexed |
+| `active` | boolean |  |  |
+| `dataset_id` | → | yes | → `geo.Dataset`, on delete PROTECT (reference data is deactivated, never deleted) |
+
+Constraints:
+
+- `geo_constituency_unique_code`: unique (kind, code)
+
+Indexes:
+
+- `geo_constituency_kind_state`: (kind, state)
+
+### `geo.ConstituencyArea` — `geo_constituencyarea`
+
+One part of a constituency: a whole LGA, or one ward of a split LGA. Exactly one of the two.
+
+Data register: Not personal.
+
+| Column | Type | Null | Notes |
+|---|---|---|---|
+| `id` | bigint (auto) |  | primary key |
+| `constituency_id` | → |  | → `geo.Constituency`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `lga_id` | → | yes | → `geo.Lga`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `ward_id` | → | yes | → `geo.Ward`, on delete PROTECT (reference data is deactivated, never deleted) |
+
+Constraints:
+
+- `geo_constituency_area_one_of`: check (lga is not null and ward is null) or (lga is null and ward is not null)
+
+### `geo.Dataset` — `geo_dataset`
+
+One geography file: previewed first, then applied (spec 19 §4.3). Counts are the active totals after applying.
+
+Data register: Not personal.
+
+| Column | Type | Null | Notes |
+|---|---|---|---|
+| `id` | bigint (auto) |  | primary key |
+| `kind` | varchar(24) |  | one of polling_units, senatorial_districts, federal_constituencies, state_constituencies |
+| `status` | varchar(10) |  | one of previewed, applied |
 | `source` | varchar(300) |  |  |
 | `published_on` | date | yes |  |
+| `notes` | text |  |  |
 | `checksum` | varchar(64) |  |  |
+| `file_name` | varchar(200) |  |  |
+| `preview` | jsonb |  | the preview report of a geography file: counts and lists shown together, never queried (spec 19 §11.1) |
 | `loaded_at` | timestamptz |  |  |
+| `applied_at` | timestamptz | yes |  |
+| `applied_by_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
+| `first_approval_by_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
 | `states` | integer ≥ 0 |  |  |
 | `lgas` | integer ≥ 0 |  |  |
 | `wards` | integer ≥ 0 |  |  |
 | `polling_units` | integer ≥ 0 |  |  |
+| `constituencies` | integer ≥ 0 |  |  |
 | `deactivated` | integer ≥ 0 |  |  |
+
+Constraints:
+
+- `geo_dataset_applied_has_time`: check not (status = 'applied') or applied_at is not null
 
 ### `geo.Lga` — `geo_lga`
 
@@ -1054,11 +1166,13 @@ Data register: Not personal.
 | `code` | varchar(2) |  |  |
 | `name` | varchar(80) |  |  |
 | `folded_name` | varchar(80) |  |  |
+| `slug` | varchar(90) |  | indexed |
 | `active` | boolean |  |  |
 
 Constraints:
 
 - `geo_lga_unique_code`: unique (state, code)
+- `geo_lga_unique_slug`: unique (state, slug)
 
 Indexes:
 
@@ -1100,6 +1214,7 @@ Data register: Not personal.
 | `code` | varchar(2) |  | unique |
 | `slug` | varchar(20) |  | unique; one of 37 values |
 | `name` | varchar(60) |  |  |
+| `capital` | varchar(60) |  |  |
 
 ### `geo.Ward` — `geo_ward`
 
@@ -1250,7 +1365,7 @@ Data register: Not personal.
 | Column | Type | Null | Notes |
 |---|---|---|---|
 | `id` | uuid |  | primary key |
-| `kind` | varchar(12) |  | one of candidate, article, post, event; indexed |
+| `kind` | varchar(12) |  | one of candidate, article, post, event, state, lga; indexed |
 | `object_id` | uuid |  |  |
 | `title` | varchar(200) |  |  |
 | `folded_title` | varchar(200) |  |  |

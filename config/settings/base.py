@@ -146,6 +146,7 @@ REST_FRAMEWORK = {
         "moderation_public": "5/hour",  # per user or IP: copyright notices, appeals and counter-notices (spec 13 §9)
         "media_sign": "60/hour",  # per user: upload signatures (spec 15 §7.3)
         "ready": "120/min",  # per IP: /ready/ (spec 15 §12.5)
+        "geo_lookup": "120/min",  # per IP: pickers' type-ahead (spec 19 §13.1)
     },
 }
 
@@ -168,7 +169,13 @@ SPECTACULAR_SETTINGS = {
                             "NotificationKindEnum": "apps.notifications.models.Kind",
                             "EventModeEnum": "apps.events.models.Mode",  # spec 18
                             "EventStatusEnum": "apps.events.models.EventStatus",
-                            "EventRegistrationStatusEnum": "apps.events.models.RegistrationStatus"},
+                            "EventRegistrationStatusEnum": "apps.events.models.RegistrationStatus",
+                            "GeoDatasetKindEnum": "apps.geo.models.DatasetKind",  # spec 19
+                            "GeoDatasetStatusEnum": "apps.geo.models.DatasetStatus",
+                            "GeoConstituencyKindEnum": "apps.geo.models.ConstituencyKind",
+                            "GeoPlaceLevelEnum": ["lga", "ward", "polling_unit"],
+                            "GeoRecordKindEnum": ["membership", "pvc"],
+                            "LevelEnum": "apps.communities.models.Level"},
     "APPEND_COMPONENTS": {"securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "Clerk session JWT"}}},
     "POSTPROCESSING_HOOKS": ["drf_spectacular.hooks.postprocess_schema_enums", "apps.core.schema.postprocess"],
 }
@@ -287,6 +294,11 @@ INEC_VOTER_CHECK_URL = "https://cvr.inecnigeria.org/vvs"  # officers' manual che
 PII_ENCRYPTION_KEYS = config("PII_ENCRYPTION_KEYS", default="", cast=Csv())
 # Member photos live OUTSIDE the public media folder and are served only through authenticated views.
 PRIVATE_MEDIA_ROOT = config("PRIVATE_MEDIA_ROOT", default=str(BASE_DIR / "private_media"))
+# Spec 19 §4.3: a polling-unit file with fewer than 95% of the active units needs a second system admin, once at least
+# this many units are loaded (so the 5-unit sample and test files aren't caught by it).
+GEO_SECOND_ADMIN_MIN_UNITS = config("GEO_SECOND_ADMIN_MIN_UNITS", default=1000, cast=int)
+# INEC's public polling-unit locator, linked from the finder (spec 19 §6.4). Official INEC site only.
+INEC_PU_LOCATOR_URL = config("INEC_PU_LOCATOR_URL", default="https://cvr.inecnigeria.org/pu")
 
 # --------------------------------------------------------------------------
 # News and announcements (spec 07)

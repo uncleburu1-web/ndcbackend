@@ -43,10 +43,58 @@ def _lock(candidate: Candidate) -> Candidate:
     return Candidate.objects.select_for_update().get(pk=candidate.pk)
 
 
+# --------------------------------------------------------------------- geography (spec 19 §5.2)
+CONSTITUENCY_KIND = {"senator": "senatorial_district", "house_of_reps": "federal_constituency", "state_assembly": "state_constituency"}
+
+
+def _geo(c: Candidate, ids: dict):
+    """Apply the editor's choices: a constituency for senators, House of Reps and State Assembly; an LGA for LGA chairmen;
+    an LGA and ward for councillors. The free-text area is written from the chosen names (kept editable when none)."""
+    from apps.geo.models import Constituency
+    from apps.geo.services import validate_chain
+
+    if c.position not in CONSTITUENCY_KIND:
+        c.geo_constituency = None
+    elif "constituency_id" in ids:
+        cid = ids["constituency_id"]
+        if not cid:
+            c.geo_constituency = None
+        else:
+            con = Constituency.objects.filter(pk=cid).first()
+            if con is None or con.kind != CONSTITUENCY_KIND[c.position] or con.state.slug != c.state:
+                e = ServiceError("That constituency isn't one this office stands in, in the chosen state.", code="geo_mismatch",
+                                 status_code=400)
+                e.extra = {"field": "constituency_id"}
+                raise e
+            if not con.active and c.geo_constituency_id != con.pk:
+                e = ServiceError("That constituency is no longer in INEC's current list.", code="geo_inactive", status_code=400)
+                e.extra = {"field": "constituency_id"}
+                raise e
+            c.geo_constituency, c.area_name = con, con.name[:120]
+    if c.position in ("lga_chairman", "councillor") and ("lga_id" in ids or "ward_id" in ids):
+        lga_id, ward_id = ids.get("lga_id"), ids.get("ward_id") if c.position == "councillor" else None
+        if not lga_id and not ward_id:
+            c.geo_lga = c.geo_ward = None
+        else:
+            keep = tuple(f for f, cur, new in (("lga", c.geo_lga_id, lga_id), ("ward", c.geo_ward_id, ward_id)) if cur and cur == new)
+            _, lga, ward, _ = validate_chain(c.state, lga_id, ward_id, None, allow_inactive=keep)
+            c.geo_lga, c.geo_ward = lga, ward
+            c.area_name = lga.name[:120]
+            if ward is not None:
+                c.ward_name = ward.name[:120]
+
+
+def _split(data: dict):
+    ids = {k: data.pop(k) for k in ("constituency_id", "lga_id", "ward_id") if k in data}
+    return data, ids
+
+
 # --------------------------------------------------------------------- create/edit
 @transaction.atomic
 def create_candidate(*, data: dict, actor, request=None) -> Candidate:
+    data, ids = _split(dict(data))
     c = Candidate(**data, created_by=actor, updated_by=actor, status=S.DRAFT)
+    _geo(c, ids)
     _full_clean(c)
     c.assign_slug()
     c.save()
@@ -65,9 +113,13 @@ def update_candidate(*, candidate: Candidate, data: dict, actor, request=None) -
     if c.status == S.ARCHIVED:
         raise _conflict("Restore this candidate before editing it.")
 
+    data, ids = _split(dict(data))
+    before = {f: getattr(c, f) for f in ("area_name", "ward_name", "geo_constituency_id", "geo_lga_id", "geo_ward_id")}
     changed = [f for f, v in data.items() if getattr(c, f) != v]
     for f, v in data.items():
         setattr(c, f, v)
+    _geo(c, ids)
+    changed += [f for f, v in before.items() if getattr(c, f) != v and f not in changed]
     _full_clean(c)
     if not changed:
         return c, False

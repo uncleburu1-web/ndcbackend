@@ -188,7 +188,16 @@ TARGET_FIELD = {
     Kind.COMMUNITY_REPLY: "community_post", Kind.COMMUNITY_POST: "community_post", Kind.COMMUNITY_PLACED: None,  # spec 17 §10
     Kind.EVENT_UPDATE: "event", Kind.EVENT_REMINDER: "event", Kind.EVENT_WAITLIST: "event", Kind.CANDIDATE_EVENT: "event",  # spec 18
     Kind.VOLUNTEER_DECISION: "candidate", Kind.VOLUNTEER_UPDATE: "volunteer_update",
+    Kind.GEO_CONFIRM: None, Kind.GEO_UNIT_CHANGED: None,  # spec 19 §10: the record kind in `decision`, never a place
 }
+
+GEO_RECORDS = {"membership": "mem", "pvc": "pvc"}
+
+
+def notify_geo(user, kind: str, record: str, change: str = ""):
+    """Spec 19 §10. `decision` holds "mem" or "pvc", plus ".ret" or ".mov" for a changed unit. Never the unit's name."""
+    word = GEO_RECORDS[record] + ({"retired": ".ret", "moved": ".mov"}[change] if change else "")
+    return notify(user, kind, decision=word)
 
 
 def can_receive(user) -> bool:
@@ -256,11 +265,11 @@ def notify_donation_receipt(donation):
 
 def visible(user):
     """Announcements only while their article is public; decisions about your own requests always."""
-    from .models import MODERATION_KINDS, OWN_RECORD_KINDS, PRIVACY_KINDS, VOLUNTEER_KINDS
+    from .models import GEO_KINDS, MODERATION_KINDS, OWN_RECORD_KINDS, PRIVACY_KINDS, VOLUNTEER_KINDS
 
     return (Notification.objects.filter(recipient=user)
             .filter(Q(kind__in=[Kind.NEWS_DECISION, Kind.PVC_DECISION, Kind.COMMUNITY_PLACED, *MODERATION_KINDS, *PRIVACY_KINDS,
-                                *OWN_RECORD_KINDS])
+                                *OWN_RECORD_KINDS, *GEO_KINDS])
                     | Q(kind__in=[Kind.COMMUNITY_REPLY, Kind.COMMUNITY_POST], community_post__status="published",
                         community_post__community__active=True)
                     | Q(kind__in=VOLUNTEER_KINDS)

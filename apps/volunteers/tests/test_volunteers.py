@@ -164,3 +164,28 @@ class EndingTests(Base):
         self.assertFalse(VolunteerApplication.objects.filter(pk=b.pk).exists())
         call_command("prune_volunteers")
         Candidate.objects.filter(pk=self.cand.pk).update(status="published")
+
+
+class LgaPickerTests(Base):
+    """Spec 19 §7.2: the volunteer form sends the LGA's ID; the text is written from it."""
+
+    def test_lga_id_writes_the_text_and_is_checked(self):
+        from pathlib import Path
+
+        from django.conf import settings
+
+        from apps.geo import loading
+        from apps.geo.models import Lga
+
+        loading.load((Path(settings.BASE_DIR) / "data" / "geo" / "sample.csv").read_bytes(), source="sample")
+        self.open()
+        ikeja = Lga.objects.get(state__slug="lagos", code="07")
+        url = reverse("candidate-volunteering-apply", kwargs={"slug": "amina"})
+        r = client(self.ada).post(url, {**APPLY, "lga_text": "typed", "geo_lga": ikeja.pk}, format="json")
+        self.assertEqual(r.status_code, 201, r.data)
+        app = VolunteerApplication.objects.get(user=self.ada)
+        self.assertEqual((app.lga_text, app.geo_lga_id), ("Ikeja", ikeja.pk))
+        fct = Lga.objects.get(state__slug="fct")
+        r = client(self.bo).post(url, {**APPLY, "geo_lga": fct.pk}, format="json")
+        self.assertEqual(r.status_code, 400)
+        self.assertEqual(client(self.bo).post(url, {**APPLY, "geo_lga": "abc"}, format="json").status_code, 400)

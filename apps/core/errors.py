@@ -97,6 +97,11 @@ CATALOGUE: dict[str, tuple[int, str, bool]] = {
     "checkin_window_closed": (409, "The check-in list is open from 24 hours before to 24 hours after the event.", False),
     "update_limit": (409, "Too many updates (3 per event; 5 volunteer updates a week).", False),
     "capacity_below_registrations": (409, "Capacity can't go below the number already registered.", False),
+    # geography (19)
+    "geo_mismatch": (400, "The chosen ward isn't in the LGA, or the LGA isn't in the state; see `field`.", False),
+    "geo_inactive": (400, "The chosen place is no longer in INEC's current list; see `field`.", False),
+    "geo_file_invalid": (400, "The geography file failed its checks; see `errors` (with line numbers).", False),
+    "geo_second_admin_required": (409, "The file has fewer than 95% of the active polling units; a second system admin must apply it.", False),
     # privacy and security (14)
     "consent_required": (403, "Consent for this purpose is needed; carries `purpose`, `version`, `text`.", True),
     "export_limit": (429, "Data downloads are limited to 3 a day.", False),

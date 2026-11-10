@@ -34,6 +34,9 @@ class Kind(models.TextChoices):
     CANDIDATE_EVENT = "candidate_event", "New event from a candidate you follow"
     VOLUNTEER_DECISION = "volunteer_decision", "Volunteer application"
     VOLUNTEER_UPDATE = "volunteer_update", "Update from a campaign you volunteer for"
+    # spec 19 §10: about the person's own record; never the unit's name
+    GEO_CONFIRM = "geo_confirm", "Confirm where you vote"
+    GEO_UNIT_CHANGED = "geo_unit_changed", "Your polling unit changed"
 
 
 MODERATION_KINDS = ["report_outcome", "content_removed", "account_warning", "submissions_paused", "appeal_decision"]
@@ -41,6 +44,7 @@ PRIVACY_KINDS = ["security_notice", "privacy_request_update"]
 OWN_RECORD_KINDS = ["membership_decision", "donation_receipt"]
 EVENT_KINDS = ["event_update", "event_reminder", "event_waitlist", "candidate_event"]  # spec 18: IDs and a short word only
 VOLUNTEER_KINDS = ["volunteer_decision", "volunteer_update"]
+GEO_KINDS = ["geo_confirm", "geo_unit_changed"]  # spec 19 §10: the record kind and a short word only
 COMMUNITY_KINDS = ["community_reply", "community_post", "community_placed"]  # spec 17: IDs only, never post text  # spec 15: about the person's own record; no amounts in the row
 
 
@@ -92,7 +96,8 @@ class Notification(models.Model):
                                               | Q(kind="volunteer_decision", candidate__isnull=False, article__isnull=True,
                                                   candidate_post__isnull=True)
                                               | Q(kind="volunteer_update", volunteer_update__isnull=False, candidate__isnull=False,
-                                                  article__isnull=True, candidate_post__isnull=True))),
+                                                  article__isnull=True, candidate_post__isnull=True)
+                                              | Q(kind__in=GEO_KINDS, article__isnull=True, candidate_post__isnull=True))),
             models.UniqueConstraint(fields=["recipient", "event"], name="notif_one_candidate_event", condition=Q(kind="candidate_event")),
             models.UniqueConstraint(fields=["recipient", "volunteer_update"], name="notif_one_volunteer_update",
                                     condition=Q(kind="volunteer_update")),

@@ -158,7 +158,7 @@ class MyMembershipCard(_Private):
 # ------------------------------------------------------------------ admin
 def _admin_qs(request):
     qp = request.query_params
-    qs = Membership.objects.select_related("user", "user__pvc").order_by("-created_at")
+    qs = Membership.objects.select_related("user", "user__pvc", "geo_lga", "geo_ward", "geo_polling_unit").order_by("-created_at")
     if qp.get("status") in M.values:
         qs = qs.filter(status=qp["status"])
     if qp.get("state"):

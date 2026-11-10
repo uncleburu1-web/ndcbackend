@@ -115,13 +115,14 @@ class OverviewAccessTests(Base):
     def test_each_role_gets_exactly_its_sections(self):
         expect = {
             "sa": (["incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due",
-                    "community_hidden_waiting", "events_reported", "events_hidden_waiting", "news_pending", "pvc_pending",
+                    "community_hidden_waiting", "events_reported", "events_hidden_waiting", "geo_review_waiting", "geo_units_changed",
+                    "geo_preview_waiting", "news_pending", "pvc_pending",
                     "membership_approvals", "membership_payments_review", "donations_review", "candidates_unpublished", "ban_failed",
                     "background_tasks_failing", "data_integrity_issues", "communities_unmoderated", "events_in_blackout"],
                    ["people", "candidates", "content", "pvc", "membership", "donations"], True),
             "news": (["reports_review", "reports_urgent", "appeals_waiting", "news_pending"], ["content"], False),
-            "pvc": (["pvc_pending"], ["pvc"], False),
-            "mem": (["pvc_pending", "membership_approvals", "membership_payments_review"], ["pvc", "membership"], False),
+            "pvc": (["geo_review_waiting", "pvc_pending"], ["pvc"], False),  # 19 §15.2: the review queue for officers
+            "mem": (["geo_review_waiting", "pvc_pending", "membership_approvals", "membership_payments_review"], ["pvc", "membership"], False),
             "fin": (["donations_review"], ["donations"], False),
             "mod": (["reports_review", "reports_urgent", "appeals_waiting", "community_hidden_waiting", "events_reported",
                      "events_hidden_waiting"], [], False),  # 13 §4.9, 17 §15.2, 18 §15.2
@@ -245,7 +246,8 @@ class CountTests(Base):
         cache.clear()
         with CaptureQueriesContext(connection) as ctx:
             client(self.sa).get(reverse("admin-overview"))
-        self.assertLess(len(ctx.captured_queries), 104)  # 17: communities cards and two readiness lines; 18: three event cards, two lines
+        self.assertLess(len(ctx.captured_queries), 120)  # 17: communities cards and two readiness lines; 18: three event cards, two lines
+        # 19: three geography cards and two readiness lines
 
 
 class ReadinessTests(Base):
@@ -521,10 +523,11 @@ class MeAreasTests(Base):
         self.assertEqual(admin_areas(self.plain), [])
         self.assertEqual(admin_areas(self.mod), ["overview", "moderation"])
         self.assertEqual(admin_areas(self.news), ["overview", "moderation", "news"])
-        self.assertEqual(admin_areas(self.pvc), ["overview", "pvc"])
-        self.assertEqual(admin_areas(self.mem), ["overview", "pvc", "membership"])
+        self.assertEqual(admin_areas(self.pvc), ["overview", "pvc", "geography"])  # 19 §15.1: the review tab
+        self.assertEqual(admin_areas(self.mem), ["overview", "pvc", "membership", "geography"])
         self.assertEqual(admin_areas(self.fin), ["overview", "donations"])
-        self.assertEqual(admin_areas(self.sa), ["overview", "candidates", "donations", "pvc", "membership", "moderation", "news", "privacy",
+        self.assertEqual(admin_areas(self.sa), ["overview", "candidates", "donations", "pvc", "membership", "geography", "moderation", "news",
+                                                "privacy",
                                                 "announcements", "posts", "team", "audit", "integrations", "communities", "events"])
         r = client(self.news).get(reverse("me"))
         self.assertEqual(r.data["admin_areas"], ["overview", "moderation", "news"])

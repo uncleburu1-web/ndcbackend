@@ -49,6 +49,8 @@ KNOWN_JOBS = {
     "events_tick": ("Event reminders and deadlines", H / 2),  # spec 18 §12.3 (every 15 min)
     "prune_events": ("Clear old event registrations", 26 * H),
     "prune_volunteers": ("Clear finished volunteer applications", 26 * H),
+    "match_geography": ("Link typed places to INEC's list", 26 * H),  # spec 19 §12.2
+    "geo_notify_unconfirmed": ("Ask people to confirm where they vote", 2 * H),
 }
 MANUAL_STALE = 24 * H  # a by-hand run that hasn't finished after this "didn't finish"
 KEEP = timedelta(days=90)

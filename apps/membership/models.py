@@ -33,6 +33,13 @@ class Sex(models.TextChoices):
     FEMALE = "female", "Female"
 
 
+class GeoSource(models.TextChoices):
+    """Spec 19 §11.2."""
+    MATCHED = "matched", "Exact match"
+    CHOSEN = "chosen", "Chosen by the person"
+    REVIEW = "review", "Not listed (needs review)"
+
+
 class Membership(models.Model):
     """One person's party membership application and register entry (Electoral Act 2026 s. 77(2); spec 06)."""
 
@@ -51,6 +58,9 @@ class Membership(models.Model):
     geo_lga = models.ForeignKey("geo.Lga", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     geo_ward = models.ForeignKey("geo.Ward", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     geo_polling_unit = models.ForeignKey("geo.PollingUnit", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    # spec 19 §7.3: how the links were set ("" none, matched = exact match not yet confirmed, chosen = the person, review = "not listed")
+    geo_source = models.CharField(max_length=8, choices=GeoSource.choices, blank=True, default="")
+    geo_confirm_asked_at = models.DateTimeField(null=True, blank=True)  # spec 19 §8.1: the geo_confirm notice was sent
     nin_encrypted = models.BinaryField(blank=True, default=b"")
     nin_last4 = models.CharField(max_length=4, blank=True)
     photo = models.CharField(max_length=200, blank=True)  # private storage name
@@ -76,6 +86,7 @@ class Membership(models.Model):
             models.CheckConstraint(condition=~Q(status="cancelled") | Q(cancelled_at__isnull=False), name="membership_membership_cancel_shape"),
             choice_check("status", MembershipStatus.values, "membership_status_valid"),
             state_check("state", "membership_state_valid"),
+            choice_check("geo_source", [*GeoSource.values, ""], "membership_geo_source_valid"),
         ]
 
     def __str__(self):

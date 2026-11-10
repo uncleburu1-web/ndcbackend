@@ -96,8 +96,9 @@ def _filtered(qp, now):
         qs = qs.filter(ends_at__gt=now)
     if qp.get("state"):
         qs = qs.filter(state=qp["state"])
-    if qp.get("lga"):
-        qs = qs.filter(geo_lga_id=_uuid(qp["lga"]))
+    if qp.get("lga"):  # spec 19 §6.2: geography IDs are integers
+        lga = str(qp["lga"]).strip()
+        qs = qs.filter(geo_lga_id=int(lga)) if lga.isdigit() else qs.none()
     if qp.get("type"):
         qs = qs.filter(type=qp["type"])
     if qp.get("mode") == "online":
@@ -299,8 +300,11 @@ def _data(request):
             d[k] = _dt(d[k], k)
     if "capacity" in d and d["capacity"] in ("", None):
         d["capacity"] = None
-    if "geo_lga" in d:
-        d["geo_lga"] = _uuid(d["geo_lga"]) if d["geo_lga"] else None
+    if "geo_lga" in d:  # spec 19 §7.2: the LGA picker's ID (geography IDs are integers)
+        v = str(d["geo_lga"] or "").strip()
+        if v and not v.isdigit():
+            raise ServiceError("Choose an LGA from the list.", code="geo_mismatch", status_code=400)
+        d["geo_lga"] = int(v) if v else None
     for k in ("members_only",):
         if k in d:
             d[k] = str(d[k]).lower() in ("true", "1", "on")

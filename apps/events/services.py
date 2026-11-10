@@ -216,11 +216,12 @@ def _clean(event, data, *, now):
     if event.geo_lga_id:
         from apps.geo.models import Lga
 
-        lga = Lga.objects.filter(pk=event.geo_lga_id, active=True).select_related("state").first()
+        chosen = bool(data.get("geo_lga"))  # spec 19 §7.2: a picker choice must be active; an old link may stay as it is
+        lga = Lga.objects.filter(pk=event.geo_lga_id, **({"active": True} if chosen else {})).select_related("state").first()
         if lga is None or (event.state and lga.state.slug != event.state):
             errors["geo_lga"] = ["Choose an LGA in this state."]
-        elif not event.lga_text:
-            event.lga_text = lga.name
+        elif chosen or not event.lga_text:
+            event.lga_text = lga.name[:100]
     if errors:
         raise serializers.ValidationError(errors)
 

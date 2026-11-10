@@ -135,7 +135,7 @@ class PublicOnlyTests(TestCase):
                                                                                                          deleted_at=timezone.now())
         Candidate.objects.filter(pk=hidden.pk).update(status="unpublished")  # bypasses signals: the query-time check catches it
         res = self.kinds("zebra")
-        self.assertEqual(res, {Kind.CANDIDATE: [], Kind.ARTICLE: [], Kind.POST: [], Kind.EVENT: []})
+        self.assertEqual(res, {Kind.CANDIDATE: [], Kind.ARTICLE: [], Kind.POST: [], Kind.EVENT: [], Kind.STATE: [], Kind.LGA: []})
         self.assertTrue(SearchEntry.objects.filter(kind=Kind.POST, object_id=p.pk).exists())  # planted entry still there…
         # …and a hand-planted entry for a draft is ignored too
         draft = Candidate.objects.get(slug="draft-zebra")

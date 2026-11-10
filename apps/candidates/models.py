@@ -51,6 +51,8 @@ class Candidate(TimeStampedModel):
     # spec 16 §8.2: optional links to INEC's geography beside what the person typed (never overwritten)
     geo_lga = models.ForeignKey("geo.Lga", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     geo_ward = models.ForeignKey("geo.Ward", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
+    # spec 19 §5.2: senators, House of Representatives and State Assembly candidates stand in a constituency
+    geo_constituency = models.ForeignKey("geo.Constituency", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
 
     biography = models.TextField(max_length=5000, blank=True, default="")
     campaign_summary = models.TextField(max_length=1000, blank=True, default="")

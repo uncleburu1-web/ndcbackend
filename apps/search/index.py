@@ -3,6 +3,8 @@ Indexing (spec 12 §6.1). An item is in the index only while a guest could open 
 Every save of a candidate, article or post re-indexes it in the same transaction (signals.py);
 `rebuild()` repairs any drift. Later units add a line to SEARCHABLE, not a new engine.
 """
+import uuid
+
 from django.contrib.postgres.search import SearchVector
 from django.db import transaction
 from django.db.models import Value
@@ -80,17 +82,59 @@ def _event_entry(e):
     }
 
 
+def _public_states():
+    from apps.geo.models import State
+
+    return State.objects.all()
+
+
+def _public_lgas():
+    from apps.geo.models import Lga
+
+    return Lga.objects.filter(active=True).select_related("state").prefetch_related("aliases")
+
+
+GEO_NS = uuid.UUID("5b3f4c8e-19a0-4c1e-9a77-6e0d0c2f1919")
+GEO_KINDS = (Kind.STATE, Kind.LGA)
+
+
+def geo_id(kind, pk):
+    """Search rows hold UUIDs; geography rows have integer keys, so their entries use a stable name-based UUID."""
+    return uuid.uuid5(GEO_NS, f"{kind}:{pk}")
+
+
+def _state_label(st):
+    return "Federal Capital Territory" if st.slug == "fct" else f"{st.name} State"
+
+
+def _state_entry(st):
+    return {"title": _state_label(st), "body_text": st.capital, "state": st.slug, "position": "", "election_year": None, "source": "",
+            "published_at": None, "rank_order": 0, "_object_id": geo_id(Kind.STATE, st.pk),
+            "_weights": {"A": f"{st.name} {place_words(st.slug)}", "B": st.capital, "C": "", "D": ""}}
+
+
+def _lga_entry(l_):
+    aliases = " ".join(a.name for a in l_.aliases.all())
+    return {"title": f"{l_.name}, {_state_label(l_.state)}", "body_text": "", "state": l_.state.slug, "position": "",
+            "election_year": None, "source": "", "published_at": None, "rank_order": 0, "_object_id": geo_id(Kind.LGA, l_.pk),
+            "_weights": {"A": f"{l_.name} {aliases}", "B": l_.state.name, "C": place_words(l_.state.slug), "D": ""}}
+
+
 # kind → (public queryset factory, entry builder)
 SEARCHABLE = {
     Kind.CANDIDATE: (_public_candidates, _candidate_entry),
     Kind.ARTICLE: (_public_articles, _article_entry),
     Kind.POST: (_public_posts, _post_entry),
     Kind.EVENT: (_public_events, _event_entry),
+    Kind.STATE: (_public_states, _state_entry),  # spec 19 §9: reference data, from active rows
+    Kind.LGA: (_public_lgas, _lga_entry),
 }
 
 
 def public_ids(kind):
     """Query-time re-check (spec 12 §9): the IDs a guest could open right now."""
+    if kind in GEO_KINDS:
+        return [geo_id(kind, pk) for pk in SEARCHABLE[kind][0]().values_list("pk", flat=True)]
     return SEARCHABLE[kind][0]().values("pk")
 
 
@@ -105,10 +149,11 @@ def _vector(weights: dict):
 def _upsert(kind, obj):
     data = SEARCHABLE[kind][1](obj)
     weights = data.pop("_weights")
+    oid = data.pop("_object_id", obj.pk)
     data["title"] = data["title"][:200]
     data["folded_title"] = fold(data["title"])[:200]
     data["title_key"] = title_key(data["folded_title"])[:200] if kind == Kind.CANDIDATE else ""
-    entry, _ = SearchEntry.objects.update_or_create(kind=kind, object_id=obj.pk, defaults=data)
+    entry, _ = SearchEntry.objects.update_or_create(kind=kind, object_id=oid, defaults=data)
     SearchEntry.objects.filter(pk=entry.pk).update(document=_vector(weights))
     return entry
 
@@ -145,15 +190,23 @@ def sync_event(e):
     _sync(Kind.EVENT, e)
 
 
+def sync_lga(lga):
+    """An alias changed (spec 19 §4.5): re-index that LGA's entry."""
+    row = _public_lgas().filter(pk=lga.pk).first()
+    if row is None:
+        remove(Kind.LGA, geo_id(Kind.LGA, lga.pk))
+        return None
+    return _upsert(Kind.LGA, row)
+
+
 @transaction.atomic
 def rebuild(kind=None, batch=500) -> dict:
     out = {}
     for k in ([kind] if kind else list(SEARCHABLE)):
         qs = SEARCHABLE[k][0]().order_by("pk")
         seen, n = [], 0
-        for obj in qs.iterator(chunk_size=batch):
-            _upsert(k, obj)
-            seen.append(obj.pk)
+        for obj in (qs.iterator(chunk_size=batch) if k not in GEO_KINDS else qs):  # LGAs prefetch their aliases
+            seen.append(_upsert(k, obj).object_id)
             n += 1
         orphans, _ = SearchEntry.objects.filter(kind=k).exclude(object_id__in=seen).delete()
         out[k] = {"indexed": n, "orphans_removed": orphans}

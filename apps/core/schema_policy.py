@@ -21,6 +21,7 @@ JSON_REASONS = {
     "volunteers.VolunteerOpening.states": "a few state slugs, always read with the opening",
     "volunteers.VolunteerApplication.roles": "the role keys the person offered, from the opening's list",
     "volunteers.VolunteerApplication.availability": "up to three availability keys, shown with the application",
+    "geo.Dataset.preview": "the preview report of a geography file: counts and lists shown together, never queried (spec 19 §11.1)",
 }
 
 # Owner-of-private-data links to a person (CASCADE is the rule; §5.1 row 2).

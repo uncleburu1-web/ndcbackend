@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field, inline_serializer
 from rest_framework import serializers
 
 from apps.accounts.models import User
@@ -61,6 +62,10 @@ class CandidateWriteSerializer(serializers.Serializer):
     state = serializers.ChoiceField(choices=State.choices, required=False, allow_blank=True)
     area_name = serializers.CharField(max_length=120, required=False, allow_blank=True)
     ward_name = serializers.CharField(max_length=120, required=False, allow_blank=True)
+    # spec 19 §5.2: chosen from the lists; area_name and ward_name are then written from the chosen names
+    constituency_id = serializers.IntegerField(required=False, allow_null=True, help_text="Senators, House of Reps, State Assembly")
+    lga_id = serializers.IntegerField(required=False, allow_null=True, help_text="LGA chairmen and councillors")
+    ward_id = serializers.IntegerField(required=False, allow_null=True, help_text="Councillors")
     biography = serializers.CharField(max_length=5000, required=False, allow_blank=True, trim_whitespace=False)
     campaign_summary = serializers.CharField(max_length=1000, required=False, allow_blank=True)
     priorities = serializers.ListField(child=serializers.CharField(max_length=500, allow_blank=True), required=False)
@@ -78,17 +83,27 @@ class AdminCandidateSerializer(serializers.ModelSerializer):
     photo = serializers.SerializerMethodField()
     is_verified = serializers.BooleanField(read_only=True)
     verified_by_email = serializers.EmailField(source="verified_by.email", read_only=True, default=None)
+    constituency = serializers.SerializerMethodField()
+    lga_id = serializers.IntegerField(source="geo_lga_id", read_only=True, allow_null=True)
+    ward_id = serializers.IntegerField(source="geo_ward_id", read_only=True, allow_null=True)
 
     class Meta:
         model = Candidate
         fields = ["id", "slug", "full_name", "party", "position", "position_label", "election_year", "state",
-                  "area_name", "ward_name", "area_display", "biography", "campaign_summary", "priorities", "links",
+                  "area_name", "ward_name", "area_display", "constituency", "lga_id", "ward_id", "biography", "campaign_summary", "priorities", "links",
                   "photo", "status", "is_verified", "verified_at", "verified_by_email", "verification_notes",
                   "published_at", "created_at", "updated_at"]
         read_only_fields = fields
 
     def get_photo(self, obj) -> dict | None:
         return _photo(obj, self.context.get("request"))
+
+    @extend_schema_field(inline_serializer("CandidateConstituency", {"id": serializers.IntegerField(), "code": serializers.CharField(),
+                                                                      "name": serializers.CharField(), "kind": serializers.CharField()},
+                                           allow_null=True))
+    def get_constituency(self, obj):
+        c = obj.geo_constituency
+        return {"id": c.pk, "code": c.code, "name": c.name, "kind": c.kind} if c else None
 
 
 class LinkedAccountSerializer(serializers.Serializer):

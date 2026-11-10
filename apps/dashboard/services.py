@@ -21,16 +21,16 @@ from .cards import Card, Stat, to_dict
 logger = logging.getLogger(__name__)
 
 # Order matters: cards appear in this order (spec 11 §4.2).
-SUMMARY_APPS = ["privacy", "moderation", "communities", "events", "news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts",
+SUMMARY_APPS = ["privacy", "moderation", "communities", "events", "geo", "news", "posts", "pvc", "membership", "donations", "candidates", "follows", "accounts",
                 "integrations"]
-CARD_ORDER = ["audit_chain_broken", "incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "community_hidden_waiting", "events_reported", "events_hidden_waiting", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
+CARD_ORDER = ["audit_chain_broken", "incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "community_hidden_waiting", "events_reported", "events_hidden_waiting", "geo_review_waiting", "geo_units_changed", "geo_preview_waiting", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
               "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing", "data_integrity_issues", "communities_unmoderated", "events_in_blackout", "access_review_due"]
 GROUPS = [("people", "People"), ("candidates", "Candidates and following"), ("content", "Content"), ("pvc", "PVC"),
           ("membership", "Membership"), ("donations", "Donations")]
 ADMIN_ROLES = {Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.MODERATOR,
                Role.PRIVACY_OFFICER}
 CACHE_SECONDS = 30
-APP_LABELS = {"privacy": "Privacy and security", "moderation": "Moderation", "communities": "Communities", "events": "Events", "news": "News", "posts": "Candidate posts", "pvc": "PVC checks", "membership": "Membership", "donations": "Donations",
+APP_LABELS = {"privacy": "Privacy and security", "moderation": "Moderation", "communities": "Communities", "events": "Events", "geo": "Geography", "news": "News", "posts": "Candidate posts", "pvc": "PVC checks", "membership": "Membership", "donations": "Donations",
               "candidates": "Candidates", "follows": "Following", "accounts": "Accounts", "integrations": "Integrations"}
 
 
@@ -59,6 +59,8 @@ def admin_areas(user) -> list[str]:
         areas.append("pvc")
     if has_role(user, Role.MEMBERSHIP_OFFICER):
         areas.append("membership")
+    if has_role(user, Role.PVC_OFFICER) or has_role(user, Role.MEMBERSHIP_OFFICER):
+        areas.append("geography")  # spec 19 §15.1: system admins see it all; officers the review tab
     if sysadmin or Role.MODERATOR in roles or has_role(user, Role.NEWS_REVIEWER):
         areas.append("moderation")  # spec 13 §4.9; community moderators too (spec 17)
     if has_role(user, Role.NEWS_REVIEWER):
@@ -190,6 +192,7 @@ def readiness(now):
     unset = blackouts.unset_period_offices()
     out.append(_item("security", "Campaign periods", "warning" if len(unset) == 7 else "ready",
                      ("Not set for " + ", ".join(unset)) if unset else ""))
+    out += geo_readiness(now)
     tick = JobRun.objects.filter(job="events_tick", ok=True).order_by("-finished_at").first()
     fresh = bool(tick and tick.finished_at and tick.finished_at >= now - timedelta(minutes=30))
     out.append(_item("security", "Events jobs", "ready" if fresh else "warning", "" if fresh else "events_tick hasn't run in 30 minutes"))
@@ -215,6 +218,31 @@ def readiness(now):
         else:
             out.append(_item("security", name, words[state]))
     return {"items": out, "blackouts": [_blackout_payload(w, now) for w in blackouts.windows()]}
+
+
+def geo_readiness(now):
+    """Spec 19 §15.3: which geography is loaded, from where, and how old it is. Never hard-codes a number of units."""
+    from django.conf import settings
+
+    from apps.geo.models import Dataset
+    from apps.geo.services import current_datasets, is_sample_only
+
+    cur = {d.kind: d for d in current_datasets()}
+    pu = cur.get(Dataset.Kind.POLLING_UNITS)
+    when = lambda d: (d.published_on or d.applied_at.date()).isoformat()  # noqa: E731
+    if pu is None:
+        out = [_item("geography", "Geography", "error", "No polling-unit list loaded · run load_geography")]
+    else:
+        detail = f"{pu.polling_units} polling units · {pu.source[:80]} · {when(pu)}"
+        sample = is_sample_only()
+        old = (pu.published_on or pu.applied_at.date()) < (now - timedelta(days=365)).date()
+        state = "error" if sample and not settings.DEBUG else "warning" if sample or old else "ready"
+        out = [_item("geography", "Geography", state, ("Only the sample is loaded · " if sample else "")
+                     + ("Older than 12 months · " if old else "") + detail)]
+    missing = [k.label for k in Dataset.Kind if k != Dataset.Kind.POLLING_UNITS and k not in cur]
+    out.append(_item("geography", "Constituencies", "warning" if missing else "ready",
+                     ("Not loaded: " + ", ".join(missing).lower()) if missing else ""))
+    return out
 
 
 def activity():

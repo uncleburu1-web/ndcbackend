@@ -253,9 +253,9 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
   integrity, and a card when there are issues). Counts only.
 - **`IP_HASH_KEY`:** a long random string used to hash IP addresses for abuse limits (falls back to `SECRET_KEY`). Set it before
   launch; changing it later only resets abuse limits.
-- **Geography:** `python manage.py load_geography <file.csv> --source "<where it came from>" --published-on YYYY-MM-DD` loads
-  INEC's polling-unit list (format in `data/geo/README.md`; `--dry-run` first). Loading the same file again changes nothing; units
-  missing from a newer file become inactive. `python manage.py match_geography --dry-run` reports how many existing memberships,
+- **Geography:** `python manage.py load_geography <file.csv> --source "<where it came from>" --published-on YYYY-MM-DD` previews
+  INEC's polling-unit list (format in `data/geo/README.md`); add `--apply` to apply it (spec 19). Loading the same file again changes
+  nothing; places missing from a newer file become inactive. `python manage.py match_geography --dry-run` reports how many existing memberships,
   PVC checks and candidates match exactly; without `--dry-run` it adds the links (people's own text is never changed).
   `data/geo/sample.csv` is invented test data, not INEC's list.
 
@@ -294,6 +294,28 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **Schedule:** `events_tick` every 15 minutes; `prune_events` and `prune_volunteers` daily (spec 18 §17.2).
 - **Checks:** `check_integrity` adds event count drift, events over capacity, waitlists with free places and open volunteering for
   unpublished candidates.
+
+## States and geography (spec 19)
+
+- **Loading INEC's list:** Admin → Geography → Files → upload the CSV (system admins), or `python manage.py load_geography <file>`.
+  Both preview first: problems with line numbers, then what would be added, renamed, brought back, retired or moved, per state, and
+  how many memberships and PVC checks point at retired or moved units. Nothing changes until you apply (`--apply`, or the Apply
+  button). Write who checked the file and how in Notes / `--notes` (spec 19 §4.1).
+- **The 95% rule:** a polling-unit file with fewer than 95% of the active units needs two different system admins: the first apply is
+  recorded and refused, a second admin then applies with "Apply as the second admin" (or `--confirm-by <their email>` on the
+  command line, which counts as one admin). `GEO_SECOND_ADMIN_MIN_UNITS` (default 1000) keeps small test lists out of it.
+- **Constituencies:** `load_geography <file> --kind senatorial_districts|federal_constituencies|state_constituencies` with columns
+  `state_code,code,name,lga_codes,ward_codes` (codes separated by `;`, wards as `LGA-ward`, e.g. `07-05`). Samples in `data/geo/`.
+- **After an apply** the worker updates communities and search and tells people whose polling unit was retired or moved
+  (`geo_unit_changed`, once each).
+- **Existing free text:** `match_geography` (nightly) links exact matches as `matched`; `geo_notify_unconfirmed` (hourly, 500 a run)
+  asks each person once to confirm on their Account page. Admin → Geography → Review lists records with typed text but no link,
+  "not listed" ones, retired units and PVC changes waiting for an officer (membership officers see memberships, PVC officers see PVC
+  checks). PVC officers confirm the polling unit when they verify a check; communities use only those links and exact matches.
+- **Public:** `/states/<state>/<lga>` pages and the `/polling-units` finder (INEC's names and codes, always linking to INEC's locator,
+  `INEC_PU_LOCATOR_URL`). Wards and polling units have no pages of their own.
+- **Checks:** `check_integrity` adds broken location chains, active places under retired ones, constituencies covering retired places
+  and officer-confirmed PVC locations without a polling unit. Readiness shows "Geography" and "Constituencies".
 
 ## Deploying on Railway (ahead of spec 20)
 

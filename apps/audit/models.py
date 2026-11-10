@@ -120,6 +120,11 @@ class AuditLog(models.Model):
         EVENT_PARTY_CREATED = "event.party_created"
         VOLUNTEER_CONTACT_VIEWED = "volunteer.contact_viewed"
         VOLUNTEER_OPENING_CHANGED = "volunteer.opening_changed"
+        # spec 19 §15.4 (link changes carry the record kind and ID, never place names)
+        GEO_DATASET_PREVIEWED = "geo.dataset_previewed"
+        GEO_DATASET_APPLIED = "geo.dataset_applied"
+        GEO_LINK_CHANGED = "geo.link_changed"
+        GEO_ALIAS_CHANGED = "geo.alias_changed"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

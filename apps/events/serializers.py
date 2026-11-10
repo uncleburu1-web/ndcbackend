@@ -133,7 +133,7 @@ class OrganiserEventSchema(EventDetailSchema):
     declarations = S.DictField()
     checkin_open = S.BooleanField()
     blackout_flagged = S.BooleanField()
-    geo_lga = S.UUIDField(allow_null=True)
+    geo_lga = S.CharField(allow_null=True, help_text="The linked LGA's ID as text (18 published it as a string; spec 19 keeps that)")
     online_url_value = S.CharField()
     venue_address_value = S.CharField()
 
@@ -151,7 +151,7 @@ class EventWriteSchema(S.Serializer):
     address_visibility = S.ChoiceField(AddressVisibility.choices, required=False)
     state = S.CharField(required=False, allow_blank=True)
     lga_text = S.CharField(required=False, allow_blank=True)
-    geo_lga = S.UUIDField(required=False, allow_null=True)
+    geo_lga = S.IntegerField(required=False, allow_null=True, help_text="The LGA picker's choice (spec 19 §7.2); lga_text is written from it")
     online_url = S.CharField(required=False, allow_blank=True)
     accessibility_notes = S.CharField(required=False, allow_blank=True)
     capacity = S.IntegerField(required=False, allow_null=True)

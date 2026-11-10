@@ -124,14 +124,17 @@ def apply(user, candidate, data) -> VolunteerApplication:
         errors["note"] = ["Use up to 300 characters."]
     lga_text = " ".join((data.get("lga_text") or "").split())[:100]
     geo_lga = data.get("geo_lga") or None
+    if geo_lga is not None and not str(geo_lga).isdigit():  # spec 19 §7.2: the LGA picker sends the LGA's ID
+        errors["geo_lga"] = ["Choose an LGA from the list."]
+        geo_lga = None
     if geo_lga:
         from apps.geo.models import Lga
 
         lga = Lga.objects.filter(pk=geo_lga, active=True, state__slug=state).first()
         if lga is None:
             errors["geo_lga"] = ["Choose an LGA in this state."]
-        elif not lga_text:
-            lga_text = lga.name
+        else:  # spec 19 §7.2: the text is written from the chosen LGA
+            lga_text = lga.name[:100]
     if errors:
         raise serializers.ValidationError(errors)
     try:

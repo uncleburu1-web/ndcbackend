@@ -45,6 +45,7 @@ CATALOGUE = {
     "privacy_public": ("user", "Privacy requests, consent changes, deletion (14)"),
     "media_sign": ("user", "Image upload signatures (15)"),
     "ready": ("ip", "Readiness checks (15)"),
+    "geo_lookup": ("ip", "Geography lookups for pickers and pages: 120 a minute (19)"),
 }
 
 

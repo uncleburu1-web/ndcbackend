@@ -194,6 +194,44 @@ def _volunteers_unpublished():
         ~Q(candidate__status="published") | Q(candidate__verified_at__isnull=True)).count()
 
 
+def _geo_chain_broken():
+    """Spec 19 §12.4: a record's ward link outside its LGA link, or its polling-unit link outside its ward link."""
+    from django.db.models import F, Q
+
+    from apps.candidates.models import Candidate
+    from apps.membership.models import Membership
+    from apps.pvc.models import PvcVerification
+
+    n = 0
+    for M in (Membership, PvcVerification):
+        n += M.objects.filter(Q(geo_ward__isnull=False, geo_lga__isnull=False) & ~Q(geo_ward__lga=F("geo_lga"))).count()
+        n += M.objects.filter(Q(geo_polling_unit__isnull=False, geo_ward__isnull=False) & ~Q(geo_polling_unit__ward=F("geo_ward"))).count()
+        n += M.objects.filter(Q(geo_lga__isnull=False) & ~Q(geo_lga__state__slug=F("state"))).count()
+    n += Candidate.objects.filter(Q(geo_ward__isnull=False, geo_lga__isnull=False) & ~Q(geo_ward__lga=F("geo_lga"))).count()
+    return n
+
+
+def _geo_active_under_inactive():
+    from apps.geo.models import PollingUnit, Ward
+
+    return (Ward.objects.filter(active=True, lga__active=False).count()
+            + PollingUnit.objects.filter(active=True, ward__active=False).count())
+
+
+def _geo_areas_inactive():
+    from django.db.models import Q
+
+    from apps.geo.models import ConstituencyArea
+
+    return ConstituencyArea.objects.filter(constituency__active=True).filter(Q(lga__active=False) | Q(ward__active=False)).count()
+
+
+def _geo_officer_without_unit():
+    from apps.pvc.models import PvcVerification
+
+    return PvcVerification.objects.filter(geo_source="officer", geo_polling_unit__isnull=True).count()
+
+
 CHECKS = [
     ("orphan_case_targets", "Open moderation cases or reports pointing at missing items", lambda now: _orphan_targets()),
     ("search_not_public", "Search entries for items that aren't public", lambda now: _search_not_public()),
@@ -212,6 +250,11 @@ CHECKS = [
     ("events_over_capacity", "Events with more people registered than their capacity", lambda now: _events_over_capacity()),
     ("event_waitlist_with_places", "Waitlisted people on events with free places", _waitlist_with_free_places),
     ("volunteers_unpublished_candidates", "Open volunteer applications for unlisted candidates", lambda now: _volunteers_unpublished()),
+    # spec 19 §12.4
+    ("geo_chain_broken", "Location links whose ward, LGA or state don't belong together", lambda now: _geo_chain_broken()),
+    ("geo_active_under_inactive", "Active wards or polling units under a retired parent", lambda now: _geo_active_under_inactive()),
+    ("geo_areas_inactive", "Constituencies covering a retired LGA or ward", lambda now: _geo_areas_inactive()),
+    ("geo_officer_without_unit", "Officer-confirmed PVC locations with no polling unit", lambda now: _geo_officer_without_unit()),
 ]
 
 

@@ -90,6 +90,10 @@ class PublicCandidateList(generics.ListAPIView):
         state = F.choice(self.request, "state", State.values)
         if state:
             qs = qs.filter(state=state)
+        for name, field in (("lga", "geo_lga"), ("constituency", "geo_constituency")):  # spec 19 §6.2 "See all"
+            raw = (qp.get(name) or "").strip()
+            if raw:
+                qs = qs.filter(**{f"{field}_id": int(raw)}) if raw.isdigit() else qs.none()
         q = (qp.get("q") or "").strip()[:100]
         if q:
             # Spec 12 §4.3: same engine as /search (diacritics, aliases, name typos); relevance order with fixed tie-breaks.

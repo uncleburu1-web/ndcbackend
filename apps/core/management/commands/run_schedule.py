@@ -31,6 +31,7 @@ SCHEDULE = [
     ("moderation_tick", [], 15 * M),
     ("events_tick", [], 15 * M),
     ("privacy_tick", [], H),
+    ("geo_notify_unconfirmed", [], H),  # spec 19 §12.2: 500 an hour, each record once
     ("check_donations", [], D),
     ("prune_pvc", [], D),
     ("prune_news", [], D),
@@ -42,6 +43,7 @@ SCHEDULE = [
     ("prune_volunteers", [], D),
     ("prune_outbox", [], D),
     ("prune_webhooks", [], D),
+    ("match_geography", [], D),  # spec 19 §12.2: before communities, so new exact links place people the same night
     ("sync_communities", ["--placements"], D),
     ("prune_jobruns", [], 7 * D),
     ("verify_audit", [], 7 * D),

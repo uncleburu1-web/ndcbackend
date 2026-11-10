@@ -19,6 +19,7 @@ HISTORY_TABLES = [
 ]
 # Added after core 0005 by the owning app's own migration (the 0005 copy stays frozen):
 LATER_TABLES = ["communities_communityevent",  # communities 0002 (spec 17)
+                "geo_change",  # geo 0003 (spec 19)
                 "events_eventchange", "volunteers_volunteerchange"]  # events 0002, volunteers 0002 (spec 18)
 
 FUNCTION_SQL = r"""
