@@ -325,7 +325,7 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **Checks:** `check_integrity` adds broken location chains, active places under retired ones, constituencies covering retired places
   and officer-confirmed PVC locations without a polling unit. Readiness shows "Geography" and "Constituencies".
 
-## Deploying on Railway (ahead of spec 20)
+## Deploying on Railway (ahead of spec 22)
 
 Two services from this repo plus the Postgres service, all in one Railway project and region:
 

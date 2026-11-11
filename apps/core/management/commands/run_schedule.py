@@ -1,4 +1,4 @@
-"""One long-running worker for every background job (deployment on Railway; spec 20 will formalise hosting).
+"""One long-running worker for every background job (deployment on Railway; spec 22 will formalise hosting).
 
 Railway's cron services run at most every 5 minutes and each is billed as its own service, while the outbox needs a
 poll every few seconds. So one worker process:
