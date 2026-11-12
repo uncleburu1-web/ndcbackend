@@ -24,7 +24,7 @@ Health check: `GET http://localhost:8000/api/v1/health/` · readiness: `GET /api
 
 | Method | Path | Who |
 |---|---|---|
-| GET | `/api/v1/health/` | anyone |
+| GET | `/api/v1/health/` (status, database, `api_version`, `commit`) | anyone |
 | GET / PATCH | `/api/v1/me/` | signed in (`Authorization: Bearer <Clerk session token>`) |
 | POST | `/api/v1/webhooks/clerk/` | Clerk (Svix-signed) |
 | GET | `/api/v1/candidates/` (`?position=&state=&election_year=&q=&page=`) | anyone — published only |
@@ -324,6 +324,23 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
   `INEC_PU_LOCATOR_URL`). Wards and polling units have no pages of their own.
 - **Checks:** `check_integrity` adds broken location chains, active places under retired ones, constituencies covering retired places
   and officer-confirmed PVC locations without a polling unit. Readiness shows "Geography" and "Constituencies".
+
+## Settings (spec 20)
+
+- **Endpoints:** everything for one person under `/api/v1/me/settings/` (private, `no-store`, `settings_write` 60/min): `GET` all;
+  `PATCH profile/`, `language/`, `accessibility/`, `notifications/`, `privacy/`; `POST`/`DELETE public-profile/` (on needs
+  `{"consent": true, "version": n}`); `POST security/sign-out-others/` (reverification; revokes the other Clerk sessions);
+  `POST import-device/` (once, before the account saves its own). `POST /me/pause/` (reverification, `{"confirm": "pause"}`) and
+  `POST /me/reactivate/`. Public `GET /people/<handle>/` (404 unless on; `noindex`; 5-minute cache) and `POST /people/<handle>/report/`.
+  System admins: `GET`/`PATCH /admin/settings/defaults/` (audited).
+- **Paused accounts:** `deactivation_kind = "self"`. Signing in still works; only `/me/`, `/me/reactivate/`, `/me/data-export/` and
+  `/me/delete/` answer, everything else is 403 `account_paused`. Future event registrations are cancelled and pending volunteer
+  applications withdrawn; nothing new is delivered. Admin deactivation (`admin`) always wins and only an admin reverses it.
+- **Defaults for new accounts** (Admin → Settings defaults): notification categories, theme, text size, and which languages can be
+  chosen (only those in `settings_services.TRANSLATIONS_COMPLETE`, English until spec 21). Existing people keep what they have.
+- **Public profile moderation:** reports open a `profile` case for platform-wide moderators; Remove takes `parts`
+  (`["bio"]`, `["photo"]` or both) and hides them without editing; Restore shows them again.
+- **About:** `/api/v1/health/` returns `api_version` and `commit` (from `RAILWAY_GIT_COMMIT_SHA`) for Settings → About.
 
 ## Deploying on Railway (ahead of spec 22)
 

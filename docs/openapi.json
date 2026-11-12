@@ -18990,9 +18990,17 @@
                     },
                     "database": {
                         "$ref": "#/components/schemas/DatabaseEnum"
+                    },
+                    "api_version": {
+                        "type": "string"
+                    },
+                    "commit": {
+                        "type": "string"
                     }
                 },
                 "required": [
+                    "api_version",
+                    "commit",
                     "database",
                     "status"
                 ]

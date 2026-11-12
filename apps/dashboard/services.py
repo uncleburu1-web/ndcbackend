@@ -68,7 +68,7 @@ def admin_areas(user) -> list[str]:
     if has_role(user, Role.PRIVACY_OFFICER):
         areas.append("privacy")  # spec 14 §4.13 (implied by system admin)
     if sysadmin:
-        areas += ["announcements", "posts", "team", "audit", "integrations", "communities", "events"]  # 15; communities: 17; events: 18
+        areas += ["announcements", "posts", "team", "audit", "integrations", "communities", "events", "settings"]  # 15; 17; 18; 20
     return areas
 
 

@@ -1,3 +1,5 @@
+import os
+
 from django.db import connection
 from django.urls import path
 from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
@@ -13,7 +15,14 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 
 HEALTH_SCHEMA = inline_serializer("Health", {"status": serializers.ChoiceField(["ok", "degraded"]),
-                                             "database": serializers.ChoiceField(["ok", "unavailable"])})
+                                             "database": serializers.ChoiceField(["ok", "unavailable"]),
+                                             "api_version": serializers.CharField(), "commit": serializers.CharField()})
+API_VERSION = "v1"
+
+
+def _commit() -> str:
+    """The deployed commit, for Settings → About (spec 20 §15). Railway sets RAILWAY_GIT_COMMIT_SHA; it isn't a secret."""
+    return (os.environ.get("RAILWAY_GIT_COMMIT_SHA") or os.environ.get("GIT_COMMIT") or "")[:7]
 READY_SCHEMA = OpenApiResponse(inline_serializer("Ready", {
     "status": serializers.ChoiceField(["ready", "not_ready"]),
     "checks": serializers.DictField(child=serializers.ChoiceField(["ok", "failed"]))}))
@@ -31,7 +40,8 @@ def health(request):
         db = "ok"
     except Exception:  # pragma: no cover
         db = "unavailable"
-    return Response({"status": "ok" if db == "ok" else "degraded", "database": db}, status=200 if db == "ok" else 503)
+    return Response({"status": "ok" if db == "ok" else "degraded", "database": db, "api_version": API_VERSION, "commit": _commit()},
+                    status=200 if db == "ok" else 503)
 
 
 class ReadyThrottle(AnonRateThrottle):

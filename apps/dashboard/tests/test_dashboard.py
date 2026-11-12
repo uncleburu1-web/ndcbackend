@@ -528,6 +528,6 @@ class MeAreasTests(Base):
         self.assertEqual(admin_areas(self.fin), ["overview", "donations"])
         self.assertEqual(admin_areas(self.sa), ["overview", "candidates", "donations", "pvc", "membership", "geography", "moderation", "news",
                                                 "privacy",
-                                                "announcements", "posts", "team", "audit", "integrations", "communities", "events"])
+                                                "announcements", "posts", "team", "audit", "integrations", "communities", "events", "settings"])
         r = client(self.news).get(reverse("me"))
         self.assertEqual(r.data["admin_areas"], ["overview", "moderation", "news"])
