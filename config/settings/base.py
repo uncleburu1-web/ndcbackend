@@ -68,6 +68,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.core.middleware.SecurityHeaders",  # spec 14 §4.9
+    "apps.accounts.language.LanguageMiddleware",  # spec 20 §6: request.ndc_language for spec 21
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -147,6 +148,8 @@ REST_FRAMEWORK = {
         "media_sign": "60/hour",  # per user: upload signatures (spec 15 §7.3)
         "ready": "120/min",  # per IP: /ready/ (spec 15 §12.5)
         "geo_lookup": "120/min",  # per IP: pickers' type-ahead (spec 19 §13.1)
+        "settings_write": "60/min",  # spec 20 §17
+        "people_public": "60/min",
     },
 }
 

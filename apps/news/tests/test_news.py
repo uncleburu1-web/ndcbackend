@@ -209,6 +209,9 @@ class ReviewTests(Base):
     def test_byline_choice(self):
         a = self.submit(show_author_name=True)
         self.as_(self.reviewer).post(reverse("admin-news-approve", kwargs={"pk": a.pk}))
+        # spec 20 §5.2: first name and last initial by default; the full name if the author chooses it
+        self.assertEqual(APIClient().get(reverse("news-detail", kwargs={"pk": a.pk})).data["byline"], "Ada O.")
+        self.client.patch(reverse("my-settings-profile"), {"name_style": "full"}, format="json")
         self.assertEqual(APIClient().get(reverse("news-detail", kwargs={"pk": a.pk})).data["byline"], "Ada Obi")
         self.client.patch(reverse("my-news-detail", kwargs={"pk": a.pk}), {"show_author_name": False}, format="json")
         self.assertIsNone(APIClient().get(reverse("news-detail", kwargs={"pk": a.pk})).data["byline"])
@@ -315,7 +318,8 @@ class NotificationTests(Base):
         self.assertEqual(self.client.get(reverse("my-notifications")).data["count"], 0)  # hidden once not public
         self.assertEqual(self.client.patch(reverse("my-notifications-preferences"), {"announcements": False}, format="json").data,
                          {"announcements": False, "community_replies": True, "event_reminders": True,
-                          "candidate_events": True})
+                          "candidate_events": True, "community_posts": True, "volunteer_updates": True,
+                          "candidate_bells_paused": False})
         self.client.post(reverse("my-notifications-read-all"))
         self.assertFalse(AuditLog.objects.filter(action__startswith="notification").exists())
 

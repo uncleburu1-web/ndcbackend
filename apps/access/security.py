@@ -43,7 +43,8 @@ SECOND_FACTOR = {
     "admin-integrations-outbox-retry": {"POST"},  # spec 15 §15.3
 }
 # Your own data download and account deletion: any factor, recently (spec 14 §3.5).
-ANY_FACTOR = {"my-data-export": {"POST"}, "my-delete": {"POST"}}
+ANY_FACTOR = {"my-data-export": {"POST"}, "my-delete": {"POST"},
+              "my-pause": {"POST"}, "my-settings-sign-out-others": {"POST"}}  # spec 20 §9, §12
 
 
 class MfaRequired(ServiceError):

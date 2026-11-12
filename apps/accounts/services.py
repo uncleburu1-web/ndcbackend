@@ -24,6 +24,16 @@ def _prefill_name(data: dict) -> str:
     return " ".join(p for p in [(data.get("first_name") or "").strip(), (data.get("last_name") or "").strip()] if p)
 
 
+def _image(data: dict):
+    """The uploaded Clerk photo's URL, "" when they have none, or None when the payload doesn't say (leave as is)."""
+    if "has_image" not in data and "image_url" not in data:
+        return None
+    url = (data.get("image_url") or "").strip()
+    if not data.get("has_image") or not url.startswith("https://img.clerk.com/") or len(url) > 500:
+        return ""
+    return url
+
+
 def upsert_from_clerk(data: dict, *, source: str) -> Optional[User]:
     """
     Create or update the local user from a Clerk user payload (webhook or API fetch).
@@ -32,6 +42,7 @@ def upsert_from_clerk(data: dict, *, source: str) -> Optional[User]:
     clerk_id = data["id"]
     email = _primary_email(data)
     name = _prefill_name(data)
+    image = _image(data)
     now = timezone.now()
 
     with transaction.atomic():
@@ -39,11 +50,14 @@ def upsert_from_clerk(data: dict, *, source: str) -> Optional[User]:
         if user is None:
             try:
                 with transaction.atomic():
-                    user = User.objects.create_user(clerk_id, email=email, full_name=name, clerk_synced_at=now)
+                    user = User.objects.create_user(clerk_id, email=email, full_name=name, image_url=image or "", clerk_synced_at=now)
             except IntegrityError:  # created concurrently (JIT vs webhook)
                 user = User.objects.select_for_update().get(clerk_user_id=clerk_id)
             else:
                 record(AuditLog.Action.USER_CREATED, target=user, actor_label=source)
+                from .settings_services import apply_defaults_for_new_user
+
+                apply_defaults_for_new_user(user)  # spec 20 §14
                 return user
 
         if user.clerk_deleted_at:
@@ -56,8 +70,15 @@ def upsert_from_clerk(data: dict, *, source: str) -> Optional[User]:
         if name and not user.full_name:  # prefill only; never overwrite what the user set in NDCConnect
             changed.append("full_name")
             user.full_name = name
+        if image is not None and image != user.image_url:  # spec 20 §4.1: the photo is changed in Clerk
+            changed.append("image_url")
+            user.image_url = image
         user.clerk_synced_at = now
         user.save(update_fields=[*changed, "clerk_synced_at", "updated_at"])
+        if "image_url" in changed:  # a new photo is new content: a moderator's earlier removal no longer applies (spec 20 §5.1)
+            from .models import UserPreferences
+
+            UserPreferences.objects.filter(user=user, photo_removed_at__isnull=False).update(photo_removed_at=None)
         if "email" in changed:
             record(AuditLog.Action.USER_UPDATED, target=user, actor_label=source, fields=["email"])
         return user
@@ -94,10 +115,12 @@ def mark_deleted(clerk_user_id: str) -> Optional[User]:
             return user
         user.email = ""
         user.full_name = ""
+        user.image_url = ""
         user.phone_number = ""
         user.home_state = ""
         user.last_seen_at, user.mfa_enabled = None, None  # spec 14 §10
         user.is_active = False
+        user.deactivation_kind = "deleted"
         user.deactivated_at = user.deactivated_at or now
         user.clerk_deleted_at = now
         user.clerk_synced_at = now
@@ -139,6 +162,10 @@ def mark_deleted(clerk_user_id: str) -> Optional[User]:
         from apps.privacy.models import DataRequest
 
         DataRequest.objects.filter(user=user).update(user=None)
+        # Spec 20: settings go; the public-profile handle is retired so it's never handed to someone else.
+        from .settings_services import erase_for_deleted_user as erase_settings
+
+        erase_settings(user)
     record(AuditLog.Action.USER_DELETED, target=user, actor_label="clerk:webhook", roles_revoked=roles_revoked,
            follows_removed=follows_removed, donations_anonymised=donations_anonymised, membership_erased=membership_erased,
            pvc_erased=pvc_erased, news_erased=news_erased)

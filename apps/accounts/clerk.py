@@ -110,6 +110,8 @@ def fetch_user(clerk_user_id: str) -> Optional[dict]:
         "id": user.id,
         "first_name": user.first_name,
         "last_name": user.last_name,
+        "has_image": bool(getattr(user, "has_image", False)),
+        "image_url": getattr(user, "image_url", "") or "",
         "primary_email_address_id": user.primary_email_address_id,
         "email_addresses": [{"id": e.id, "email_address": e.email_address} for e in (user.email_addresses or [])],
     }
@@ -162,3 +164,23 @@ def delete_user(clerk_user_id: str) -> bool:
     except Exception:
         logger.error("Clerk delete failed for %s", clerk_user_id, exc_info=True)
         return False
+
+
+def revoke_other_sessions(clerk_user_id: str, keep: str = "") -> int:
+    """Spec 20 §9: sign the person out of every other device. Raises ClerkUnavailable when Clerk can't be reached,
+    so the caller never claims devices were signed out when they weren't."""
+    try:
+        client = _client()
+        with _guarded("sessions.revoke"), client as clerk:
+            sessions = clerk.sessions.list(user_id=clerk_user_id, status="active", limit=100) or []
+            n = 0
+            for s in sessions:
+                if s.id != keep:
+                    clerk.sessions.revoke(session_id=s.id)
+                    n += 1
+        return n
+    except ClerkUnavailable:
+        raise
+    except Exception as exc:
+        logger.error("Clerk session revoke failed for %s", clerk_user_id, exc_info=True)
+        raise ClerkUnavailable("sessions") from exc

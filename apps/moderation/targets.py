@@ -21,6 +21,10 @@ def service(kind):
 
 
 def model_for(kind):
+    if kind == TargetKind.PROFILE:  # spec 20 §5.1: the person's settings row (its pk is the user's id)
+        from apps.accounts.models import UserPreferences
+
+        return UserPreferences
     if kind == TargetKind.EVENT:
         from apps.events.models import Event
 
@@ -58,6 +62,8 @@ def load(kind, target_id):
         qs = qs.select_related("author", "post__community", "campaign_candidate")
     if kind == TargetKind.EVENT:
         qs = qs.select_related("candidate", "created_by")
+    if kind == TargetKind.PROFILE:
+        qs = qs.select_related("user")
     return qs.filter(pk=target_id).first()
 
 
@@ -73,6 +79,8 @@ def is_public(kind, obj) -> bool:
         return False
     if kind in COMMUNITY_KINDS:
         return obj.status == "published" and community_of(kind, obj).active
+    if kind == TargetKind.PROFILE:
+        return bool(obj.public_profile and obj.profile_handle and obj.user.is_active and not obj.user.clerk_deleted_at)
     if kind == TargetKind.EVENT:
         from apps.events.services import is_public as event_public
 
@@ -89,6 +97,10 @@ def title(kind, obj) -> str:
         return ""
     if kind in COMMUNITY_KINDS:
         return " ".join((obj.body or "").split())[:80]
+    if kind == TargetKind.PROFILE:
+        from apps.accounts.naming import format_name
+
+        return f"Public profile · {format_name(obj.user.full_name, obj.name_style) or 'A member'}"[:200]
     return (obj.full_name if kind == TargetKind.CANDIDATE else obj.title)[:200]
 
 
@@ -101,6 +113,8 @@ def state(kind, obj) -> str:
         return obj.state or ""
     if kind in COMMUNITY_KINDS:
         return community_of(kind, obj).state or ""
+    if kind == TargetKind.PROFILE:
+        return obj.user.home_state or ""
     return getattr(obj, "state", "") or ""
 
 
@@ -127,6 +141,8 @@ def owner_ids(kind, obj) -> set:
         return organiser_ids(obj)
     if kind in COMMUNITY_KINDS:  # the author, and accounts linked to the campaign it was posted for (spec 17 §8.2)
         return ({obj.author_id} if obj.author_id else set()) | (set(_linked(obj.campaign_candidate_id)) if obj.campaign_candidate_id else set())
+    if kind == TargetKind.PROFILE:
+        return {obj.user_id}
     return set(_linked(obj.pk))
 
 
@@ -153,6 +169,8 @@ def public_url(kind, obj) -> str:
         return f"/communities/{obj.post.community.path}/posts/{obj.post_id}#comment-{obj.pk}"
     if kind == TargetKind.EVENT:
         return f"/events/{obj.pk}"
+    if kind == TargetKind.PROFILE:
+        return f"/people/{obj.profile_handle}" if obj.profile_handle else ""
     return f"/candidates/{obj.slug}"
 
 
@@ -167,6 +185,8 @@ def admin_url(kind, obj) -> str:
         return public_url(kind, obj)
     if kind == TargetKind.EVENT:
         return f"/admin/events/party/{obj.pk}" if obj.organiser_kind == "party" else f"/events/{obj.pk}"
+    if kind == TargetKind.PROFILE:
+        return public_url(kind, obj)
     return f"/admin/candidates/{obj.pk}"
 
 
@@ -179,6 +199,8 @@ def kind_words(kind, obj=None) -> str:
         return "community comment"
     if kind == TargetKind.EVENT:
         return "event"
+    if kind == TargetKind.PROFILE:
+        return "public profile"
     return "post" if kind == TargetKind.POST else "candidate profile"
 
 
@@ -191,6 +213,12 @@ def parse_url(value: str):
     m = re.search(r"/news/(?:official|community)/([0-9a-f-]{36})", v)
     if m:
         return TargetKind.ARTICLE, load(TargetKind.ARTICLE, m.group(1))
+    m = re.search(r"/people/([a-z0-9]{6})/?$", v)
+    if m:
+        from apps.accounts.models import UserPreferences
+
+        p = UserPreferences.objects.select_related("user").filter(profile_handle=m.group(1)).first()
+        return (TargetKind.PROFILE, p) if p else (None, None)
     m = re.search(r"/events/([0-9a-f-]{36})", v)
     if m:
         return TargetKind.EVENT, load(TargetKind.EVENT, m.group(1))

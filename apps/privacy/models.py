@@ -24,6 +24,7 @@ class Purpose(models.TextChoices):
     COMMUNITY_MEMBERSHIP = "community_membership", "Communities"  # spec 17 §17.1
     EVENT_REGISTRATION = "event_registration", "Event registration"  # spec 18 §17.1
     VOLUNTEERING = "volunteering", "Volunteering"
+    PUBLIC_PROFILE = "public_profile", "Public profile"  # spec 20 §5.1
 
 
 class ConsentRecord(models.Model):

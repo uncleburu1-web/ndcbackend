@@ -19,10 +19,12 @@ def byline(a: Article):
     """The public byline: the author's name only if they chose it (spec 07 §3.6)."""
     if a.source != "community" or not a.show_author_name:
         return None
+    from apps.accounts.naming import format_name, is_gone, name_style
+
     u = a.author
-    if u is None or not u.is_active or u.clerk_deleted_at or not u.full_name:
+    if is_gone(u) or not u.full_name:  # a paused account keeps its byline (spec 20 §12)
         return None
-    return u.full_name
+    return format_name(u.full_name, name_style(u))  # spec 20 §5.2: the person's chosen name style
 
 
 def image_payload(a: Article, request, full=False):
@@ -44,13 +46,14 @@ class PublicArticleSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     byline = serializers.SerializerMethodField()
     byline_verified = serializers.SerializerMethodField()
+    byline_profile = serializers.SerializerMethodField()
     pinned = serializers.SerializerMethodField()
     audience = serializers.SerializerMethodField()
 
     class Meta:
         model = Article
         fields = ["id", "source", "category", "category_label", "title", "excerpt", "state", "state_label", "image", "published_at",
-                  "edited_at", "byline", "byline_verified", "pinned", "audience"]
+                  "edited_at", "byline", "byline_verified", "byline_profile", "pinned", "audience"]
 
     @extend_schema_field(inline_serializer("ArticleAudience", {"id": serializers.UUIDField(), "name": serializers.CharField(),
                                                                 "path": serializers.CharField()}, allow_null=True))
@@ -81,6 +84,15 @@ class PublicArticleSerializer(serializers.ModelSerializer):
         from apps.pvc.services import public_badge
 
         return public_badge(a.author)
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_byline_profile(self, a):
+        """Spec 20 §5.1: the author's public profile handle, only beside a name they chose to show."""
+        if byline(a) is None:
+            return None
+        from apps.accounts.naming import public_handle
+
+        return public_handle(a.author)
 
     def get_pinned(self, a):
         return bool(a.pinned_at)

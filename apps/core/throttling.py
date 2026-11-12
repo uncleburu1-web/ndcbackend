@@ -46,6 +46,8 @@ CATALOGUE = {
     "media_sign": ("user", "Image upload signatures (15)"),
     "ready": ("ip", "Readiness checks (15)"),
     "geo_lookup": ("ip", "Geography lookups for pickers and pages: 120 a minute (19)"),
+    "settings_write": ("user", "Settings changes: 60 a minute (20)"),
+    "people_public": ("ip", "Public profile pages: 60 a minute (20)"),
 }
 
 

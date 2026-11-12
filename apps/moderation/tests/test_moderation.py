@@ -564,8 +564,10 @@ class MigrationTests(TransactionTestCase):
         # communities 0002 (spec 17) needs core 0005; news 0006 needs communities
         # events and volunteers 0002 (spec 18 history triggers) need core 0005 too
         # geo 0003 (spec 19 history trigger) needs core 0005, and membership, pvc and candidates' spec 19 fields need geo 0003
+        # accounts 0006 (spec 20 settings: the profile LGA) needs geo 0003 too
         others = [n for n in leaves if n[0] not in {"moderation", "news", "posts", "notifications", "media", "core", "communities", "events",
-                                                    "volunteers", "geo", "membership", "pvc", "candidates"}] + [
+                                                    "volunteers", "geo", "membership", "pvc", "candidates", "accounts"}] + [
+            ("accounts", "0005_state_field"),
             ("media", "0001_initial"), ("core", "0004_outbox_constraints_prune_index"), ("communities", "0001_initial"),
             ("events", "0001_initial"), ("volunteers", "0001_initial"), ("geo", "0002_spec19_geography"),
             ("membership", "0002_state_field_constraints_geo_links"), ("pvc", "0003_state_field_constraints_geo_links"),

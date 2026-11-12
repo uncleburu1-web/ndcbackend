@@ -222,7 +222,7 @@ class AdminCases(_Private):
                 qs = qs.filter(status=CaseStatus.OPEN)
         if tab != "closed":
             qs = qs.order_by("priority_rank", "opened_at")
-        kind = {"news": "article", "posts": "post", "profiles": "candidate", "events": "event"}.get(qp.get("type", ""), qp.get("type", ""))
+        kind = {"news": "article", "posts": "post", "profiles": "candidate", "events": "event", "people": "profile"}.get(qp.get("type", ""), qp.get("type", ""))
         if kind == "communities":  # spec 17: community posts and comments together
             qs = qs.filter(target_kind__in=T.COMMUNITY_KINDS)
         elif kind in TargetKind.values:
@@ -292,6 +292,13 @@ def _item_payload(case, obj, request):
                 "event": {"type_label": obj.get_type_display(), "starts_at": obj.starts_at, "venue": obj.venue_name or "Online",
                           "venue_type_label": obj.get_venue_type_display() if obj.venue_type else "", "registered": obj.registered_count},
                 "hidden_at": obj.hidden_at}
+    elif k == TargetKind.PROFILE:  # spec 20 §5.1: what the public page shows (bio and photo), as it was if removed
+        from apps.accounts.naming import format_name
+
+        u = obj.user
+        out |= {"body": obj.bio, "state": u.home_state or "", "author": {"label": format_name(u.full_name, obj.name_style) or "A member"},
+                "profile": {"handle": obj.profile_handle, "photo_url": (u.image_url or None) if obj.profile_photo else None,
+                            "bio_removed_at": obj.bio_removed_at, "photo_removed_at": obj.photo_removed_at}}
     else:
         out |= {"body": obj.biography, "position": obj.get_position_display(), "author": None}
     return out
@@ -373,7 +380,7 @@ class AdminCaseAction(_Private):
             S.keep(case, u, note, request=request)
         elif a == "remove":
             S.remove(case, u, str(d.get("rule", "")), str(d.get("note_to_author", "") or "")[:500], str(d.get("internal_note", "") or "")[:1000],
-                     warn=bool(d.get("warn")), request=request)
+                     warn=bool(d.get("warn")), request=request, parts=d.get("parts"))
         elif a == "restore":
             S.restore(case, u, note, request=request)
         elif a == "escalate":

@@ -25,7 +25,7 @@ class MeTests(APITestCase):
         res = self.client.get(ME, **self.auth)
         self.assertEqual(
             set(res.data), {"id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status", "admin_areas", "home_state",
-             "adult_confirmed", "mfa_enabled", "consents_needed", "privacy_version", "admin_mfa_required"}
+             "adult_confirmed", "mfa_enabled", "consents_needed", "privacy_version", "admin_mfa_required", "account_status", "preferences"}
         )
         self.assertEqual(res.data["pvc_status"], "unverified")
 

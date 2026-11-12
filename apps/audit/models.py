@@ -125,6 +125,13 @@ class AuditLog(models.Model):
         GEO_DATASET_APPLIED = "geo.dataset_applied"
         GEO_LINK_CHANGED = "geo.link_changed"
         GEO_ALIAS_CHANGED = "geo.alias_changed"
+        # spec 20 §16.2 (ordinary preference changes are not audited, like follows and bells)
+        SETTINGS_SIGNED_OUT_OTHERS = "settings.signed_out_others"
+        ACCOUNT_PAUSED_SELF = "account.paused_self"
+        ACCOUNT_REACTIVATED_SELF = "account.reactivated_self"
+        PUBLIC_PROFILE_ON = "settings.public_profile_on"
+        PUBLIC_PROFILE_OFF = "settings.public_profile_off"
+        SETTINGS_DEFAULTS_CHANGED = "settings.defaults_changed"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

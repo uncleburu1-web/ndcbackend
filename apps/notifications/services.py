@@ -36,8 +36,9 @@ COMMUNITY_POST_SQL = """
 INSERT INTO notifications_notification (id, recipient_id, kind, community_post_id, community_id, decision, count, created_at)
 SELECT gen_random_uuid(), cm.user_id, 'community_post', %(post)s, %(community)s, '', 1, now()
 FROM communities_communitymembership cm JOIN accounts_user u ON u.id = cm.user_id
+LEFT JOIN notifications_notificationpreference p ON p.user_id = u.id
 WHERE cm.community_id = %(community)s AND cm.status = 'active' AND cm.notify_new_posts AND cm.user_id <> %(author)s
-  AND u.is_active AND u.clerk_deleted_at IS NULL
+  AND u.is_active AND u.clerk_deleted_at IS NULL AND COALESCE(p.community_posts, TRUE)
 ON CONFLICT DO NOTHING
 """
 
@@ -80,8 +81,9 @@ POST_SQL = """
 INSERT INTO notifications_notification (id, recipient_id, kind, candidate_post_id, article_id, decision, created_at)
 SELECT gen_random_uuid(), f.user_id, 'candidate_post', %(post)s, NULL, '', now()
 FROM follows_candidatefollow f JOIN accounts_user u ON u.id = f.user_id
+LEFT JOIN notifications_notificationpreference p ON p.user_id = u.id
 WHERE f.candidate_id = %(candidate)s AND f.notify AND f.notify_changed_at <= %(published_at)s
-  AND u.is_active AND u.clerk_deleted_at IS NULL
+  AND u.is_active AND u.clerk_deleted_at IS NULL AND NOT COALESCE(p.candidate_bells_paused, FALSE)
 ON CONFLICT DO NOTHING
 """
 
@@ -133,8 +135,9 @@ VOLUNTEER_UPDATE_SQL = """
 INSERT INTO notifications_notification (id, recipient_id, kind, volunteer_update_id, candidate_id, decision, count, created_at)
 SELECT gen_random_uuid(), a.user_id, 'volunteer_update', %(update)s, %(candidate)s, '', 1, now()
 FROM volunteers_volunteerapplication a JOIN accounts_user u ON u.id = a.user_id
+LEFT JOIN notifications_notificationpreference p ON p.user_id = u.id
 WHERE a.candidate_id = %(candidate)s AND a.status = 'accepted' AND (%(role)s = '' OR a.roles @> to_jsonb(ARRAY[%(role)s]::text[]))
-  AND u.is_active AND u.clerk_deleted_at IS NULL
+  AND u.is_active AND u.clerk_deleted_at IS NULL AND COALESCE(p.volunteer_updates, TRUE)
 ON CONFLICT DO NOTHING
 """
 
@@ -295,18 +298,18 @@ def mark_all_read(user) -> int:
     return Notification.objects.filter(recipient=user, read_at__isnull=True).update(read_at=timezone.now())
 
 
-PREF_FIELDS = ("announcements", "community_replies", "event_reminders", "candidate_events")
+PREF_FIELDS = ("announcements", "community_replies", "event_reminders", "candidate_events", "community_posts", "volunteer_updates",
+               "candidate_bells_paused")
+PREF_DEFAULTS = {"candidate_bells_paused": False}
 
 
 def preferences(user) -> dict:
     p = NotificationPreference.objects.filter(user=user).first()
-    return {k: getattr(p, k) if p else True for k in PREF_FIELDS}
+    return {k: getattr(p, k) if p else PREF_DEFAULTS.get(k, True) for k in PREF_FIELDS}
 
 
-def set_preferences(user, announcements=None, community_replies=None, event_reminders=None, candidate_events=None) -> dict:
-    given = {"announcements": announcements, "community_replies": community_replies, "event_reminders": event_reminders,
-             "candidate_events": candidate_events}
-    values = {k: bool(v) for k, v in given.items() if v is not None}
+def set_preferences(user, **given) -> dict:
+    values = {k: bool(v) for k, v in given.items() if k in PREF_FIELDS and v is not None}
     NotificationPreference.objects.update_or_create(user=user, defaults=values)
     return preferences(user)
 

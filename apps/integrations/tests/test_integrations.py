@@ -295,7 +295,7 @@ class ClerkCallTests(TestCase):
         from apps.accounts import clerk
 
         u = mk("user_banme")
-        User.objects.filter(pk=u.pk).update(is_active=False)
+        User.objects.filter(pk=u.pk).update(is_active=False, deactivation_kind="admin")  # spec 20: the kind comes with it
         with override_settings(CLERK_SECRET_KEY="sk_test_x"), mock.patch.object(clerk, "set_banned", side_effect=TimeoutError), \
                 self.assertLogs("apps.accounts.clerk", "ERROR"):
             self.assertFalse(clerk.ban_user("user_banme"))
@@ -305,7 +305,7 @@ class ClerkCallTests(TestCase):
             self.assertTrue(outbox.run_job(job))
         ok.assert_called_once_with("user_banme", True)
         # reactivated meanwhile: a stale ban job does nothing
-        User.objects.filter(pk=u.pk).update(is_active=True)
+        User.objects.filter(pk=u.pk).update(is_active=True, deactivation_kind="")
         stale = OutboxJob.objects.create(kind="clerk_ban", payload={"clerk_user_id": "user_banme"}, next_attempt_at=timezone.now())
         with mock.patch.object(clerk, "set_banned") as never:
             outbox.run_job(stale)

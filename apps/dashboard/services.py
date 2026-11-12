@@ -26,7 +26,7 @@ SUMMARY_APPS = ["privacy", "moderation", "communities", "events", "geo", "news",
 CARD_ORDER = ["audit_chain_broken", "incident_deadlines", "privacy_requests_due", "reports_review", "reports_urgent", "appeals_waiting", "legal_due", "community_hidden_waiting", "events_reported", "events_hidden_waiting", "geo_review_waiting", "geo_units_changed", "geo_preview_waiting", "news_pending", "pvc_pending", "membership_approvals", "membership_payments_review",
               "donations_review", "candidates_unpublished", "ban_failed", "background_tasks_failing", "data_integrity_issues", "communities_unmoderated", "events_in_blackout", "access_review_due"]
 GROUPS = [("people", "People"), ("candidates", "Candidates and following"), ("content", "Content"), ("pvc", "PVC"),
-          ("membership", "Membership"), ("donations", "Donations")]
+          ("membership", "Membership"), ("donations", "Donations"), ("settings", "Settings")]
 ADMIN_ROLES = {Role.SYSTEM_ADMIN, Role.NEWS_REVIEWER, Role.PVC_OFFICER, Role.MEMBERSHIP_OFFICER, Role.FINANCE_OFFICER, Role.MODERATOR,
                Role.PRIVACY_OFFICER}
 CACHE_SECONDS = 30

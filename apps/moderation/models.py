@@ -25,6 +25,7 @@ class TargetKind(models.TextChoices):
     COMMUNITY_POST = "community_post", "Community post"  # spec 17 §8.1
     COMMUNITY_COMMENT = "community_comment", "Community comment"
     EVENT = "event", "Event"  # spec 18 §8
+    PROFILE = "profile", "Public profile"  # spec 20 §5.1: the bio and photo
 
 
 class ReportStatus(models.TextChoices):

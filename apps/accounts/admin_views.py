@@ -24,6 +24,8 @@ def summary(u: User) -> dict:
     return {
         "id": str(u.id), "full_name": "" if deleted else u.full_name, "email": "" if deleted else u.email,
         "joined_at": u.created_at, "profile_complete": u.profile_complete, "is_active": u.is_active, "deleted": deleted,
+        # spec 20 §14: Active, Paused by the person, or Deactivated by an admin. Nothing else from Settings.
+        "deactivation_kind": u.deactivation_kind,
         "roles": [{"role": a.role, "scope_type": a.scope_type} for a in u.role_assignments.all() if a.is_active],
     }
 

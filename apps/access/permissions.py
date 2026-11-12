@@ -18,7 +18,19 @@ class IsSignedIn(BasePermission):
 
     def has_permission(self, request, view):
         user = request.user
-        return bool(user and user.is_authenticated and user.is_active)
+        if not (user and user.is_authenticated):
+            return False
+        return bool(user.is_active or _paused_here(request, user))
+
+
+def _paused_here(request, user) -> bool:
+    """Spec 20 §12: a person who paused their own account can still read /me, reactivate, download or delete."""
+    from apps.accounts.authentication import PAUSED_ALLOWED
+
+    if getattr(user, "deactivation_kind", "") != "self" or getattr(user, "clerk_deleted_at", None):
+        return False
+    match = getattr(getattr(request, "_request", request), "resolver_match", None)
+    return bool(match and match.url_name in PAUSED_ALLOWED)
 
 
 class IsProfileComplete(IsSignedIn):

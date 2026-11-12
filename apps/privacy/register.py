@@ -32,13 +32,22 @@ class Category:
 
 CATEGORIES = [
     Category("account", "Your account", ("accounts.User",),
-             "Your name, email, phone number, an optional home state, that you confirmed you're 18 or older, and when you last used the admin "
-             "(admin roles only).",
+             "Your name, email, phone number, the profile photo you uploaded in Clerk (if any), an optional home state, that you confirmed "
+             "you're 18 or older, and when you last used the admin (admin roles only).",
              "To run your account, show your name where you choose to, and contact you about your own requests.",
              "Contract (providing the service you signed up for), NDPA s. 25(1)(b).",
              "You. System administrators can open an account page (audited); a phone number needs an audited reveal.",
              "While your account exists.",
              "Name, email, phone and home state are erased; the record stays, anonymised, so history still adds up."),
+    Category("settings", "Your settings and public profile", ("accounts.UserPreferences", "accounts.RetiredHandle"),
+             "Your language, display and notification-category choices, the name style for your bylines, the default name on your "
+             "donations, and, if you turn it on, your public profile: its address, bio, the location you chose to show and whether to show "
+             "your photo.",
+             "To show NDCConnect the way you asked, on every device, and to publish the profile you chose.",
+             "Contract, NDPA s. 25(1)(b); your explicit consent for the public profile, s. 30(1)(a) (it shows that you use a party platform).",
+             "Only you. The public profile, when on, is public; admins see counts only (for example how many people chose dark mode).",
+             "While your account exists.",
+             "Deleted. A public-profile address is retired so nobody else gets it."),
     Category("roles", "Admin roles", ("access.RoleAssignment",),
              "Which admin or campaign roles you hold, who granted them and when.",
              "To control who can use the admin and to review access every 90 days.",
@@ -190,6 +199,7 @@ CATEGORIES = [
 
 # Models with no personal data, or only derived/public data, and why (the coverage test needs a reason).
 NOT_PERSONAL = {
+    "accounts.SettingsDefaults": "platform defaults for new accounts and the enabled languages; who last changed them (spec 20 §14)",
     "core.JobRun": "background job records: counts only (spec 11)",
     "integrations.WebhookReceipt": "webhook event IDs, types and body hashes; payloads are never stored (spec 15 §12.4)",
     "core.OutboxJob": "background jobs holding record IDs only (spec 15 §9.3)",
@@ -256,6 +266,13 @@ CONSENT_PURPOSES = {
         "and last initial, state, LGA, roles, availability and note; if they accept you, your full name, and your phone number if you "
         "choose to share it. You can withdraw any time.",
         "Your open applications are withdrawn and the campaign can no longer see your contact details.", notice_anchor="volunteering"),
+    "public_profile": ConsentPurpose(
+        "public_profile", "Public profile", 1,
+        "A public profile shows that you use NDCConnect, which says something about your politics. It shows only what you choose: your "
+        "public name, a short bio, your state or LGA, your photo, the Verified voter badge if it's on, and community news you published "
+        "under your name. It never shows who you follow, your communities, membership, PVC or donations. It isn't in search and asks "
+        "search engines not to list it. You can turn it off at any time.",
+        "Your public profile is turned off at once.", notice_anchor="settings"),
     "community_membership": ConsentPurpose(
         "community_membership", "Communities", 1,
         "Communities let you discuss politics with people in your state, LGA, ward and polling unit. Joining records which communities "

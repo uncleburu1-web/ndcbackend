@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
+from drf_spectacular.utils import extend_schema_field, inline_serializer
 from rest_framework import serializers
 
 from apps.access.models import RoleAssignment
@@ -27,12 +28,14 @@ class MeSerializer(serializers.ModelSerializer):
     consents_needed = serializers.SerializerMethodField()
     privacy_version = serializers.SerializerMethodField()
     admin_mfa_required = serializers.SerializerMethodField()
+    account_status = serializers.SerializerMethodField()
+    preferences = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ["id", "email", "full_name", "phone_number", "profile_complete", "roles", "is_system_admin", "pvc_status", "admin_areas",
                   "home_state", "adult_confirmed", "mfa_enabled", "consents_needed", "privacy_version",
-                  "admin_mfa_required"]
+                  "admin_mfa_required", "account_status", "preferences"]
         read_only_fields = fields
 
     def get_pvc_status(self, obj) -> str:
@@ -73,6 +76,22 @@ class MeSerializer(serializers.ModelSerializer):
         from django.conf import settings
 
         return bool(settings.ADMIN_MFA_REQUIRED)
+
+    @extend_schema_field(serializers.ChoiceField(["active", "paused"]))
+    def get_account_status(self, obj) -> str:
+        """Spec 20 §12: "active", or "paused" when the person paused their own account (they can still read /me/)."""
+        return "active" if obj.is_active else "paused"
+
+    @extend_schema_field(inline_serializer("MePreferences", {
+        "language": serializers.CharField(), "theme": serializers.CharField(), "text_size": serializers.CharField(),
+        "contrast": serializers.CharField(), "motion": serializers.CharField(), "saved_at": serializers.DateTimeField(allow_null=True),
+        "updated_at": serializers.DateTimeField(allow_null=True)}))
+    def get_preferences(self, obj):
+        """Spec 20 §13: applied by the app after sign-in and written to the device for the next first paint."""
+        from .settings_services import display_payload, prefs_for
+
+        p = prefs_for(obj)
+        return {"language": p.language, **display_payload(p), "saved_at": p.saved_at, "updated_at": p.updated_at}
 
     def get_privacy_version(self, obj) -> int:
         from apps.privacy.register import PRIVACY_VERSION

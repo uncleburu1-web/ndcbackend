@@ -175,6 +175,947 @@
                 "x-untyped": true
             }
         },
+        "/api/v1/me/settings/": {
+            "get": {
+                "operationId": "my_settings_get",
+                "summary": "All your settings (spec 20)",
+                "tags": [
+                    "me:settings"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Settings"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/me/settings/profile/": {
+            "patch": {
+                "operationId": "my_settings_profile_patch",
+                "summary": "Name style, bio, location and photo choice for your public name and profile",
+                "tags": [
+                    "me:settings"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSettingsProfileRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSettingsProfileRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSettingsProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SettingsProfile"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "settings_write",
+                        "rate": "60/min",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/settings/public-profile/": {
+            "post": {
+                "operationId": "my_settings_public_profile_post",
+                "summary": "Turn your public profile on (needs consent)",
+                "tags": [
+                    "me:settings"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PublicProfileOnRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PublicProfileOnRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PublicProfileOnRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SettingsProfile"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "settings_write",
+                        "rate": "60/min",
+                        "key": "user"
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "my_settings_public_profile_delete",
+                "summary": "Turn your public profile off",
+                "tags": [
+                    "me:settings"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "settings_write",
+                        "rate": "60/min",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/settings/language/": {
+            "patch": {
+                "operationId": "my_settings_language_patch",
+                "summary": "Your interface language",
+                "tags": [
+                    "me:settings"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedLanguageChoiceRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedLanguageChoiceRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedLanguageChoiceRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SettingsLanguage"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "settings_write",
+                        "rate": "60/min",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/settings/accessibility/": {
+            "patch": {
+                "operationId": "my_settings_accessibility_patch",
+                "summary": "Theme, text size, contrast and motion",
+                "tags": [
+                    "me:settings"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSettingsAccessibilityRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSettingsAccessibilityRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSettingsAccessibilityRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SettingsAccessibility"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "settings_write",
+                        "rate": "60/min",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/settings/notifications/": {
+            "get": {
+                "operationId": "my_settings_notifications_get",
+                "summary": "Notification categories (essential ones are locked on)",
+                "tags": [
+                    "me:settings"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SettingsNotifications"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "validation_error"
+                ]
+            },
+            "patch": {
+                "operationId": "my_settings_notifications_patch",
+                "summary": "Turn switchable notification categories on or off, or pause all candidate bells",
+                "tags": [
+                    "me:settings"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedNotificationSwitchesRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedNotificationSwitchesRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedNotificationSwitchesRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SettingsNotifications"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "settings_write",
+                        "rate": "60/min",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/settings/privacy/": {
+            "patch": {
+                "operationId": "my_settings_privacy_patch",
+                "summary": "Default name on your donations",
+                "tags": [
+                    "me:settings"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedPrivacyChoiceRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedPrivacyChoiceRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedPrivacyChoiceRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SettingsPrivacy"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "settings_write",
+                        "rate": "60/min",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/settings/security/sign-out-others/": {
+            "post": {
+                "operationId": "my_settings_sign_out_others_post",
+                "summary": "Sign out of all other devices (needs a recent second check)",
+                "tags": [
+                    "me:settings"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SignedOut"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in",
+                    "recent sign-in confirmation (reverification)"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "reverification_required",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "settings_write",
+                        "rate": "60/min",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/settings/import-device/": {
+            "post": {
+                "operationId": "my_settings_import_device_post",
+                "summary": "Copy this device's language and display settings to an account that has none yet (once)",
+                "tags": [
+                    "me:settings"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceSettingsRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceSettingsRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceSettingsRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SettingsDeviceImport"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "settings_write",
+                        "rate": "60/min",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/pause/": {
+            "post": {
+                "operationId": "my_pause_post",
+                "summary": "Pause your account (needs a recent second check and the word 'pause')",
+                "tags": [
+                    "me:pause"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PauseConfirmRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PauseConfirmRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PauseConfirmRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Paused"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in",
+                    "recent sign-in confirmation (reverification)"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "reverification_required",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "settings_write",
+                        "rate": "60/min",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/me/reactivate/": {
+            "post": {
+                "operationId": "my_reactivate_post",
+                "summary": "Reactivate an account you paused",
+                "tags": [
+                    "me:reactivate"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Reactivated"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "not_authenticated",
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "settings_write",
+                        "rate": "60/min",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
+        "/api/v1/people/{handle}/": {
+            "get": {
+                "operationId": "public_profile_get",
+                "summary": "A person's public profile (only when they turned it on)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "handle",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PublicProfile"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "people_public",
+                        "rate": "60/min",
+                        "key": "ip"
+                    }
+                ],
+                "security": [
+                    {}
+                ]
+            }
+        },
+        "/api/v1/people/{handle}/report/": {
+            "post": {
+                "operationId": "public_profile_report_post",
+                "summary": "Report a public profile's bio or photo (spec 13's reasons)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "handle",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProfileReportRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProfileReportRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProfileReportRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProfileReportResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "not_found",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "news_report",
+                        "rate": "5/hour",
+                        "key": "user or ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/settings/defaults/": {
+            "get": {
+                "operationId": "admin_settings_defaults_get",
+                "summary": "Defaults for new accounts and enabled languages",
+                "tags": [
+                    "admin:settings"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SettingsDefaults"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            },
+            "patch": {
+                "operationId": "admin_settings_defaults_patch",
+                "summary": "Change defaults for new accounts or enabled languages (audited)",
+                "tags": [
+                    "admin:settings"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSettingsDefaultsRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSettingsDefaultsRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedSettingsDefaultsRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SettingsDefaults"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "settings_write",
+                        "rate": "60/min",
+                        "key": "user"
+                    }
+                ]
+            }
+        },
         "/api/v1/webhooks/clerk/": {
             "post": {
                 "operationId": "clerk_webhook_post",
@@ -5075,7 +6016,7 @@
             },
             "patch": {
                 "operationId": "my_notifications_preferences_patch",
-                "summary": "Turn announcement, community-reply, event-reminder or new-event notifications on or off",
+                "summary": "Turn notification categories on or off (alias of /me/settings/notifications/)",
                 "tags": [
                     "me:notifications"
                 ],
@@ -16919,6 +17860,14 @@
                     "ward_ids"
                 ]
             },
+            "ContrastEnum": {
+                "enum": [
+                    "system",
+                    "standard",
+                    "more"
+                ],
+                "type": "string"
+            },
             "CountsSchema": {
                 "type": "object",
                 "properties": {
@@ -17239,6 +18188,38 @@
                 "required": [
                     "file"
                 ]
+            },
+            "DeviceSettingsRequest": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "theme": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "text_size": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "contrast": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "motion": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "DonationNameDefaultEnum": {
+                "enum": [
+                    "anonymous",
+                    "name"
+                ],
+                "type": "string"
             },
             "EventActionRequestRequest": {
                 "type": "object",
@@ -18153,6 +19134,55 @@
                     "webhooks"
                 ]
             },
+            "LanguageOption": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "native": {
+                        "type": "string"
+                    },
+                    "enabled": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "code",
+                    "enabled",
+                    "label",
+                    "native"
+                ]
+            },
+            "LanguageOptionRequest": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "label": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "native": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "enabled": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "code",
+                    "enabled",
+                    "label",
+                    "native"
+                ]
+            },
             "LevelEnum": {
                 "enum": [
                     "national",
@@ -18355,6 +19385,13 @@
                     "notify_new_posts"
                 ]
             },
+            "MotionEnum": {
+                "enum": [
+                    "system",
+                    "reduce"
+                ],
+                "type": "string"
+            },
             "MyCommunitiesSchema": {
                 "type": "object",
                 "properties": {
@@ -18516,6 +19553,45 @@
                     "results",
                     "updates"
                 ]
+            },
+            "NameExamples": {
+                "type": "object",
+                "properties": {
+                    "first_initial": {
+                        "type": "string"
+                    },
+                    "full": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "first_initial",
+                    "full"
+                ]
+            },
+            "NameExamplesRequest": {
+                "type": "object",
+                "properties": {
+                    "first_initial": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "full": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "first_initial",
+                    "full"
+                ]
+            },
+            "NameStyleEnum": {
+                "enum": [
+                    "first_initial",
+                    "full"
+                ],
+                "type": "string"
             },
             "NigerianStateEnum": {
                 "enum": [
@@ -18786,6 +19862,44 @@
                     "title"
                 ]
             },
+            "NotificationCategory": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "kinds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "help": {
+                        "type": "string"
+                    },
+                    "on": {
+                        "type": "boolean"
+                    },
+                    "locked": {
+                        "type": "boolean"
+                    },
+                    "reason": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "help",
+                    "key",
+                    "kinds",
+                    "label",
+                    "locked",
+                    "on",
+                    "reason"
+                ]
+            },
             "NotificationCommunity": {
                 "type": "object",
                 "properties": {
@@ -18994,13 +20108,25 @@
                     },
                     "candidate_events": {
                         "type": "boolean"
+                    },
+                    "community_posts": {
+                        "type": "boolean"
+                    },
+                    "volunteer_updates": {
+                        "type": "boolean"
+                    },
+                    "candidate_bells_paused": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
                     "announcements",
+                    "candidate_bells_paused",
                     "candidate_events",
+                    "community_posts",
                     "community_replies",
-                    "event_reminders"
+                    "event_reminders",
+                    "volunteer_updates"
                 ]
             },
             "NotificationPrivacyRequest": {
@@ -19673,6 +20799,15 @@
                     }
                 }
             },
+            "PatchedLanguageChoiceRequest": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
             "PatchedNotificationPreferencesRequest": {
                 "type": "object",
                 "properties": {
@@ -19686,6 +20821,169 @@
                         "type": "boolean"
                     },
                     "candidate_events": {
+                        "type": "boolean"
+                    },
+                    "community_posts": {
+                        "type": "boolean"
+                    },
+                    "volunteer_updates": {
+                        "type": "boolean"
+                    },
+                    "candidate_bells_paused": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "PatchedNotificationSwitchesRequest": {
+                "type": "object",
+                "properties": {
+                    "candidate_events": {
+                        "type": "boolean"
+                    },
+                    "announcements": {
+                        "type": "boolean"
+                    },
+                    "community_replies": {
+                        "type": "boolean"
+                    },
+                    "community_posts": {
+                        "type": "boolean"
+                    },
+                    "event_reminders": {
+                        "type": "boolean"
+                    },
+                    "volunteer_updates": {
+                        "type": "boolean"
+                    },
+                    "candidate_bells_paused": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "PatchedPrivacyChoiceRequest": {
+                "type": "object",
+                "properties": {
+                    "donation_name_default": {
+                        "$ref": "#/components/schemas/DonationNameDefaultEnum"
+                    }
+                }
+            },
+            "PatchedSettingsAccessibilityRequest": {
+                "type": "object",
+                "properties": {
+                    "theme": {
+                        "$ref": "#/components/schemas/ThemeEnum"
+                    },
+                    "text_size": {
+                        "$ref": "#/components/schemas/TextSizeEnum"
+                    },
+                    "contrast": {
+                        "$ref": "#/components/schemas/ContrastEnum"
+                    },
+                    "motion": {
+                        "$ref": "#/components/schemas/MotionEnum"
+                    }
+                }
+            },
+            "PatchedSettingsDefaultsRequest": {
+                "type": "object",
+                "properties": {
+                    "enabled_languages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    },
+                    "languages": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LanguageOptionRequest"
+                        }
+                    },
+                    "translations_complete": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    },
+                    "notifications": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "boolean"
+                        }
+                    },
+                    "notification_labels": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    },
+                    "default_theme": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "default_text_size": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                }
+            },
+            "PatchedSettingsProfileRequest": {
+                "type": "object",
+                "properties": {
+                    "consent": {
+                        "$ref": "#/components/schemas/SettingsConsentRequest"
+                    },
+                    "public_profile": {
+                        "type": "boolean"
+                    },
+                    "handle": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "minLength": 1
+                    },
+                    "name_style": {
+                        "$ref": "#/components/schemas/NameStyleEnum"
+                    },
+                    "name_examples": {
+                        "$ref": "#/components/schemas/NameExamplesRequest"
+                    },
+                    "bio": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "bio_removed": {
+                        "type": "boolean"
+                    },
+                    "photo_removed": {
+                        "type": "boolean"
+                    },
+                    "profile_location": {
+                        "$ref": "#/components/schemas/ProfileLocationEnum"
+                    },
+                    "profile_lga": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/SettingsLgaRequest"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "profile_photo": {
                         "type": "boolean"
                     }
                 }
@@ -19732,6 +21030,37 @@
                         "format": "uuid"
                     }
                 }
+            },
+            "PauseConfirmRequest": {
+                "type": "object",
+                "properties": {
+                    "confirm": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "confirm"
+                ]
+            },
+            "Paused": {
+                "type": "object",
+                "properties": {
+                    "paused": {
+                        "type": "boolean"
+                    },
+                    "registrations_cancelled": {
+                        "type": "integer"
+                    },
+                    "applications_withdrawn": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "applications_withdrawn",
+                    "paused",
+                    "registrations_cancelled"
+                ]
             },
             "PinnedSchema": {
                 "type": "object",
@@ -19956,6 +21285,46 @@
                     "status"
                 ]
             },
+            "ProfileLocationEnum": {
+                "enum": [
+                    "none",
+                    "state",
+                    "lga"
+                ],
+                "type": "string"
+            },
+            "ProfileReportRequest": {
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "details": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "contact_email": {
+                        "type": "string",
+                        "format": "email",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "reason"
+                ]
+            },
+            "ProfileReportResponse": {
+                "type": "object",
+                "properties": {
+                    "reference": {
+                        "type": "string"
+                    },
+                    "route": {
+                        "type": "string"
+                    }
+                }
+            },
             "PublicCandidate": {
                 "type": "object",
                 "description": "§7.1 — public fields ONLY. Never notes, verifier, linked accounts, creator, status history.",
@@ -20125,6 +21494,116 @@
                     "verified"
                 ]
             },
+            "PublicProfile": {
+                "type": "object",
+                "properties": {
+                    "handle": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "bio": {
+                        "type": "string"
+                    },
+                    "location": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/PublicProfileLocation"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "verified_voter": {
+                        "type": "boolean"
+                    },
+                    "photo_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "member_since": {
+                        "type": "string"
+                    },
+                    "news": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PublicProfileNews"
+                        }
+                    }
+                },
+                "required": [
+                    "bio",
+                    "handle",
+                    "location",
+                    "member_since",
+                    "name",
+                    "news",
+                    "photo_url",
+                    "verified_voter"
+                ]
+            },
+            "PublicProfileLocation": {
+                "type": "object",
+                "properties": {
+                    "state": {
+                        "type": "string"
+                    },
+                    "state_label": {
+                        "type": "string"
+                    },
+                    "lga": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "lga",
+                    "state",
+                    "state_label"
+                ]
+            },
+            "PublicProfileNews": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "id",
+                    "published_at",
+                    "title"
+                ]
+            },
+            "PublicProfileOnRequest": {
+                "type": "object",
+                "properties": {
+                    "consent": {
+                        "type": "boolean"
+                    },
+                    "version": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "consent",
+                    "version"
+                ]
+            },
             "PurposeEnum": {
                 "enum": [
                     "candidate_photo",
@@ -20148,6 +21627,17 @@
                 "required": [
                     "liked",
                     "reaction_count"
+                ]
+            },
+            "Reactivated": {
+                "type": "object",
+                "properties": {
+                    "active": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "active"
                 ]
             },
             "ReadScopeEnum": {
@@ -20410,6 +21900,466 @@
                 ],
                 "type": "string"
             },
+            "Settings": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "$ref": "#/components/schemas/SettingsLanguage"
+                    },
+                    "accessibility": {
+                        "$ref": "#/components/schemas/SettingsAccessibility"
+                    },
+                    "notifications": {
+                        "$ref": "#/components/schemas/SettingsNotifications"
+                    },
+                    "profile": {
+                        "$ref": "#/components/schemas/SettingsProfile"
+                    },
+                    "privacy": {
+                        "$ref": "#/components/schemas/SettingsPrivacy"
+                    },
+                    "account": {
+                        "$ref": "#/components/schemas/SettingsAccount"
+                    },
+                    "manage": {
+                        "$ref": "#/components/schemas/SettingsManage"
+                    },
+                    "connected": {
+                        "$ref": "#/components/schemas/SettingsConnected"
+                    },
+                    "saved_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "accessibility",
+                    "account",
+                    "connected",
+                    "language",
+                    "manage",
+                    "notifications",
+                    "privacy",
+                    "profile",
+                    "saved_at",
+                    "updated_at"
+                ]
+            },
+            "SettingsAccessibility": {
+                "type": "object",
+                "properties": {
+                    "theme": {
+                        "$ref": "#/components/schemas/ThemeEnum"
+                    },
+                    "text_size": {
+                        "$ref": "#/components/schemas/TextSizeEnum"
+                    },
+                    "contrast": {
+                        "$ref": "#/components/schemas/ContrastEnum"
+                    },
+                    "motion": {
+                        "$ref": "#/components/schemas/MotionEnum"
+                    }
+                },
+                "required": [
+                    "contrast",
+                    "motion",
+                    "text_size",
+                    "theme"
+                ]
+            },
+            "SettingsAccount": {
+                "type": "object",
+                "properties": {
+                    "full_name": {
+                        "type": "string"
+                    },
+                    "phone_number": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "home_state": {
+                        "type": "string"
+                    },
+                    "membership_status": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "pvc_status": {
+                        "type": "string"
+                    },
+                    "staff": {
+                        "type": "boolean"
+                    },
+                    "mfa_enabled": {
+                        "type": [
+                            "boolean",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "email",
+                    "full_name",
+                    "home_state",
+                    "membership_status",
+                    "mfa_enabled",
+                    "phone_number",
+                    "pvc_status",
+                    "staff",
+                    "status"
+                ]
+            },
+            "SettingsCampaign": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "slug"
+                ]
+            },
+            "SettingsConnected": {
+                "type": "object",
+                "properties": {
+                    "campaigns": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SettingsCampaign"
+                        }
+                    }
+                },
+                "required": [
+                    "campaigns"
+                ]
+            },
+            "SettingsConsent": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "integer"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "label",
+                    "text",
+                    "version"
+                ]
+            },
+            "SettingsConsentRequest": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "integer"
+                    },
+                    "text": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "label": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "label",
+                    "text",
+                    "version"
+                ]
+            },
+            "SettingsDefaults": {
+                "type": "object",
+                "properties": {
+                    "enabled_languages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "languages": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LanguageOption"
+                        }
+                    },
+                    "translations_complete": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "notifications": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "boolean"
+                        }
+                    },
+                    "notification_labels": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    },
+                    "default_theme": {
+                        "type": "string"
+                    },
+                    "default_text_size": {
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "default_text_size",
+                    "default_theme",
+                    "enabled_languages",
+                    "languages",
+                    "notification_labels",
+                    "notifications",
+                    "translations_complete",
+                    "updated_at"
+                ]
+            },
+            "SettingsDeviceImport": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "$ref": "#/components/schemas/SettingsLanguage"
+                    },
+                    "accessibility": {
+                        "$ref": "#/components/schemas/SettingsAccessibility"
+                    },
+                    "saved_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "accessibility",
+                    "language",
+                    "saved_at"
+                ]
+            },
+            "SettingsLanguage": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "type": "string"
+                    },
+                    "options": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LanguageOption"
+                        }
+                    }
+                },
+                "required": [
+                    "language",
+                    "options"
+                ]
+            },
+            "SettingsLga": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name"
+                ]
+            },
+            "SettingsLgaRequest": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "id",
+                    "name"
+                ]
+            },
+            "SettingsManage": {
+                "type": "object",
+                "properties": {
+                    "upcoming_registrations": {
+                        "type": "integer"
+                    },
+                    "pending_volunteer_applications": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "pending_volunteer_applications",
+                    "upcoming_registrations"
+                ]
+            },
+            "SettingsNotifications": {
+                "type": "object",
+                "properties": {
+                    "categories": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/NotificationCategory"
+                        }
+                    },
+                    "candidate_bells_paused": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "candidate_bells_paused",
+                    "categories"
+                ]
+            },
+            "SettingsPrivacy": {
+                "type": "object",
+                "properties": {
+                    "donation_name_default": {
+                        "$ref": "#/components/schemas/DonationNameDefaultEnum"
+                    },
+                    "verified_badge": {
+                        "type": "boolean"
+                    },
+                    "named_news": {
+                        "type": "integer"
+                    },
+                    "public_profile": {
+                        "type": "boolean"
+                    },
+                    "name_style": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "donation_name_default",
+                    "name_style",
+                    "named_news",
+                    "public_profile",
+                    "verified_badge"
+                ]
+            },
+            "SettingsProfile": {
+                "type": "object",
+                "properties": {
+                    "consent": {
+                        "$ref": "#/components/schemas/SettingsConsent"
+                    },
+                    "public_profile": {
+                        "type": "boolean"
+                    },
+                    "handle": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "name_style": {
+                        "$ref": "#/components/schemas/NameStyleEnum"
+                    },
+                    "name_examples": {
+                        "$ref": "#/components/schemas/NameExamples"
+                    },
+                    "bio": {
+                        "type": "string"
+                    },
+                    "bio_removed": {
+                        "type": "boolean"
+                    },
+                    "photo_removed": {
+                        "type": "boolean"
+                    },
+                    "profile_location": {
+                        "$ref": "#/components/schemas/ProfileLocationEnum"
+                    },
+                    "profile_lga": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/SettingsLga"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "profile_photo": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "bio",
+                    "bio_removed",
+                    "consent",
+                    "handle",
+                    "name_examples",
+                    "name_style",
+                    "photo_removed",
+                    "profile_lga",
+                    "profile_location",
+                    "profile_photo",
+                    "public_profile"
+                ]
+            },
+            "SignedOut": {
+                "type": "object",
+                "properties": {
+                    "signed_out": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "signed_out"
+                ]
+            },
             "StateSchema": {
                 "type": "object",
                 "properties": {
@@ -20501,6 +22451,22 @@
                     "polling_unit",
                     "ward"
                 ]
+            },
+            "TextSizeEnum": {
+                "enum": [
+                    "standard",
+                    "large",
+                    "larger"
+                ],
+                "type": "string"
+            },
+            "ThemeEnum": {
+                "enum": [
+                    "system",
+                    "light",
+                    "dark"
+                ],
+                "type": "string"
             },
             "TypeEnum": {
                 "enum": [
@@ -21299,6 +23265,11 @@
             "meaning": "The account was deactivated by an administrator.",
             "web_handling": true
         },
+        "account_paused": {
+            "status": 403,
+            "meaning": "The person paused their own account; only /me/, reactivation, data download and deletion work (20).",
+            "web_handling": true
+        },
         "already_applied": {
             "status": 409,
             "meaning": "You already have an open application for this campaign.",
@@ -21464,6 +23435,11 @@
             "meaning": "The item has already moved to another state.",
             "web_handling": false
         },
+        "language_unavailable": {
+            "status": 400,
+            "meaning": "That language isn't enabled yet (its translations aren't complete) (20).",
+            "web_handling": false
+        },
         "last_system_admin": {
             "status": 409,
             "meaning": "There must always be at least one system administrator.",
@@ -21584,9 +23560,19 @@
             "meaning": "Posting is paused: a candidate in a blackout, a community's posting switch, or a community pause; see `until`.",
             "web_handling": true
         },
+        "profile_consent_required": {
+            "status": 400,
+            "meaning": "Turning on a public profile needs the current consent version; see `purpose`, `version`, `text` (20).",
+            "web_handling": false
+        },
         "profile_incomplete": {
             "status": 403,
             "meaning": "Finish your profile first.",
+            "web_handling": false
+        },
+        "profile_location_invalid": {
+            "status": 400,
+            "meaning": "The profile location needs a home state, and an LGA in that state; see `fields` (20).",
             "web_handling": false
         },
         "publishing_paused": {
@@ -21901,6 +23887,11 @@
             "purpose": "Paystack webhooks (05)",
             "rate": "600/min"
         },
+        "people_public": {
+            "key": "ip",
+            "purpose": "Public profile pages: 60 a minute (20)",
+            "rate": "60/min"
+        },
         "pii_reveal": {
             "key": "user",
             "purpose": "Officer reveals of VIN, NIN and phone numbers (06)",
@@ -21934,6 +23925,11 @@
         "search_public": {
             "key": "ip",
             "purpose": "Search (12)",
+            "rate": "60/min"
+        },
+        "settings_write": {
+            "key": "user",
+            "purpose": "Settings changes: 60 a minute (20)",
             "rate": "60/min"
         },
         "volunteer_apply": {

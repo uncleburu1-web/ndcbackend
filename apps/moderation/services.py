@@ -176,7 +176,7 @@ def can_view(user, case, obj=None) -> bool:
         from apps.communities.services import moderates
 
         return moderates(user, T.community_of(case.target_kind, obj))
-    if case.target_kind == TargetKind.EVENT:  # spec 18 §8: platform-wide moderators
+    if case.target_kind in (TargetKind.EVENT, TargetKind.PROFILE):  # spec 18 §8, spec 20 §5.1: platform-wide moderators
         return r["mod"]
     if case.target_kind == TargetKind.CANDIDATE or T.is_official(case.target_kind, obj):
         return False
@@ -196,7 +196,8 @@ def visible_cases(user):
     community = Article.objects.filter(source="community").values("pk")
     allowed = Q(target_kind=TargetKind.ARTICLE, target_id__in=community) if (r["mod"] or r["news"]) else Q(pk__in=[])
     if r["mod"]:
-        allowed |= Q(target_kind=TargetKind.POST) | Q(target_kind__in=T.COMMUNITY_KINDS) | Q(target_kind=TargetKind.EVENT)
+        allowed |= (Q(target_kind=TargetKind.POST) | Q(target_kind__in=T.COMMUNITY_KINDS) | Q(target_kind=TargetKind.EVENT)
+                    | Q(target_kind=TargetKind.PROFILE))
     else:  # a community-scoped moderator: items in their communities and every level below (spec 17 §8.2)
         from apps.communities.models import CommunityComment, CommunityPost
         from apps.communities.services import scope_paths, under_paths
@@ -390,7 +391,7 @@ def _validate_rule(rule_id):
         raise _err("Choose the rule it broke.", "rule_required")
 
 
-def remove(case, user, rule_id, note_to_author="", internal_note="", warn=False, request=None):
+def remove(case, user, rule_id, note_to_author="", internal_note="", warn=False, request=None, parts=None):
     """Spec 13 §6.2. The owning app removes the item; its service calls `content_removed`, which closes this case."""
     _validate_rule(rule_id)
     with transaction.atomic():
@@ -413,6 +414,10 @@ def remove(case, user, rule_id, note_to_author="", internal_note="", warn=False,
             posts.remove_post(obj, user, reason, request=request, rule=rule_id, note_to_author=note, internal_note=internal_note)
         elif c.target_kind in T.HIDEABLE_KINDS:
             T.service(c.target_kind).remove(obj, user, rule=rule_id, note_to_author=note, internal_note=internal_note)
+        elif c.target_kind == TargetKind.PROFILE:  # spec 20 §5.1: the bio, the photo or both; never edited
+            from apps.accounts import settings_services
+
+            settings_services.moderator_remove(obj, user, rule=rule_id, parts=parts, note_to_author=note, internal_note=internal_note)
         else:
             raise _err("Candidate profiles aren't removed: correct the profile, then close the case with Keep.", "invalid_transition", 409)
         if warn:
@@ -466,6 +471,10 @@ def _restore_target(c, obj, user, note, request=None):
         news.restore(obj, user, request=request, note=note)
     elif c.target_kind in T.HIDEABLE_KINDS:
         T.service(c.target_kind).restore(obj, user, note)
+    elif c.target_kind == TargetKind.PROFILE:
+        from apps.accounts import settings_services
+
+        settings_services.moderator_restore(obj, user, note)
     else:
         from apps.posts import services as posts
 
@@ -747,6 +756,10 @@ def set_item_outcome(item, by, outcome, reason="", request=None):
                                 note_to_author=reason)
                 elif c.target_kind in T.HIDEABLE_KINDS:
                     T.service(c.target_kind).remove(obj, by, rule=rule_id, note_to_author=reason, source=c.source)
+                elif c.target_kind == TargetKind.PROFILE:
+                    from apps.accounts import settings_services
+
+                    settings_services.moderator_remove(obj, by, rule=rule_id, note_to_author=reason, source=c.source)
                 else:
                     from apps.posts import services as posts
 
@@ -927,7 +940,8 @@ def _owned_case_ids(user):
     return Case.objects.filter(Q(target_kind=TargetKind.ARTICLE, target_id__in=news) | Q(target_kind=TargetKind.POST, target_id__in=posts)
                                | Q(target_kind=TargetKind.COMMUNITY_POST, target_id__in=cposts)
                                | Q(target_kind=TargetKind.COMMUNITY_COMMENT, target_id__in=ccomments)
-                               | Q(target_kind=TargetKind.EVENT, target_id__in=events))
+                               | Q(target_kind=TargetKind.EVENT, target_id__in=events)
+                               | Q(target_kind=TargetKind.PROFILE, target_id=user.pk))  # spec 20 §5.1: their own public profile
 
 
 def _appeal_payload(a):

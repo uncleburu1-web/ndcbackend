@@ -36,6 +36,37 @@ Indexes:
 
 - `access_role_user_id_267653_idx`: (user, role, is_active)
 
+### `accounts.RetiredHandle` — `accounts_retiredhandle`
+
+Public-profile handles that belonged to a deleted account: never handed out again (spec 20 §16.2).
+
+Data register: Your settings and public profile.
+
+| Column | Type | Null | Notes |
+|---|---|---|---|
+| `handle` | varchar(6) |  | primary key |
+| `retired_at` | timestamptz |  |  |
+
+### `accounts.SettingsDefaults` — `accounts_settingsdefaults`
+
+One row (spec 20 §14): what new accounts start with, and which languages can be chosen. System admins only; audited.
+
+Data register: Not personal.
+
+| Column | Type | Null | Notes |
+|---|---|---|---|
+| `id` | smallint ≥ 0 |  | primary key |
+| `enabled_languages` | jsonb |  | a few language codes from a fixed list, always read whole (spec 20 §14) |
+| `notifications` | jsonb |  | category → on/off for new accounts, always read whole (spec 20 §14) |
+| `default_theme` | varchar(6) |  | one of system, light, dark |
+| `default_text_size` | varchar(8) |  | one of standard, large, larger |
+| `updated_by_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
+| `updated_at` | timestamptz |  |  |
+
+Constraints:
+
+- `accounts_settings_defaults_single_row`: check id = 1
+
 ### `accounts.User` — `accounts_user`
 
 A person's NDCConnect account, linked to Clerk by `clerk_user_id`. Never hard-deleted: anonymised when the person deletes their account.
@@ -57,8 +88,10 @@ Data register: Your account.
 | `mfa_enabled` | boolean | yes |  |
 | `home_state` | varchar(20) |  | one of 37 values |
 | `welcome_shown_at` | timestamptz | yes |  |
+| `image_url` | varchar(500) |  |  |
 | `is_active` | boolean |  |  |
 | `deactivated_at` | timestamptz | yes |  |
+| `deactivation_kind` | varchar(8) |  | one of , admin, self, deleted |
 | `clerk_deleted_at` | timestamptz | yes |  |
 | `clerk_synced_at` | timestamptz | yes |  |
 | `created_at` | timestamptz |  |  |
@@ -67,6 +100,39 @@ Data register: Your account.
 Constraints:
 
 - `accounts_home_state_valid`: check home_state in (37 values) or home_state = ''
+- `accounts_deactivation_kind_matches`: check (is_active = True and deactivation_kind = '') or (is_active = False and not (deactivation_kind = ''))
+
+### `accounts.UserPreferences` — `accounts_userpreferences`
+
+A person's settings (spec 20 §16.1). One row, created on first save; defaults apply when it's missing. Only the person reads or changes it (rule 6).
+
+Data register: Your settings and public profile.
+
+| Column | Type | Null | Notes |
+|---|---|---|---|
+| `user_id` | → (one) |  | primary key; → `accounts.User`, on delete CASCADE (owner of private data; erased through the owning service) |
+| `language` | varchar(3) |  | one of en, ha, ig, yo, pcm |
+| `theme` | varchar(6) |  | one of system, light, dark |
+| `text_size` | varchar(8) |  | one of standard, large, larger |
+| `contrast` | varchar(8) |  | one of system, standard, more |
+| `motion` | varchar(6) |  | one of system, reduce |
+| `name_style` | varchar(13) |  | one of first_initial, full |
+| `donation_name_default` | varchar(9) |  | one of anonymous, name |
+| `public_profile` | boolean |  |  |
+| `profile_handle` | varchar(6) | yes | unique |
+| `bio` | varchar(300) |  |  |
+| `profile_location` | varchar(5) |  | one of none, state, lga |
+| `profile_lga_id` | → | yes | → `geo.Lga`, on delete PROTECT (reference data is deactivated, never deleted) |
+| `profile_photo` | boolean |  |  |
+| `bio_removed_at` | timestamptz | yes |  |
+| `photo_removed_at` | timestamptz | yes |  |
+| `saved_at` | timestamptz | yes |  |
+| `updated_at` | timestamptz |  |  |
+
+Constraints:
+
+- `accounts_prefs_profile_has_handle`: check public_profile = False or profile_handle is not null
+- `accounts_prefs_lga_only_for_lga`: check profile_lga is null or profile_location = 'lga'
 
 ### `audit.AuditLog` — `audit_auditlog`
 
@@ -79,7 +145,7 @@ Data register: Security and audit records.
 | `id` | uuid |  | primary key |
 | `actor_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
 | `actor_label` | varchar(32) |  |  |
-| `action` | varchar(48) |  | one of 110 values; indexed |
+| `action` | varchar(48) |  | one of 116 values; indexed |
 | `target_type` | varchar(64) |  |  |
 | `target_id` | varchar(64) |  | indexed |
 | `metadata` | jsonb |  | per-action details from an allow-list; displayed, never joined |
@@ -652,7 +718,7 @@ Data register: Reports and moderation.
 | Column | Type | Null | Notes |
 |---|---|---|---|
 | `id` | uuid |  | primary key |
-| `target_kind` | varchar(20) |  | one of article, post, candidate, community_post, community_comment, event |
+| `target_kind` | varchar(20) |  | one of article, post, candidate, community_post, community_comment, event, profile |
 | `target_id` | uuid |  |  |
 | `source` | varchar(20) |  | one of user_report, agency_notice, court_order, copyright_notice, proactive |
 | `status` | varchar(10) |  | one of open, escalated, closed |
@@ -774,7 +840,7 @@ Data register: Reports and moderation.
 |---|---|---|---|
 | `id` | uuid |  | primary key |
 | `reference` | varchar(12) |  | unique |
-| `target_kind` | varchar(20) |  | one of article, post, candidate, community_post, community_comment, event |
+| `target_kind` | varchar(20) |  | one of article, post, candidate, community_post, community_comment, event, profile |
 | `target_id` | uuid |  |  |
 | `case_id` | → |  | → `moderation.Case`, on delete CASCADE (reports are grouped by their case and pruned with it) |
 | `reason` | varchar(16) |  |  |
@@ -869,7 +935,7 @@ Indexes:
 
 ### `notifications.NotificationPreference` — `notifications_notificationpreference`
 
-A person's notification settings (announcements on or off).
+A person's notification switches (spec 07, 17, 18, 20). Essential notices have no switch (spec 20 §7).
 
 Data register: Notifications.
 
@@ -881,6 +947,9 @@ Data register: Notifications.
 | `community_replies` | boolean |  |  |
 | `event_reminders` | boolean |  |  |
 | `candidate_events` | boolean |  |  |
+| `community_posts` | boolean |  |  |
+| `volunteer_updates` | boolean |  |  |
+| `candidate_bells_paused` | boolean |  |  |
 | `updated_at` | timestamptz |  |  |
 
 ## Privacy and security
@@ -922,7 +991,7 @@ Data register: Your privacy choices and requests.
 |---|---|---|---|
 | `id` | uuid |  | primary key |
 | `user_id` | → |  | → `accounts.User`, on delete CASCADE (owner of private data; erased through the owning service) |
-| `purpose` | varchar(24) |  | one of political_following, membership, pvc_check, verified_badge, community_membership, event_registration, volunteering |
+| `purpose` | varchar(24) |  | one of political_following, membership, pvc_check, verified_badge, community_membership, event_registration, volunteering, public_profile |
 | `version` | smallint ≥ 0 |  |  |
 | `method` | varchar(16) |  | one of dialog, form, before_records |
 | `granted_at` | timestamptz |  |  |

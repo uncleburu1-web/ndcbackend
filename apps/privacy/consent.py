@@ -100,6 +100,10 @@ def _undo(user, purpose, options=None) -> str:
         from apps.pvc.services import erase_for_withdrawn_consent as erase_pvc
 
         return "PVC details deleted" if erase_pvc(user) else "no PVC details on file"
+    if purpose == "public_profile":  # spec 20 §5.1
+        from apps.accounts.settings_services import profile_off
+
+        return "public profile turned off" if profile_off(user) else "public profile was already off"
     if purpose == "verified_badge":
         from apps.pvc.models import PvcVerification
 

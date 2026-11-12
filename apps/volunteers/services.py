@@ -256,6 +256,18 @@ def withdraw_all(user) -> int:
     return n
 
 
+def withdraw_pending(user) -> int:
+    """Spec 20 §12: pausing an account withdraws applications still waiting for a decision (accepted ones stay)."""
+    n = 0
+    with transaction.atomic():
+        for a in VolunteerApplication.objects.select_for_update().filter(user=user, status=AppStatus.PENDING):
+            a.status, a.ended_at = AppStatus.WITHDRAWN, timezone.now()
+            a.save(update_fields=["status", "ended_at", "updated_at"])
+            _history(a, VolunteerChangeKind.WITHDRAWN, user)
+            n += 1
+    return n
+
+
 def erase_for_deleted_user(user) -> dict:
     from apps.core.history import allow_history_delete
 

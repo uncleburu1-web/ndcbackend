@@ -46,7 +46,9 @@ NOTIFICATION = inline_serializer("Notification", {
 NOTIFICATION_PAGE = inline_serializer("NotificationPage", {"count": S.IntegerField(), "next": S.CharField(allow_null=True),
                                                            "previous": S.CharField(allow_null=True), "results": S.ListField(child=NOTIFICATION)})
 PREFERENCES = inline_serializer("NotificationPreferences", {"announcements": S.BooleanField(), "community_replies": S.BooleanField(),
-                                                           "event_reminders": S.BooleanField(), "candidate_events": S.BooleanField()})
+                                                           "event_reminders": S.BooleanField(), "candidate_events": S.BooleanField(),
+                                                           "community_posts": S.BooleanField(), "volunteer_updates": S.BooleanField(),
+                                                           "candidate_bells_paused": S.BooleanField()})
 
 
 class _Private(APIView):
@@ -151,7 +153,7 @@ class Preferences(_Private):
     def get(self, request):
         return Response(services.preferences(request.user))
 
-    @extend_schema(summary="Turn announcement, community-reply, event-reminder or new-event notifications on or off", request=PREFERENCES, responses=PREFERENCES)
+    @extend_schema(summary="Turn notification categories on or off (alias of /me/settings/notifications/)", request=PREFERENCES, responses=PREFERENCES)
     def patch(self, request):
         values = {k: request.data.get(k) for k in services.PREF_FIELDS if k in request.data}
         if not values or any(not isinstance(v, bool) for v in values.values()):

@@ -124,7 +124,11 @@ def deactivate_user(*, user, reason="", actor=None, actor_label="") -> bool:
             _guard_last_admin(user)
             user.is_active = False
             user.deactivated_at = timezone.now()
-            user.save(update_fields=["is_active", "deactivated_at", "updated_at"])
+            user.deactivation_kind = "admin"
+            user.save(update_fields=["is_active", "deactivated_at", "deactivation_kind", "updated_at"])
+    elif user.deactivation_kind == "self":  # spec 20 §12: an admin deactivating a paused account takes over; no self-reactivation
+        user.deactivation_kind = "admin"
+        user.save(update_fields=["deactivation_kind", "updated_at"])
     banned = clerk.ban_user(user.clerk_user_id)
     record(AuditLog.Action.USER_DEACTIVATED, target=user, actor=actor, actor_label=actor_label,
            reason=reason, clerk_ban="ok" if banned else "failed", retry=not first_time)
@@ -139,7 +143,8 @@ def reactivate_user(*, user, reason="", actor=None, actor_label="") -> bool:
     if was_inactive:
         user.is_active = True
         user.deactivated_at = None
-        user.save(update_fields=["is_active", "deactivated_at", "updated_at"])
+        user.deactivation_kind = ""
+        user.save(update_fields=["is_active", "deactivated_at", "deactivation_kind", "updated_at"])
     unbanned = clerk.unban_user(user.clerk_user_id)
     record(AuditLog.Action.USER_REACTIVATED, target=user, actor=actor, actor_label=actor_label,
            reason=reason, clerk_unban="ok" if unbanned else "failed", retry=not was_inactive)

@@ -111,11 +111,15 @@ class Notification(models.Model):
 
 
 class NotificationPreference(models.Model):
-    """A person's notification settings (announcements on or off)."""
+    """A person's notification switches (spec 07, 17, 18, 20). Essential notices have no switch (spec 20 §7)."""
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notification_preference")
     announcements = models.BooleanField(default=True)
     community_replies = models.BooleanField(default=True)  # spec 17 §10
     event_reminders = models.BooleanField(default=True)  # spec 18 §7
     candidate_events = models.BooleanField(default=True)  # spec 18 §7 (follows the candidate-post bell)
+    # spec 20 §7
+    community_posts = models.BooleanField(default=True)  # new posts in communities whose bell is on
+    volunteer_updates = models.BooleanField(default=True)
+    candidate_bells_paused = models.BooleanField(default=False)  # keeps every bell, delivers no candidate posts
     updated_at = models.DateTimeField(auto_now=True)

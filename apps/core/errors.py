@@ -18,6 +18,10 @@ CATALOGUE: dict[str, tuple[int, str, bool]] = {
     "error": (400, "Generic fallback when no specific code applies.", False),
     # accounts and access (02, 11, 14)
     "account_deactivated": (403, "The account was deactivated by an administrator.", True),
+    "account_paused": (403, "The person paused their own account; only /me/, reactivation, data download and deletion work (20).", True),
+    "language_unavailable": (400, "That language isn't enabled yet (its translations aren't complete) (20).", False),
+    "profile_consent_required": (400, "Turning on a public profile needs the current consent version; see `purpose`, `version`, `text` (20).", False),
+    "profile_location_invalid": (400, "The profile location needs a home state, and an LGA in that state; see `fields` (20).", False),
     "auth_unavailable": (503, "Sign-in can't be checked right now (Clerk keys or Clerk unavailable).", True),
     "mfa_required": (403, "Admin endpoints need two-step verification.", True),
     "reverification_required": (403, "Confirm it's you; carries Clerk's reverification hint.", True),

@@ -4,7 +4,6 @@ from rest_framework import serializers as S
 
 from . import services
 from .models import LOWER_LEVELS, CommunityPost, ItemStatus, Level
-from .text import short_name
 
 
 # ------------------------------------------------------------------ OpenAPI shapes
@@ -170,7 +169,7 @@ def _author(obj, user, badges):
     info = badges.get(a.pk, {}) if a else {}
     # §5.4: someone who withdrew the communities consent keeps their posts, shown as "Former member" (no badge either).
     former = bool(a) and info.get("former", False)
-    return {"name": "Former member" if former else short_name(a), "verified": bool(info.get("badge")) and not former,
+    return {"name": "Former member" if former else _public(a, info.get("style")), "verified": bool(info.get("badge")) and not former,
             "campaign": f"Campaign team · {obj.campaign_candidate.full_name}" if obj.campaign_candidate_id else None,
             "is_you": bool(user and getattr(user, "pk", None) and obj.author_id == user.pk)}
 
@@ -192,11 +191,25 @@ def badges_for(objs) -> dict:
     former: the communities consent has been withdrawn (§5.4)}."""
     from apps.pvc.services import community_badge
 
+    from apps.accounts.models import UserPreferences
+
     out = {}
     for o in objs:
         if o.author_id and o.author_id not in out:
             out[o.author_id] = {"badge": community_badge(o.author), "former": not services.has_consent(o.author)}
+    # spec 20 §5.2 (§23.2): each author's chosen name style, in one query
+    for uid, style in UserPreferences.objects.filter(user_id__in=list(out)).values_list("user_id", "name_style"):
+        out[uid]["style"] = style
     return out
+
+
+def _public(user, style):
+    """First name and last initial by default, or the full name if the author chose it (spec 20 §5.2)."""
+    from apps.accounts.naming import FORMER, format_name, is_gone
+
+    if is_gone(user):
+        return FORMER
+    return format_name(user.full_name, style or "first_initial") or "A member"
 
 
 def _common(obj, user, badges, kind):

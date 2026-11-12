@@ -119,7 +119,7 @@ class OverviewAccessTests(Base):
                     "geo_preview_waiting", "news_pending", "pvc_pending",
                     "membership_approvals", "membership_payments_review", "donations_review", "candidates_unpublished", "ban_failed",
                     "background_tasks_failing", "data_integrity_issues", "communities_unmoderated", "events_in_blackout"],
-                   ["people", "candidates", "content", "pvc", "membership", "donations"], True),
+                   ["people", "candidates", "content", "pvc", "membership", "donations", "settings"], True),
             "news": (["reports_review", "reports_urgent", "appeals_waiting", "news_pending"], ["content"], False),
             "pvc": (["geo_review_waiting", "pvc_pending"], ["pvc"], False),  # 19 §15.2: the review queue for officers
             "mem": (["geo_review_waiting", "pvc_pending", "membership_approvals", "membership_payments_review"], ["pvc", "membership"], False),

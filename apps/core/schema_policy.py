@@ -22,12 +22,14 @@ JSON_REASONS = {
     "volunteers.VolunteerApplication.roles": "the role keys the person offered, from the opening's list",
     "volunteers.VolunteerApplication.availability": "up to three availability keys, shown with the application",
     "geo.Dataset.preview": "the preview report of a geography file: counts and lists shown together, never queried (spec 19 §11.1)",
+    "accounts.SettingsDefaults.enabled_languages": "a few language codes from a fixed list, always read whole (spec 20 §14)",
+    "accounts.SettingsDefaults.notifications": "category → on/off for new accounts, always read whole (spec 20 §14)",
 }
 
 # Owner-of-private-data links to a person (CASCADE is the rule; §5.1 row 2).
 USER_OWNER_LINKS = {
     "access.RoleAssignment.user", "follows.CandidateFollow.user", "notifications.Notification.recipient",
-    "notifications.NotificationPreference.user", "privacy.ConsentRecord.user", "pvc.PvcVerification.user", "pvc.PvcEvent.user",
+    "notifications.NotificationPreference.user", "accounts.UserPreferences.user", "privacy.ConsentRecord.user", "pvc.PvcVerification.user", "pvc.PvcEvent.user",
     "moderation.Restriction.user",
     "communities.CommunityMembership.user", "communities.CommunitySettings.user", "communities.CommunityReaction.user",  # spec 17
     "events.EventRegistration.user", "volunteers.VolunteerApplication.user",  # spec 18
