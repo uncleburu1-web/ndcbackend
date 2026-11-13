@@ -132,6 +132,7 @@ def run_placements(batch=500) -> int:
     consented = ConsentRecord.objects.filter(purpose=services.PURPOSE, withdrawn_at__isnull=True).values("user_id")
     users = (PvcVerification.objects.filter(status="successful", user_id__in=consented).values_list("user_id", flat=True))
     from apps.accounts.models import User
+
     from .models import CommunityMembership, How
 
     ids = set(users) | set(CommunityMembership.objects.filter(status="active", how=How.VERIFIED).values_list("user_id", flat=True))

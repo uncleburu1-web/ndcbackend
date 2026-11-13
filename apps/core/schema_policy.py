@@ -39,6 +39,8 @@ MONEY_PARENTS = {"donations.Donation", "membership.Membership", "membership.Memb
 
 # Deliberate exceptions, each with its reason (§5.2).
 EXCEPTIONS = {
+    "news.ArticleTranslation.article": "a version of an announcement in another language has no meaning without it (spec 21 §10)",
+    "moderation.StaffLanguage.user": "the languages a staff member reads are a convenience setting for their own queues (spec 21 §9)",
     "moderation.Appeal.case": "an appeal has no meaning without its case",
     "moderation.Appeal.restriction": "an appeal has no meaning without its pause",
     "moderation.LegalNoticeItem.case": "the notice keeps its own record",

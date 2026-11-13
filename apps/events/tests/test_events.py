@@ -14,7 +14,11 @@ from apps.access.services import grant_role
 from apps.accounts.models import User
 from apps.audit.models import AuditLog
 from apps.candidates.models import Candidate
-from apps.core.integrity import _event_counts_drift, _events_over_capacity, _waitlist_with_free_places
+from apps.core.integrity import (
+    _event_counts_drift,
+    _events_over_capacity,
+    _waitlist_with_free_places,
+)
 from apps.events import services as S
 from apps.events.models import Event, EventChange, EventRegistration
 from apps.follows.models import CandidateFollow

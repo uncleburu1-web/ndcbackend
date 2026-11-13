@@ -93,9 +93,14 @@ class RulesView(APIView):
     throttle_classes = [PublicThrottle]
 
     def get(self, request):
-        data = R.public_payload() | {"legal_email": settings.MODERATION_LEGAL_EMAIL,
-                                     "counter_notice_days": settings.COPYRIGHT_COUNTER_NOTICE_DAYS, "appeal_days": S.APPEAL_DAYS}
+        from apps.core.i18n import legal_payload, param_language
+
+        lang = param_language(request)  # spec 21 rule 7: ?lang= (part of the cache key), never Accept-Language
+        payload, translation = legal_payload(R.public_payload(), lang)
+        data = payload | {"legal_email": settings.MODERATION_LEGAL_EMAIL, "translation": translation,
+                          "counter_notice_days": settings.COPYRIGHT_COUNTER_NOTICE_DAYS, "appeal_days": S.APPEAL_DAYS}
         response = Response(data)
+        response["Content-Language"] = translation["language"]
         patch_cache_control(response, public=True, max_age=300)
         return response
 
@@ -193,7 +198,7 @@ def case_row(case, now, user):
         "id": case.id, "target_kind": case.target_kind, "kind_label": case.get_target_kind_display(), "title": case.title, "state": case.state,
         "status": case.status, "priority": case.priority, "priority_label": R.PRIORITY_LABEL[case.priority],
         "legal_due_at": case.legal_due_at, "due": _due_words(case, now), "opened_at": case.opened_at, "closed_at": case.closed_at,
-        "decision": case.decision, "rule": case.rule, "source": case.source,
+        "decision": case.decision, "rule": case.rule, "source": case.source, "language": case.language,
         "report_count": getattr(case, "n_reports", None) if getattr(case, "n_reports", None) is not None else case.reports.count(),
         "top_reason": _top_reason(case), "burst_flag": case.burst_flag, "legal_hold": case.legal_hold, "restorable": case.restorable,
         "assigned_to": {"id": case.assigned_to_id, "email": case.assigned_to.email, "me": case.assigned_to_id == user.pk}
@@ -227,6 +232,14 @@ class AdminCases(_Private):
             qs = qs.filter(target_kind__in=T.COMMUNITY_KINDS)
         elif kind in TargetKind.values:
             qs = qs.filter(target_kind=kind)
+        if qp.get("language") in ("en", "ha", "ig", "yo", "pcm", "und"):  # spec 21 §9
+            qs = qs.filter(language=qp["language"])
+        elif qp.get("language") == "mine":  # the languages I read (StaffLanguage), plus items whose language isn't known
+            from .models import StaffLanguage
+
+            mine = list(StaffLanguage.objects.filter(user=user).values_list("language", flat=True))
+            if mine:
+                qs = qs.filter(language__in=[*mine, "und"])
         if qp.get("community"):  # moderation history for one community and the levels below (SRS 2.2.5)
             from apps.communities.models import (
                 Community,

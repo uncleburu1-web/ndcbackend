@@ -32,7 +32,6 @@ from .models import (
 from .reference import Position, State
 from .services import create_candidate, update_candidate
 
-
 STATUSES = {"inec_listed", "party_announced", "disputed"}
 CONFIDENCE = {"high", "medium", "low"}
 KEY_RE = re.compile(r"^[a-z0-9][a-z0-9-]{2,120}$")

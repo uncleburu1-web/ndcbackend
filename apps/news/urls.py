@@ -19,6 +19,11 @@ urlpatterns = [
     path("admin/announcements/notify-count/", views.AnnouncementNotifyCount.as_view(), name="admin-announcements-notify-count"),
     path("admin/announcements/<uuid:pk>/", views.AdminAnnouncementDetail.as_view(), name="admin-announcement-detail"),
     path("admin/announcements/<uuid:pk>/image/", views.AnnouncementImage.as_view(), name="admin-announcement-image"),
+    path("admin/announcements/<uuid:pk>/translations/", views.AnnouncementTranslations.as_view(), name="admin-announcement-translations"),
+    path("admin/announcements/<uuid:pk>/translations/<str:code>/", views.AnnouncementTranslation.as_view(),
+         name="admin-announcement-translation"),
+    path("admin/announcements/<uuid:pk>/translations/<str:code>/publish/", views.AnnouncementTranslationPublish.as_view(),
+         name="admin-announcement-translation-publish"),
     *[path(f"admin/announcements/<uuid:pk>/{a}/", views.AnnouncementAction.as_view(action_name=a), name=f"admin-announcement-{a}")
       for a in ("pin", "unpin", "unpublish", "restore")],
 ]

@@ -37,8 +37,9 @@ def pinned_items(source: str = "", state: str = ""):
     return list(qs.order_by("-pinned_at")[: settings.NEWS_MAX_PINNED])
 
 
-def feed_page(source: str, state: str, page: int, size: int = 20):
-    """Returns (pinned, items, count). Items are Article or CandidatePost instances in feed order."""
+def feed_page(source: str, state: str, page: int, size: int = 20, language: str = ""):
+    """Returns (pinned, items, count). Items are Article or CandidatePost instances in feed order.
+    `language` (spec 21 §9) keeps only items written in that language; pinned items always show."""
     from apps.posts.models import CandidatePost
 
     source = source if source in SOURCES else ""
@@ -46,10 +47,14 @@ def feed_page(source: str, state: str, page: int, size: int = 20):
     pinned_ids = [p.pk for p in pinned]
     keys_a = keys_p = None
     if source != CANDIDATE:
-        keys_a = (_articles(source, state).exclude(pk__in=pinned_ids)
+        arts = _articles(source, state)
+        if language:
+            arts = arts.filter(language=language)
+        keys_a = (arts.exclude(pk__in=pinned_ids)
                   .annotate(t=Value("a", output_field=CharField())).values_list("id", "published_at", "t"))
     if source in ("", CANDIDATE):
-        keys_p = _posts(state).annotate(t=Value("p", output_field=CharField())).values_list("id", "published_at", "t")
+        posts_qs = _posts(state).filter(language=language) if language else _posts(state)
+        keys_p = posts_qs.annotate(t=Value("p", output_field=CharField())).values_list("id", "published_at", "t")
     if keys_a is not None and keys_p is not None:
         keys = keys_a.order_by().union(keys_p.order_by(), all=True)
         count = keys_a.count() + keys_p.count()

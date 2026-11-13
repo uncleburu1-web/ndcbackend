@@ -13,9 +13,11 @@ from apps.audit.models import AuditLog
 from apps.audit.services import record
 from apps.core import blackouts
 from apps.core.exceptions import ServiceError
+from apps.core.i18n import clean_content_language, user_language
 
 from . import images
-from .models import Article, ArticleEvent, ArticleStatus as S, Source
+from .models import Article, ArticleEvent, Source
+from .models import ArticleStatus as S
 
 A = AuditLog.Action
 DECLARATIONS = ("accurate", "no_private_info", "rules")
@@ -95,6 +97,7 @@ def submit(user, data, *, request=None) -> Article:
         a = Article.objects.create(
             source=Source.COMMUNITY, status=S.PENDING, title=data["title"], body=data["body"], state=data.get("state", ""),
             source_url=data.get("source_url", ""), source_name="", author=user, show_author_name=bool(data.get("show_author_name")),
+            language=clean_content_language(data.get("language"), user_language(user)),
             declarations={**{k: True for k in DECLARATIONS}, "declared_at": now.isoformat()}, submitted_at=now)
         _event(a, ArticleEvent.Kind.SUBMITTED, user)
     record(A.NEWS_SUBMITTED, target=a, actor=user, request=request)
@@ -107,9 +110,13 @@ def edit(article, user, data, *, request=None) -> Article:
         if a.author_id != user.pk or a.source != Source.COMMUNITY:
             raise ServiceError("Article not found.", code="not_found", status_code=404)
         content = {k: data[k] for k in ("title", "body", "state", "source_url") if k in data}
+        if "language" in data:
+            content["language"] = clean_content_language(data["language"], a.language)
         if "show_author_name" in data and not content:
             return set_byline(a, user, bool(data["show_author_name"]), request=request, locked=True)
-        from apps.moderation.services import require_not_paused as require_author_not_paused
+        from apps.moderation.services import (
+            require_not_paused as require_author_not_paused,
+        )
 
         require_author_not_paused(user)  # spec 13 §6.6 (hiding your name stays possible while paused)
         if a.status not in EDITABLE:
@@ -320,7 +327,9 @@ def erase_for_deleted_user(user) -> dict:
 
     n_reports = erase_reports(user)["reports_detached"]
     transaction.on_commit(lambda: [images.delete(*pair) for pair in old_images])
-    from apps.notifications.services import erase_for_deleted_user as erase_notifications
+    from apps.notifications.services import (
+        erase_for_deleted_user as erase_notifications,
+    )
 
     n_notifications = erase_notifications(user)
     return {"drafts_cleared": n_drafts, "bylines_hidden": n_bylines, "reports_detached": n_reports, "notifications_deleted": n_notifications}

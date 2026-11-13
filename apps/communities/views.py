@@ -22,7 +22,14 @@ from apps.news.views import PublicThrottle, ReportThrottle
 
 from . import serializers as P
 from . import services
-from .models import Community, CommunityComment, CommunityPost, ItemStatus, Level, ReadScope
+from .models import (
+    Community,
+    CommunityComment,
+    CommunityPost,
+    ItemStatus,
+    Level,
+    ReadScope,
+)
 
 
 # ------------------------------------------------------------------ plumbing
@@ -153,7 +160,10 @@ class CommunityPosts(_Private):
         c = _community(pk)
         _require_read(request, c)
         paginator = FeedPagination()
-        page = paginator.paginate_queryset(services.feed(c), request, view=self)
+        qs = services.feed(c)
+        if request.query_params.get("language") in ("en", "ha", "ig", "yo", "pcm", "und"):  # spec 21 §9
+            qs = qs.filter(language=request.query_params["language"])
+        page = paginator.paginate_queryset(qs, request, view=self)
         liked = services.liked_ids(request.user, page)
         badges = P.badges_for(page)
         pinned = [P.pinned(a) for a in services.pinned_announcements(c).select_related("audience_community")] \
@@ -166,7 +176,8 @@ class CommunityPosts(_Private):
         c = _community(pk)
         if not request.user or not request.user.is_authenticated:
             raise ServiceError("Sign in to take part.", code="not_authenticated", status_code=401)
-        p = services.create_post(request.user, c, request.data.get("body", ""), request.data.get("campaign_candidate"))
+        p = services.create_post(request.user, c, request.data.get("body", ""), request.data.get("campaign_candidate"),
+                                 request.data.get("language"))
         p = CommunityPost.objects.select_related("community", "author", "campaign_candidate").get(pk=p.pk)
         return Response(P.post(p, request.user, liked=False), status=status.HTTP_201_CREATED)
 
@@ -213,7 +224,8 @@ class PostComments(_Private):
     def post(self, request, pk):
         if not request.user or not request.user.is_authenticated:
             raise ServiceError("Sign in to take part.", code="not_authenticated", status_code=401)
-        c = services.create_comment(request.user, _post(request, pk), request.data.get("body", ""), request.data.get("campaign_candidate"))
+        c = services.create_comment(request.user, _post(request, pk), request.data.get("body", ""), request.data.get("campaign_candidate"),
+                                    request.data.get("language"))
         return Response(P.comment(_comment(request, c.pk), request.user), status=status.HTTP_201_CREATED)
 
 

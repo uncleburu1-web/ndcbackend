@@ -15,10 +15,12 @@ from apps.audit.models import AuditLog
 from apps.audit.services import record
 from apps.core import blackouts
 from apps.core.exceptions import ServiceError
+from apps.core.i18n import clean_content_language
 from apps.news import images
 from apps.news.services import clean_text
 
-from .models import CandidatePost, PostEvent, PostKind, PostStatus as S
+from .models import CandidatePost, PostEvent, PostKind
+from .models import PostStatus as S
 
 A = AuditLog.Action
 
@@ -94,6 +96,8 @@ def _validate(data: dict, partial=False) -> dict:
         elif len(body) > settings.CANDIDATE_POST_MAX_BODY:
             errors["body"] = [f"Keep it under {settings.CANDIDATE_POST_MAX_BODY:,} characters."]
         out["body"] = body
+    if "language" in data and data["language"] not in (None, ""):
+        out["language"] = clean_content_language(data["language"], "und")
     if errors:
         raise serializers.ValidationError(errors)
     return out

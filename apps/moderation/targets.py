@@ -118,6 +118,17 @@ def state(kind, obj) -> str:
     return getattr(obj, "state", "") or ""
 
 
+def language(kind, obj) -> str:
+    """Spec 21 §9: the language the reported item is written in, so the queue can route it to someone who reads it."""
+    if obj is None:
+        return "und"
+    if kind == TargetKind.CANDIDATE:
+        return getattr(obj, "biography_language", "und") or "und"
+    if kind == TargetKind.PROFILE:
+        return getattr(obj, "bio_language", "und") or "und"
+    return getattr(obj, "language", "und") or "und"
+
+
 def is_official(kind, obj) -> bool:
     return kind == TargetKind.ARTICLE and obj is not None and obj.source == "official"
 

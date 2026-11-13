@@ -6,7 +6,13 @@ from rest_framework.response import Response
 from apps.access import services as access
 from apps.access.models import RoleAssignment
 from apps.access.permissions import IsSystemAdmin
-from apps.access.views import AdminReadThrottle, AdminView, AdminWriteThrottle, assignment_payload, role_error
+from apps.access.views import (
+    AdminReadThrottle,
+    AdminView,
+    AdminWriteThrottle,
+    assignment_payload,
+    role_error,
+)
 from apps.audit.display import entry_payload
 from apps.audit.models import AuditLog
 from apps.core.exceptions import ServiceError

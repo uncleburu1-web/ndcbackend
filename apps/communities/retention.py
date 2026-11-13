@@ -7,7 +7,14 @@ from django.db.models import Q
 
 from apps.core.history import allow_history_delete
 
-from .models import CommunityComment, CommunityEvent, CommunityMembership, CommunityPost, ItemStatus, MembershipStatus
+from .models import (
+    CommunityComment,
+    CommunityEvent,
+    CommunityMembership,
+    CommunityPost,
+    ItemStatus,
+    MembershipStatus,
+)
 
 E = CommunityEvent.Kind
 

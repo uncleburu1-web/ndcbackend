@@ -16,7 +16,8 @@ from apps.access.models import Role, RoleAssignment, ScopeType
 from apps.access.services import grant_role, has_role
 from apps.accounts.models import User
 from apps.audit.models import AuditLog
-from apps.candidates.models import Candidate, CandidateStatus as S
+from apps.candidates.models import Candidate
+from apps.candidates.models import CandidateStatus as S
 from apps.candidates.reference import area_display
 
 TMP_MEDIA = tempfile.mkdtemp()

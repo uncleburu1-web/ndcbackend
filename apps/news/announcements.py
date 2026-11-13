@@ -7,9 +7,17 @@ from rest_framework import serializers
 from apps.audit.models import AuditLog
 from apps.audit.services import record
 from apps.core.exceptions import ServiceError
+from apps.core.i18n import clean_content_language, user_language
 
-from .models import Article, ArticleEvent, ArticleStatus as S, Category, Source
-from .services import _event, _locked, clean_text, require_not_paused, validate_source_url
+from .models import Article, ArticleEvent, Category, Source
+from .models import ArticleStatus as S
+from .services import (
+    _event,
+    _locked,
+    clean_text,
+    require_not_paused,
+    validate_source_url,
+)
 
 A = AuditLog.Action
 CONTENT = ("category", "title", "body", "state", "source_name", "source_url", "audience_community")
@@ -76,7 +84,8 @@ def publish(admin, data: dict, *, notify=False, request=None) -> Article:
         a = Article.objects.create(
             source=Source.OFFICIAL, status=S.SUCCESSFUL, category=data["category"], title=data["title"], body=data["body"],
             state=data.get("state", ""), source_name=data.get("source_name", "").strip(), source_url=data.get("source_url", ""),
-            author=admin, important=bool(notify), published_at=now, audience_community=data.get("audience_community"))
+            author=admin, important=bool(notify), published_at=now, audience_community=data.get("audience_community"),
+            language=clean_content_language(data.get("language"), user_language(admin)))
         _event(a, ArticleEvent.Kind.PUBLISHED, admin, "notify everyone" if notify else "")
         if notify:
             from apps.notifications.services import deliver_announcement_on_commit
@@ -88,6 +97,8 @@ def publish(admin, data: dict, *, notify=False, request=None) -> Article:
 
 def update(article, admin, data: dict, *, request=None) -> Article:
     content = {k: data[k] for k in CONTENT if k in data}
+    if "language" in data:
+        content["language"] = clean_content_language(data["language"], "und")
     if "title" in content:
         content["title"] = content["title"].strip()
     if "body" in content:

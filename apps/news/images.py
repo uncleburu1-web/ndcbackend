@@ -6,7 +6,10 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from PIL import Image
 
-from apps.candidates.photos import PhotoError, load_validated_rgb  # noqa: F401  (PhotoError re-exported)
+from apps.candidates.photos import (  # noqa: F401  (PhotoError re-exported)
+    PhotoError,
+    load_validated_rgb,
+)
 
 SIZES = {"full": 1600, "thumb": 400}
 

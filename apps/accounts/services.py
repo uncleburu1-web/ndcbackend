@@ -149,12 +149,16 @@ def mark_deleted(clerk_user_id: str) -> Optional[User]:
 
         news_erased = erase_news(user)
         # Memberships and likes deleted; published community posts stay as "Former member" (spec 17 §17.4).
-        from apps.communities.services import erase_for_deleted_user as erase_communities
+        from apps.communities.services import (
+            erase_for_deleted_user as erase_communities,
+        )
 
         erase_communities(user)
         # Event registrations and volunteer applications deleted; events they created stay with no creator (spec 18 §17.4).
         from apps.events.services import erase_for_deleted_user as erase_events
-        from apps.volunteers.services import erase_for_deleted_user as erase_volunteering
+        from apps.volunteers.services import (
+            erase_for_deleted_user as erase_volunteering,
+        )
 
         erase_events(user)
         erase_volunteering(user)

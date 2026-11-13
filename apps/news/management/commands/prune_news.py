@@ -3,10 +3,10 @@ from datetime import timedelta
 from django.utils import timezone
 
 from apps.core.history import allow_history_delete
-from apps.news import images
-from apps.moderation.services import held_ids
-from apps.news.models import Article
 from apps.core.jobs import TrackedCommand
+from apps.moderation.services import held_ids
+from apps.news import images
+from apps.news.models import Article
 
 
 class Command(TrackedCommand):

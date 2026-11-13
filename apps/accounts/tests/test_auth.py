@@ -1,7 +1,10 @@
 """Token verification, JIT creation, deactivation — spec §6.1, §12, AC 4, 5, 7, 8."""
 from unittest import mock
 
-from clerk_backend_api.security.types import TokenVerificationError, TokenVerificationErrorReason
+from clerk_backend_api.security.types import (
+    TokenVerificationError,
+    TokenVerificationErrorReason,
+)
 from django.test import override_settings
 from django.urls import reverse
 from rest_framework.test import APITestCase

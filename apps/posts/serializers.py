@@ -1,8 +1,9 @@
 from rest_framework import serializers
 
 from apps.candidates.photos import public_url
-from apps.news import images
+from apps.core.i18n import CONTENT_CHOICES
 from apps.media.services import srcset
+from apps.news import images
 from apps.news.serializers import excerpt
 
 from .models import CandidatePost
@@ -34,7 +35,7 @@ class PublicPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CandidatePost
-        fields = ["id", "kind", "kind_label", "title", "excerpt", "image", "published_at", "edited_at"]
+        fields = ["language", "id", "kind", "kind_label", "title", "excerpt", "image", "published_at", "edited_at"]
 
     def get_excerpt(self, p):
         return excerpt(p.body)
@@ -123,3 +124,4 @@ class PostWriteSerializer(serializers.Serializer):
     kind = serializers.CharField(max_length=12, required=False)
     title = serializers.CharField(max_length=200, required=False, allow_blank=True)
     body = serializers.CharField(max_length=12_000, required=False, allow_blank=True, trim_whitespace=False)
+    language = serializers.ChoiceField(choices=CONTENT_CHOICES, required=False, help_text="Spec 21 §9")

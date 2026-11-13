@@ -16,7 +16,8 @@ from apps.audit.services import record
 from apps.core.exceptions import ServiceError
 
 from . import photos
-from .models import IDENTITY_FIELDS, Candidate, CandidateStatus as S
+from .models import IDENTITY_FIELDS, Candidate
+from .models import CandidateStatus as S
 
 A = AuditLog.Action
 

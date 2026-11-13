@@ -32,8 +32,20 @@ from .models import (
 )
 from .naming import format_name
 
-# Languages whose translations are complete (spec 21 adds to this). Only these can be enabled by an admin.
-TRANSLATIONS_COMPLETE = {"en"}
+
+def ready_languages() -> set[str]:
+    """Spec 21 §14, rule 1: a language can be enabled only when the backend catalogue is complete and a native speaker's
+    interface review of a complete web-app catalogue is recorded."""
+    from apps.core import i18n
+
+    from .models import LanguageReview, ReviewScope
+
+    ready = {"en"}
+    for code in i18n.TRANSLATED:
+        review = LanguageReview.objects.filter(language=code, scope=ReviewScope.INTERFACE).first()
+        if review and review.interface_percent == 100 and i18n.stats(code)["percent"] == 100:
+            ready.add(code)
+    return ready
 
 DISPLAY_FIELDS = {"theme": Theme, "text_size": TextSize, "contrast": Contrast, "motion": Motion}
 BIO_MAX = 300
@@ -155,7 +167,7 @@ def _profile(user, p: UserPreferences) -> dict:
     lga = p.profile_lga
     return {"public_profile": p.public_profile, "handle": p.profile_handle if p.public_profile else None,
             "name_style": p.name_style, "name_examples": {s: format_name(user.full_name, s) for s in NameStyle.values},
-            "bio": p.bio, "profile_location": p.profile_location,
+            "bio": p.bio, "bio_language": p.bio_language, "profile_location": p.profile_location,
             "profile_lga": {"id": lga.pk, "name": lga.name} if lga else None, "profile_photo": p.profile_photo,
             "bio_removed": p.bio_removed_at is not None, "photo_removed": p.photo_removed_at is not None,
             "consent": {"version": purpose.version, "text": purpose.text, "label": purpose.label}}
@@ -267,6 +279,14 @@ def set_profile(user, data: dict) -> dict:
             fields.append("bio_removed_at")
         p.bio = bio
         fields.append("bio")
+        if bio and "bio_language" not in data:  # spec 21 §9: written in the interface language unless the person says otherwise
+            p.bio_language = p.language
+            fields.append("bio_language")
+    if "bio_language" in data:
+        from apps.core.i18n import clean_content_language
+
+        p.bio_language = clean_content_language(data["bio_language"], "und")
+        fields.append("bio_language")
     if "profile_photo" in data:
         if not isinstance(data["profile_photo"], bool):
             raise _bad("Send true or false.", field="profile_photo")
@@ -438,7 +458,7 @@ def reactivate(user, *, request=None) -> dict:
 def defaults_payload() -> dict:
     d = defaults()
     return {"enabled_languages": enabled_languages(), "languages": language_options(),
-            "translations_complete": sorted(TRANSLATIONS_COMPLETE),
+            "translations_complete": sorted(ready_languages()),
             "notifications": {k: bool((d.notifications or {}).get(k, True)) for k in SWITCH_KEYS},
             "notification_labels": {k: label for k, label, *_ in SWITCHABLE},
             "default_theme": d.default_theme, "default_text_size": d.default_text_size,
@@ -453,10 +473,13 @@ def set_defaults(*, data: dict, actor, request=None) -> dict:
             langs = data["enabled_languages"]
             if not isinstance(langs, list) or any(c not in Language.values for c in langs):
                 raise _bad("Choose languages from the list.", field="enabled_languages")
-            not_ready = [c for c in langs if c not in TRANSLATIONS_COMPLETE]
+            already = set(enabled_languages())
+            ready = ready_languages()
+            not_ready = [c for c in langs if c not in already and c not in ready]
             if not_ready:
-                raise _bad(", ".join(Language(c).label for c in not_ready) + " can't be turned on until the translations are complete.",
-                           code="language_unavailable", field="enabled_languages")
+                raise _bad(", ".join(Language(c).label for c in not_ready)
+                           + " can't be turned on until its translation is complete and a native speaker's review is recorded.",
+                           code="language_not_ready", field="enabled_languages")
             d.enabled_languages = sorted(set(langs) - {"en"})
         if "notifications" in data:
             n = data["notifications"]
@@ -508,7 +531,7 @@ def public_profile(handle: str):
     news = (Article.objects.filter(author=u, source="community", show_author_name=True, status="successful")
             .order_by("-published_at").values("id", "title", "published_at")[:20])
     return {"handle": p.profile_handle, "name": format_name(u.full_name, p.name_style) or "A member",
-            "bio": "" if p.bio_removed_at else p.bio, "location": location, "verified_voter": public_badge(u),
+            "bio": "" if p.bio_removed_at else p.bio, "bio_language": p.bio_language, "location": location, "verified_voter": public_badge(u),
             "photo_url": (u.image_url or None) if p.profile_photo and not p.photo_removed_at else None, "member_since": u.created_at.strftime("%Y-%m"),
             "news": list(news)}
 

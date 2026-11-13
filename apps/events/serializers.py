@@ -8,8 +8,17 @@ from apps.media.services import srcset
 from apps.news import images
 
 from . import services
-from .models import (AddressVisibility, EventStatus, EventType, MaterialChange, Mode, Organiser, Registration, RegistrationStatus,
-                     VenueType)
+from .models import (
+    AddressVisibility,
+    EventStatus,
+    EventType,
+    MaterialChange,
+    Mode,
+    Organiser,
+    Registration,
+    RegistrationStatus,
+    VenueType,
+)
 
 
 # ------------------------------------------------------------------ OpenAPI shapes
@@ -77,6 +86,7 @@ class EventCardSchema(S.Serializer):
 
 class EventDetailSchema(EventCardSchema):
     description = S.CharField()
+    language = S.CharField()
     venue_name = S.CharField()
     venue_address = S.CharField(allow_null=True, help_text="Null when only registered people may see it")
     venue_type = S.CharField()
@@ -143,6 +153,7 @@ class EventWriteSchema(S.Serializer):
     mode = S.ChoiceField(Mode.choices)
     title = S.CharField(max_length=120)
     description = S.CharField(max_length=4000)
+    language = S.ChoiceField(["en", "ha", "ig", "yo", "pcm", "und"], required=False, help_text="Spec 21 §9: the description's language")
     starts_at = S.DateTimeField()
     ends_at = S.DateTimeField()
     venue_name = S.CharField(required=False, allow_blank=True)
@@ -233,7 +244,7 @@ def detail(e, user, request=None) -> dict:
     block = services.registration_block(user, e) if e.registration != Registration.NONE else None
     left = max(e.capacity - e.registered_count, 0) if e.capacity is not None else None
     out.update({
-        "description": e.description, "venue_name": e.venue_name if e.mode != Mode.ONLINE else "",
+        "description": e.description, "language": e.language, "venue_name": e.venue_name if e.mode != Mode.ONLINE else "",
         "venue_address": e.venue_address if e.address_visibility == AddressVisibility.PUBLIC and e.mode != Mode.ONLINE else None,
         "venue_type": e.venue_type, "venue_type_label": e.get_venue_type_display() if e.venue_type else "",
         "address_visibility": e.address_visibility, "online_url": None, "accessibility_notes": e.accessibility_notes,

@@ -15,9 +15,10 @@ from apps.access.services import grant_role
 from apps.accounts.models import User
 from apps.accounts.tests.helpers import signed_webhook
 from apps.audit.models import AuditLog
-from apps.news import services
 from apps.moderation.models import Report
-from apps.news.models import Article, ArticleEvent, ArticleStatus as S
+from apps.news import services
+from apps.news.models import Article, ArticleEvent
+from apps.news.models import ArticleStatus as S
 from apps.notifications.models import Notification, NotificationPreference
 
 TMP_MEDIA = tempfile.mkdtemp(prefix="ndc-news-test-")

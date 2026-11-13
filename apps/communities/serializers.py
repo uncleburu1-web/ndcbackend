@@ -189,9 +189,8 @@ def _notice(obj):
 def badges_for(objs) -> dict:
     """user_id → {badge: shows the verified badge in communities (08's opt-in plus badge consent v2, spec 17 §17.1),
     former: the communities consent has been withdrawn (§5.4)}."""
-    from apps.pvc.services import community_badge
-
     from apps.accounts.models import UserPreferences
+    from apps.pvc.services import community_badge
 
     out = {}
     for o in objs:
@@ -217,7 +216,7 @@ def _common(obj, user, badges, kind):
     mine = bool(user and getattr(user, "pk", None) and obj.author_id == user.pk)
     published = obj.status == ItemStatus.PUBLISHED
     editable = mine and published and (now - obj.created_at).total_seconds() < services.EDIT_MINUTES * 60
-    return {"id": obj.id, "body": obj.body if published else "", "status": obj.status, "created_at": obj.created_at,
+    return {"id": obj.id, "body": obj.body if published else "", "language": obj.language, "status": obj.status, "created_at": obj.created_at,
             "edited_at": obj.edited_at, "author": _author(obj, user, badges), "can_edit": editable,
             "can_delete": mine and obj.status in (ItemStatus.PUBLISHED, ItemStatus.HIDDEN), "notice": _notice(obj)}
 

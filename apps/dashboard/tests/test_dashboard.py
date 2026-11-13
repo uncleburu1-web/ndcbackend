@@ -119,7 +119,7 @@ class OverviewAccessTests(Base):
                     "geo_preview_waiting", "news_pending", "pvc_pending",
                     "membership_approvals", "membership_payments_review", "donations_review", "candidates_unpublished", "ban_failed",
                     "background_tasks_failing", "data_integrity_issues", "communities_unmoderated", "events_in_blackout"],
-                   ["people", "candidates", "content", "pvc", "membership", "donations", "settings"], True),
+                   ["people", "candidates", "content", "pvc", "membership", "donations", "settings", "languages"], True),
             "news": (["reports_review", "reports_urgent", "appeals_waiting", "news_pending"], ["content"], False),
             "pvc": (["geo_review_waiting", "pvc_pending"], ["pvc"], False),  # 19 §15.2: the review queue for officers
             "mem": (["geo_review_waiting", "pvc_pending", "membership_approvals", "membership_payments_review"], ["pvc", "membership"], False),
@@ -246,7 +246,7 @@ class CountTests(Base):
         cache.clear()
         with CaptureQueriesContext(connection) as ctx:
             client(self.sa).get(reverse("admin-overview"))
-        self.assertLess(len(ctx.captured_queries), 120)  # 17: communities cards and two readiness lines; 18: three event cards, two lines
+        self.assertLess(len(ctx.captured_queries), 128)  # 21: four language counts  # 17: communities cards and two readiness lines; 18: three event cards, two lines
         # 19: three geography cards and two readiness lines
 
 
@@ -528,6 +528,6 @@ class MeAreasTests(Base):
         self.assertEqual(admin_areas(self.fin), ["overview", "donations"])
         self.assertEqual(admin_areas(self.sa), ["overview", "candidates", "donations", "pvc", "membership", "geography", "moderation", "news",
                                                 "privacy",
-                                                "announcements", "posts", "team", "audit", "integrations", "communities", "events", "settings"])
+                                                "announcements", "posts", "team", "audit", "integrations", "communities", "events", "settings", "languages"])
         r = client(self.news).get(reverse("me"))
         self.assertEqual(r.data["admin_areas"], ["overview", "moderation", "news"])

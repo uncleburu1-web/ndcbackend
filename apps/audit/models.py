@@ -132,6 +132,11 @@ class AuditLog(models.Model):
         PUBLIC_PROFILE_ON = "settings.public_profile_on"
         PUBLIC_PROFILE_OFF = "settings.public_profile_off"
         SETTINGS_DEFAULTS_CHANGED = "settings.defaults_changed"
+        # spec 21
+        TRANSLATION_SAVED = "news.translation_saved"
+        TRANSLATION_PUBLISHED = "news.translation_published"
+        TRANSLATION_DELETED = "news.translation_deleted"
+        LANGUAGE_REVIEW_RECORDED = "languages.review_recorded"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")

@@ -33,7 +33,7 @@ PROFILE = inline_serializer("SettingsProfile", {
     "public_profile": S.BooleanField(), "handle": S.CharField(allow_null=True),
     "name_style": S.ChoiceField(["first_initial", "full"]),
     "name_examples": inline_serializer("NameExamples", {"first_initial": S.CharField(), "full": S.CharField()}),
-    "bio": S.CharField(), "bio_removed": S.BooleanField(), "photo_removed": S.BooleanField(), "profile_location": S.ChoiceField(["none", "state", "lga"]), "profile_lga": LGA.__class__(allow_null=True),
+    "bio": S.CharField(), "bio_language": S.CharField(), "bio_removed": S.BooleanField(), "photo_removed": S.BooleanField(), "profile_location": S.ChoiceField(["none", "state", "lga"]), "profile_lga": LGA.__class__(allow_null=True),
     "profile_photo": S.BooleanField(), "consent": CONSENT})
 PRIVACY = inline_serializer("SettingsPrivacy", {"donation_name_default": S.ChoiceField(["anonymous", "name"]), "verified_badge": S.BooleanField(),
                                                 "named_news": S.IntegerField(), "public_profile": S.BooleanField(), "name_style": S.CharField()})
@@ -49,7 +49,7 @@ SETTINGS = inline_serializer("Settings", {
     "manage": MANAGE, "saved_at": S.DateTimeField(allow_null=True), "updated_at": S.DateTimeField(allow_null=True)})
 DEVICE = inline_serializer("SettingsDeviceImport", {"accessibility": DISPLAY, "language": LANGUAGE, "saved_at": S.DateTimeField()})
 PUBLIC_PROFILE = inline_serializer("PublicProfile", {
-    "handle": S.CharField(), "name": S.CharField(), "bio": S.CharField(),
+    "handle": S.CharField(), "name": S.CharField(), "bio": S.CharField(), "bio_language": S.CharField(),
     "location": inline_serializer("PublicProfileLocation", {"state": S.CharField(), "state_label": S.CharField(),
                                                             "lga": S.CharField(allow_null=True)}, allow_null=True),
     "verified_voter": S.BooleanField(), "photo_url": S.CharField(allow_null=True), "member_since": S.CharField(),

@@ -84,6 +84,8 @@ jobs:
             || (echo "docs/openapi.json is stale — regenerate it (docs/api.md)"; exit 1)
       - name: data dictionary is current (spec 16 §11.1)
         run: python manage.py schema_doc --check
+      - name: Translation catalogues compiled (spec 21 §6)
+        run: python manage.py i18n_compile --check
       - name: no unexplained breaking changes
         run: |
           BASE="${{ github.event.pull_request.base.sha || github.event.before }}"

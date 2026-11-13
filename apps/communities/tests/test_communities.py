@@ -16,8 +16,15 @@ from apps.access.services import grant_role
 from apps.accounts.models import User
 from apps.candidates.models import Candidate
 from apps.communities import retention, services, sync
-from apps.communities.models import (Community, CommunityEvent, CommunityMembership, CommunityPost, CommunityReaction,
-                                     How, Level)
+from apps.communities.models import (
+    Community,
+    CommunityEvent,
+    CommunityMembership,
+    CommunityPost,
+    CommunityReaction,
+    How,
+    Level,
+)
 from apps.core.integrity import _community_chain_broken, _community_counts_drift
 from apps.geo import loading
 from apps.geo.models import PollingUnit

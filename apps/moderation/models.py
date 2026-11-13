@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models import Q
 
 from apps.core.fields import StateField, choice_check, state_check
+from apps.core.i18n import language_field
 
 ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"  # no 0/O, 1/I/L
 
@@ -91,6 +92,8 @@ class Case(models.Model):
     state = StateField()
     opened_at = models.DateTimeField(auto_now_add=True)
     closed_at = models.DateTimeField(null=True, blank=True)
+
+    language = language_field()  # spec 21 §9: the reported item's language, copied when the case opens
 
     class Meta:
         ordering = ["priority_rank", "due_at"]
@@ -304,3 +307,17 @@ class ComplianceYear(models.Model):
     year = models.PositiveSmallIntegerField(primary_key=True)
     figures = models.JSONField()
     frozen_at = models.DateTimeField(auto_now=True)
+
+
+class StaffLanguage(models.Model):
+    """Spec 21 §9: a language a moderator or news reviewer reads. Their queues default to these. Set by the person only."""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="staff_languages")
+    language = models.CharField(max_length=3)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "language"], name="moderation_staff_language_once"),
+            models.CheckConstraint(condition=Q(language__in=["en", "ha", "ig", "yo", "pcm"]), name="moderation_staff_language_valid"),
+        ]

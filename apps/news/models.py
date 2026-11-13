@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models import Q
 
 from apps.core.fields import StateField, choice_check, state_check
+from apps.core.i18n import language_check, language_field
 
 
 class Source(models.TextChoices):
@@ -48,6 +49,8 @@ class Article(models.Model):
     category = models.CharField(max_length=20, choices=Category.choices, blank=True)
     title = models.CharField(max_length=150)
     body = models.TextField()
+    # spec 21 §9: the language it is written in ("und" = not sure); shown with lang=
+    language = language_field()
     state = StateField()
     source_name = models.CharField(max_length=120, blank=True)
     source_url = models.URLField(max_length=500, blank=True)
@@ -80,7 +83,7 @@ class Article(models.Model):
 
     class Meta:
         ordering = ["-published_at", "-created_at"]
-        constraints = [
+        constraints = [language_check("news_article_language_valid", "language"), 
             models.CheckConstraint(
                 name="news_official_shape",
                 condition=Q(source="community") | (~Q(category="") & ~Q(status="pending")),
@@ -106,6 +109,44 @@ class Article(models.Model):
 
     def __str__(self):
         return f"{self.source}:{self.title[:40]}"
+
+
+class TranslationStatus(models.TextChoices):
+    DRAFT = "draft", "Draft"
+    PUBLISHED = "published", "Published"
+
+
+class ArticleTranslation(models.Model):
+    """Spec 21 §10: an official announcement in another language, entered by a person (never machine-made) and reviewed
+    by a second person before it is published. The image and source link are the original's."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="translations")
+    language = models.CharField(max_length=3)
+    title = models.CharField(max_length=150)
+    body = models.TextField()
+    status = models.CharField(max_length=9, choices=TranslationStatus.choices, default=TranslationStatus.DRAFT)
+    translated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    published_at = models.DateTimeField(null=True, blank=True)
+    original_updated_at = models.DateTimeField()  # the original's last edit when this version was written or reviewed
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["language"]
+        constraints = [
+            models.UniqueConstraint(fields=["article", "language"], name="news_translation_one_per_language"),
+            models.CheckConstraint(condition=Q(language__in=["ha", "ig", "yo", "pcm", "en"]), name="news_translation_language_valid"),
+            choice_check("status", TranslationStatus.values, "news_translation_status_valid"),
+            models.CheckConstraint(condition=~Q(status="published") | (Q(published_at__isnull=False) & Q(reviewed_by__isnull=False)),
+                                   name="news_translation_published_shape"),
+            models.CheckConstraint(condition=Q(reviewed_by__isnull=True) | ~Q(reviewed_by=models.F("translated_by")),
+                                   name="news_translation_second_person"),
+        ]
+
+    def __str__(self):
+        return f"{self.article_id}:{self.language}"
 
 
 class ArticleEvent(models.Model):

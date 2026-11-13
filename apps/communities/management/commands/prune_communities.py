@@ -1,8 +1,8 @@
 
 from django.utils import timezone
 
-from apps.core.jobs import TrackedCommand
 from apps.communities import retention
+from apps.core.jobs import TrackedCommand
 
 
 class Command(TrackedCommand):

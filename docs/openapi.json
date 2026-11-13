@@ -1116,6 +1116,253 @@
                 ]
             }
         },
+        "/api/v1/languages/": {
+            "get": {
+                "operationId": "languages_get",
+                "summary": "Enabled interface languages (spec 21 §13)",
+                "tags": [
+                    "languages"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Languages"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "anyone"
+                ],
+                "x-error-codes": [
+                    "language_invalid",
+                    "server_error",
+                    "throttled",
+                    "validation_error"
+                ],
+                "x-rate-limit": [
+                    {
+                        "scope": "people_public",
+                        "rate": "60/min",
+                        "key": "ip"
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/languages/": {
+            "get": {
+                "operationId": "admin_languages_get",
+                "summary": "Translation completeness and review sign-offs per language (spec 21 §14)",
+                "tags": [
+                    "admin:languages"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminLanguages"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "language_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/admin/languages/{code}/reviews/": {
+            "post": {
+                "operationId": "admin_language_reviews_post",
+                "summary": "Record a native speaker's (or lawyer's) review of a language (audited)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "code",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:languages"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReviewInputRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReviewInputRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReviewInputRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LanguageReviewOut"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "language_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
+        "/api/v1/admin/me/languages/": {
+            "get": {
+                "operationId": "admin_my_languages_get",
+                "summary": "The languages I read, for my review queues (spec 21 §9)",
+                "tags": [
+                    "admin:me"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StaffLanguages"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in",
+                    "Moderators, community moderators and news reviewers (and system admins) say which languages they read"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "language_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            },
+            "put": {
+                "operationId": "admin_my_languages_put",
+                "summary": "Set the languages I read",
+                "tags": [
+                    "admin:me"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StaffLanguagesRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StaffLanguagesRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StaffLanguagesRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StaffLanguages"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "signed in",
+                    "Moderators, community moderators and news reviewers (and system admins) say which languages they read"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "language_invalid",
+                    "mfa_required",
+                    "not_authenticated",
+                    "permission_denied",
+                    "server_error",
+                    "validation_error"
+                ]
+            }
+        },
         "/api/v1/webhooks/clerk/": {
             "post": {
                 "operationId": "clerk_webhook_post",
@@ -5652,6 +5899,243 @@
                     "permission_denied",
                     "server_error",
                     "storage_unavailable"
+                ]
+            }
+        },
+        "/api/v1/admin/announcements/{id}/translations/": {
+            "get": {
+                "operationId": "admin_announcement_translations_get",
+                "summary": "An announcement's versions in other languages",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:announcements"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AnnouncementVersions"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable"
+                ]
+            }
+        },
+        "/api/v1/admin/announcements/{id}/translations/{code}/": {
+            "put": {
+                "operationId": "admin_announcement_translation_put",
+                "summary": "Write or change the version in one language (goes back to draft; audited)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "code",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:announcements"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AnnouncementVersionInRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AnnouncementVersionInRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AnnouncementVersionInRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AnnouncementVersion"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "validation_error"
+                ]
+            },
+            "delete": {
+                "operationId": "admin_announcement_translation_delete",
+                "summary": "Delete the version in one language (audited)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "code",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:announcements"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Response (untyped; see docs/api.md)"
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable"
+                ]
+            }
+        },
+        "/api/v1/admin/announcements/{id}/translations/{code}/publish/": {
+            "post": {
+                "operationId": "admin_announcement_translation_publish_post",
+                "summary": "Review and publish a version someone else wrote (audited)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "code",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "admin:announcements"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AnnouncementVersion"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-permissions": [
+                    "system admin"
+                ],
+                "x-error-codes": [
+                    "account_deactivated",
+                    "auth_unavailable",
+                    "mfa_required",
+                    "not_authenticated",
+                    "not_found",
+                    "permission_denied",
+                    "server_error",
+                    "storage_unavailable",
+                    "validation_error"
                 ]
             }
         },
@@ -17150,6 +17634,25 @@
                     "results"
                 ]
             },
+            "AdminLanguages": {
+                "type": "object",
+                "properties": {
+                    "languages": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {}
+                        }
+                    },
+                    "legal_version": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "languages",
+                    "legal_version"
+                ]
+            },
             "AliasCreateRequest": {
                 "type": "object",
                 "properties": {
@@ -17211,6 +17714,96 @@
                     "target_name"
                 ]
             },
+            "AnnouncementVersion": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "body": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/AnnouncementVersionStatusEnum"
+                    },
+                    "out_of_date": {
+                        "type": "boolean"
+                    },
+                    "translated_by": {
+                        "type": "string"
+                    },
+                    "reviewed_by": {
+                        "type": "string"
+                    },
+                    "published_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "body",
+                    "language",
+                    "out_of_date",
+                    "published_at",
+                    "reviewed_by",
+                    "status",
+                    "title",
+                    "translated_by",
+                    "updated_at"
+                ]
+            },
+            "AnnouncementVersionInRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "body": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "body",
+                    "title"
+                ]
+            },
+            "AnnouncementVersionStatusEnum": {
+                "enum": [
+                    "draft",
+                    "published"
+                ],
+                "type": "string"
+            },
+            "AnnouncementVersions": {
+                "type": "object",
+                "properties": {
+                    "language": {
+                        "type": "string"
+                    },
+                    "versions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AnnouncementVersion"
+                        }
+                    }
+                },
+                "required": [
+                    "language",
+                    "versions"
+                ]
+            },
             "ApplyRequestRequest": {
                 "type": "object",
                 "properties": {
@@ -17253,6 +17846,17 @@
                     "weekdays",
                     "weekday_evenings",
                     "weekends"
+                ],
+                "type": "string"
+            },
+            "BiographyLanguageEnum": {
+                "enum": [
+                    "en",
+                    "ha",
+                    "ig",
+                    "yo",
+                    "pcm",
+                    "und"
                 ],
                 "type": "string"
             },
@@ -18428,6 +19032,9 @@
                     "description": {
                         "type": "string"
                     },
+                    "language": {
+                        "type": "string"
+                    },
                     "venue_name": {
                         "type": "string"
                     },
@@ -18540,6 +19147,7 @@
                     "full",
                     "going",
                     "id",
+                    "language",
                     "lga",
                     "material_change",
                     "members_only",
@@ -18706,6 +19314,14 @@
                         "type": "string",
                         "minLength": 1,
                         "maxLength": 4000
+                    },
+                    "language": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LanguageEnum"
+                            }
+                        ],
+                        "description": "Spec 21 §9: the description's language"
                     },
                     "starts_at": {
                         "type": "string",
@@ -19142,6 +19758,36 @@
                     "webhooks"
                 ]
             },
+            "Language": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "native": {
+                        "type": "string"
+                    },
+                    "english": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "code",
+                    "english",
+                    "native"
+                ]
+            },
+            "LanguageEnum": {
+                "enum": [
+                    "en",
+                    "ha",
+                    "ig",
+                    "yo",
+                    "pcm",
+                    "und"
+                ],
+                "type": "string"
+            },
             "LanguageOption": {
                 "type": "object",
                 "properties": {
@@ -19189,6 +19835,36 @@
                     "enabled",
                     "label",
                     "native"
+                ]
+            },
+            "LanguageReviewOut": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            },
+            "Languages": {
+                "type": "object",
+                "properties": {
+                    "languages": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Language"
+                        }
+                    },
+                    "legal_version": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "languages",
+                    "legal_version"
                 ]
             },
             "LevelEnum": {
@@ -20310,6 +20986,9 @@
                     "description": {
                         "type": "string"
                     },
+                    "language": {
+                        "type": "string"
+                    },
                     "venue_name": {
                         "type": "string"
                     },
@@ -20460,6 +21139,7 @@
                     "geo_lga",
                     "going",
                     "id",
+                    "language",
                     "lga",
                     "material_change",
                     "members_only",
@@ -20740,6 +21420,14 @@
                         "minLength": 1,
                         "maxLength": 4000
                     },
+                    "language": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LanguageEnum"
+                            }
+                        ],
+                        "description": "Spec 21 §9: the description's language"
+                    },
                     "starts_at": {
                         "type": "string",
                         "format": "date-time"
@@ -20969,6 +21657,10 @@
                         "$ref": "#/components/schemas/NameExamplesRequest"
                     },
                     "bio": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "bio_language": {
                         "type": "string",
                         "minLength": 1
                     },
@@ -21382,6 +22074,14 @@
                         "type": "string",
                         "readOnly": true
                     },
+                    "biography_language": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/BiographyLanguageEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
                     "campaign_summary": {
                         "type": "string",
                         "readOnly": true
@@ -21416,6 +22116,7 @@
                 "required": [
                     "area_display",
                     "biography",
+                    "biography_language",
                     "campaign_summary",
                     "election_year",
                     "full_name",
@@ -21514,6 +22215,9 @@
                     "bio": {
                         "type": "string"
                     },
+                    "bio_language": {
+                        "type": "string"
+                    },
                     "location": {
                         "oneOf": [
                             {
@@ -21545,6 +22249,7 @@
                 },
                 "required": [
                     "bio",
+                    "bio_language",
                     "handle",
                     "location",
                     "member_since",
@@ -21803,6 +22508,39 @@
                     "state"
                 ]
             },
+            "ReviewInputRequest": {
+                "type": "object",
+                "properties": {
+                    "scope": {
+                        "$ref": "#/components/schemas/ScopeEnum"
+                    },
+                    "reviewer_name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120
+                    },
+                    "catalogue_version": {
+                        "type": "string",
+                        "description": "Interface: the web app's catalogue version (completeness.json). Legal: ignored.",
+                        "maxLength": 40
+                    },
+                    "interface_percent": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 0,
+                        "default": 0,
+                        "description": "The web app's completeness for this language when reviewed"
+                    },
+                    "note": {
+                        "type": "string",
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "reviewer_name",
+                    "scope"
+                ]
+            },
             "ReviewItemSchema": {
                 "type": "object",
                 "properties": {
@@ -21905,6 +22643,13 @@
                     "outreach_women",
                     "outreach_disability",
                     "other"
+                ],
+                "type": "string"
+            },
+            "ScopeEnum": {
+                "enum": [
+                    "interface",
+                    "legal"
                 ],
                 "type": "string"
             },
@@ -22320,6 +23065,9 @@
                     "bio": {
                         "type": "string"
                     },
+                    "bio_language": {
+                        "type": "string"
+                    },
                     "bio_removed": {
                         "type": "boolean"
                     },
@@ -22345,6 +23093,7 @@
                 },
                 "required": [
                     "bio",
+                    "bio_language",
                     "bio_removed",
                     "consent",
                     "handle",
@@ -22366,6 +23115,35 @@
                 },
                 "required": [
                     "signed_out"
+                ]
+            },
+            "StaffLanguages": {
+                "type": "object",
+                "properties": {
+                    "languages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "languages"
+                ]
+            },
+            "StaffLanguagesRequest": {
+                "type": "object",
+                "properties": {
+                    "languages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    }
+                },
+                "required": [
+                    "languages"
                 ]
             },
             "StateSchema": {
@@ -23443,6 +24221,16 @@
             "meaning": "The item has already moved to another state.",
             "web_handling": false
         },
+        "language_invalid": {
+            "status": 400,
+            "meaning": "Not one of the five interface languages (21).",
+            "web_handling": false
+        },
+        "language_not_ready": {
+            "status": 400,
+            "meaning": "A language can't be enabled before its translation is complete and a review is recorded (21 §14).",
+            "web_handling": false
+        },
         "language_unavailable": {
             "status": 400,
             "meaning": "That language isn't enabled yet (its translations aren't complete) (20).",
@@ -23716,6 +24504,16 @@
         "too_soon": {
             "status": 403,
             "meaning": "New accounts can post 24 hours after finishing their profile; see `until`.",
+            "web_handling": false
+        },
+        "translation_same_language": {
+            "status": 400,
+            "meaning": "A translation can't be in the announcement's own language (21 §10).",
+            "web_handling": false
+        },
+        "translation_self_review": {
+            "status": 409,
+            "meaning": "A second person must review and publish a translation (21 §10).",
             "web_handling": false
         },
         "under_18": {

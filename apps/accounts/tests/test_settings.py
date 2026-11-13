@@ -306,7 +306,7 @@ class PublicProfileTests(TestCase):
                          ("Ada O.", "", None, None, False))
         self.assertEqual(r["X-Robots-Tag"], "noindex")
         self.assertIn("max-age=300", r["Cache-Control"])
-        self.assertEqual(set(r.data), {"handle", "name", "bio", "location", "verified_voter", "photo_url", "member_since", "news"})
+        self.assertEqual(set(r.data), {"handle", "name", "bio", "bio_language", "location", "verified_voter", "photo_url", "member_since", "news"})
         bad = self.c.patch(reverse("my-settings-profile"), {"profile_location": "lga", "profile_lga": 999999}, format="json")
         self.assertEqual(bad.data["error"]["code"], "profile_location_invalid")
         r = self.c.patch(reverse("my-settings-profile"), {"bio": "Teacher in Ikeja.", "profile_location": "lga", "profile_lga": ikeja.pk,
@@ -568,7 +568,7 @@ class AdminDefaultsTests(TestCase):
         r = c.get(reverse("admin-settings-defaults"))
         self.assertEqual((r.status_code, r.data["enabled_languages"], r.data["translations_complete"]), (200, ["en"], ["en"]))
         r = c.patch(reverse("admin-settings-defaults"), {"enabled_languages": ["en", "yo"]}, format="json")
-        self.assertEqual((r.status_code, r.data["error"]["code"]), (400, "language_unavailable"))
+        self.assertEqual((r.status_code, r.data["error"]["code"]), (400, "language_not_ready"))  # spec 21 §14
         r = c.patch(reverse("admin-settings-defaults"), {"notifications": {"payments": False}}, format="json")
         self.assertEqual(r.status_code, 400)
         r = c.patch(reverse("admin-settings-defaults"), {"default_theme": "dark"}, format="json")

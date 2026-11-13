@@ -1,0 +1,2487 @@
+# NDCConnect backend messages (spec 21). msgid is the English text; English is authoritative.
+msgid ""
+msgstr ""
+"Language: ha\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. rules
+msgid "\"₦2,000 for everyone who comes\""
+msgstr ""
+
+#. rules
+msgid "'Send ₦5,000 to get a job'"
+msgstr ""
+
+#. privacy notice
+msgid "2 years after the event ends (removed events: the moderation preservation period)."
+msgstr ""
+
+#. privacy notice
+msgid "6 years after withdrawal or closing."
+msgstr ""
+
+#. apps/volunteers/services.py:210
+msgid "A campaign can send at most 5 volunteer updates a week."
+msgstr ""
+
+#. rules
+msgid "A campaign rally at a church or mosque"
+msgstr ""
+
+#. apps/moderation/services.py:706
+msgid "A copyright notice needs the work, a signature and the declarations."
+msgstr ""
+
+#. apps/moderation/services.py:814
+msgid "A counter-notice was already sent."
+msgstr ""
+
+#. rules
+msgid "A fake quote from a candidate"
+msgstr ""
+
+#. rules
+msgid "A fake statement 'from' a candidate"
+msgstr ""
+
+#. rules
+msgid "A news photographer's picture used without permission"
+msgstr ""
+
+#. apps/privacy/incidents.py:248
+msgid "A notice was already sent for this version of the incident. Update the incident to send another."
+msgstr ""
+
+#. apps/membership/services.py:210
+msgid "A payment is already in progress. Finish it or wait a few minutes."
+msgstr ""
+
+#. privacy notice
+msgid "A public profile shows that you use NDCConnect, which says something about your politics. It shows only what you choose: your public name, a short bio, your state or LGA, your photo, the Verified voter badge if it's on, and community news you published under your name. It never shows who you follow, your communities, membership, PVC or donations. It isn't in search and asks search engines not to list it. You can turn it off at any time."
+msgstr ""
+
+#. core/exceptions.py
+msgid "A valid integer is required."
+msgstr ""
+
+#. rules
+msgid "Abusive or hateful"
+msgstr ""
+
+#. apps/membership/services.py:106
+msgid "Add a passport-style photo."
+msgstr ""
+
+#. apps/moderation/services.py:708
+msgid "Add at least one NDCConnect link."
+msgstr ""
+
+#. apps/news/announcements.py:67
+msgid "Add the link to the source."
+msgstr ""
+
+#. apps/events/services.py:208
+msgid "Add the meeting link (it must start with https://)."
+msgstr ""
+
+#. privacy notice
+msgid "Added public images and, when it's in use, Cloudinary as the image host."
+msgstr ""
+
+#. privacy notice
+msgid "Admin roles"
+msgstr ""
+
+#. rules
+msgid "Advance Fee Fraud and Other Fraud Related Offences Act 2006; Cybercrimes Act"
+msgstr ""
+
+#. apps/accounts/settings_services.py:334
+msgid "Agree to show a public profile first."
+msgstr ""
+
+#. apps/geo/services.py:290
+msgid "Alias not found."
+msgstr ""
+
+#. privacy notice
+msgid "Amount, the candidate or party you gave to, your name (or 'Anonymous Donor'), email and phone for the receipt, the payment reference and a hashed IP address."
+msgstr ""
+
+#. apps/moderation/services.py:704
+msgid "An agency notice must state the law and section it relies on."
+msgstr ""
+
+#. apps/events/services.py:393
+msgid "An event can have at most 3 updates."
+msgstr ""
+
+#. apps/events/services.py:187
+msgid "An event can last at most 3 days."
+msgstr ""
+
+#. rules
+msgid "An event claiming to be the party's when it isn't"
+msgstr ""
+
+#. privacy notice
+msgid "An officer checks your VIN and details on INEC's public voter checker. Your VIN is encrypted and only its last 4 characters are shown."
+msgstr ""
+
+#. apps/news/translations.py:55
+msgid "Announcement not found."
+msgstr ""
+
+#. apps/news/announcements.py:113
+msgid "Article not found."
+msgstr ""
+
+#. privacy notice
+msgid "Ask the DPO from Your data."
+msgstr ""
+
+#. rules
+msgid "At a place of worship, police station or public office"
+msgstr ""
+
+#. core/exceptions.py
+msgid "Authentication credentials were not provided."
+msgstr ""
+
+#. rules
+msgid "Calling on people to attack supporters of another party"
+msgstr ""
+
+#. apps/volunteers/services.py:108
+msgid "Campaign accounts don't volunteer for their own campaign."
+msgstr ""
+
+#. apps/events/services.py:285
+msgid "Cancelled, hidden or removed events can't be changed."
+msgstr ""
+
+#. apps/access/views.py:126
+msgid "Candidate links are managed on the candidate page."
+msgstr ""
+
+#. apps/moderation/views.py:115
+msgid "Candidate not found."
+msgstr ""
+
+#. privacy notice
+msgid "Candidate posts"
+msgstr ""
+
+#. privacy notice
+msgid "Candidate profiles"
+msgstr ""
+
+#. apps/moderation/services.py:750
+msgid "Candidate profiles aren't removed: correct the profile instead."
+msgstr ""
+
+#. apps/moderation/services.py:422
+msgid "Candidate profiles aren't removed: correct the profile, then close the case with Keep."
+msgstr ""
+
+#. apps/moderation/views.py:369
+msgid "Case not found."
+msgstr ""
+
+#. apps/privacy/incidents.py:104
+msgid "Check the dates."
+msgstr ""
+
+#. apps/communities/services.py:721
+msgid "Choose 1, 7 or 30 days."
+msgstr ""
+
+#. apps/moderation/services.py:508
+msgid "Choose 7, 30 or 90 days."
+msgstr ""
+
+#. apps/posts/services.py:82
+msgid "Choose Announcement or News."
+msgstr ""
+
+#. apps/privacy/incidents.py:78
+msgid "Choose Clerk, Paystack, hosting or none."
+msgstr ""
+
+#. apps/privacy/requests.py:135
+msgid "Choose Done or Refused."
+msgstr ""
+
+#. apps/news/translations.py:61
+msgid "Choose English, Hausa, Igbo, Yoruba or Nigerian Pidgin."
+msgstr ""
+
+#. apps/core/i18n.py:48
+msgid "Choose English, Hausa, Igbo, Yoruba, Nigerian Pidgin or “Not sure”."
+msgstr ""
+
+#. apps/accounts/language_views.py:102
+msgid "Choose Hausa, Igbo, Yoruba or Nigerian Pidgin."
+msgstr ""
+
+#. apps/privacy/incidents.py:164
+msgid "Choose NDPC, ngCERT or people affected."
+msgstr ""
+
+#. apps/moderation/views.py:501
+msgid "Choose Upheld or Not upheld."
+msgstr ""
+
+#. apps/donations/serializers.py:50
+msgid "Choose a candidate."
+msgstr ""
+
+#. apps/news/announcements.py:50
+msgid "Choose a category."
+msgstr ""
+
+#. apps/moderation/views.py:614
+msgid "Choose a file."
+msgstr ""
+
+#. apps/accounts/settings_services.py:228
+msgid "Choose a language from the list."
+msgstr ""
+
+#. apps/communities/services.py:392
+msgid "Choose a level."
+msgstr ""
+
+#. apps/access/views.py:110
+msgid "Choose a national, state or LGA community."
+msgstr ""
+
+#. apps/membership/views.py:113
+msgid "Choose a photo to upload."
+msgstr ""
+
+#. apps/geo/services.py:272
+msgid "Choose a place and give a name (up to 200 characters)."
+msgstr ""
+
+#. apps/moderation/services.py:98
+msgid "Choose a reason."
+msgstr ""
+
+#. apps/privacy/incidents.py:81
+msgid "Choose a risk level."
+msgstr ""
+
+#. apps/volunteers/services.py:207
+msgid "Choose a role from the list."
+msgstr ""
+
+#. apps/accounts/serializers.py:125
+msgid "Choose a state from the list."
+msgstr ""
+
+#. apps/volunteers/services.py:118
+msgid "Choose a state where this campaign needs people."
+msgstr ""
+
+#. apps/communities/services.py:344
+msgid "Choose a state."
+msgstr ""
+
+#. apps/events/services.py:291
+msgid "Choose a time in the future."
+msgstr ""
+
+#. apps/moderation/views.py:661
+msgid "Choose a year from 2020 to this year."
+msgstr ""
+
+#. apps/events/views.py:318
+msgid "Choose an LGA from the list."
+msgstr ""
+
+#. apps/events/services.py:243
+msgid "Choose an LGA in this state."
+msgstr ""
+
+#. apps/geo/services.py:268
+msgid "Choose an LGA, ward or polling unit."
+msgstr ""
+
+#. apps/news/announcements.py:37
+msgid "Choose an open community."
+msgstr ""
+
+#. apps/moderation/services.py:782
+msgid "Choose an outcome."
+msgstr ""
+
+#. apps/volunteers/services.py:113
+msgid "Choose at least one of the roles this campaign offers."
+msgstr ""
+
+#. apps/privacy/incidents.py:233
+msgid "Choose everyone or a list of accounts."
+msgstr ""
+
+#. apps/volunteers/services.py:121
+msgid "Choose from the list."
+msgstr ""
+
+#. apps/events/services.py:222
+msgid "Choose how people sign up."
+msgstr ""
+
+#. apps/events/services.py:176
+msgid "Choose in person, online or both."
+msgstr ""
+
+#. apps/accounts/language_views.py:147
+msgid "Choose languages from the list."
+msgstr ""
+
+#. apps/geo/records.py:199
+msgid "Choose link, accept or ask."
+msgstr ""
+
+#. apps/access/views.py:92
+msgid "Choose one of the roles in the list. Candidate links are made on the candidate page."
+msgstr ""
+
+#. apps/volunteers/services.py:68
+msgid "Choose roles from the list."
+msgstr ""
+
+#. apps/volunteers/services.py:73
+msgid "Choose states from the list."
+msgstr ""
+
+#. apps/geo/records.py:220
+msgid "Choose the LGA, ward and polling unit."
+msgstr ""
+
+#. apps/moderation/services.py:700
+msgid "Choose the notice type."
+msgstr ""
+
+#. apps/pvc/services.py:151
+msgid "Choose the polling unit INEC's checker showed."
+msgstr ""
+
+#. apps/moderation/services.py:391
+msgid "Choose the rule it broke."
+msgstr ""
+
+#. apps/events/services.py:205
+msgid "Choose the state."
+msgstr ""
+
+#. apps/events/services.py:200
+msgid "Choose the type of venue. Places of worship, police stations and public offices can't be used for campaigns (Electoral Act 2026 s. 96)."
+msgstr ""
+
+#. apps/events/services.py:174
+msgid "Choose what kind of event this is."
+msgstr ""
+
+#. apps/media/services.py:128
+msgid "Choose what the image is for."
+msgstr ""
+
+#. apps/accounts/settings_services.py:548
+msgid "Choose what to remove: the bio, the photo or both."
+msgstr ""
+
+#. apps/moderation/services.py:609
+msgid "Choose what you're appealing."
+msgstr ""
+
+#. apps/privacy/requests.py:38
+msgid "Choose what you're asking for."
+msgstr ""
+
+#. apps/events/services.py:182
+msgid "Choose when it starts and ends."
+msgstr ""
+
+#. apps/communities/services.py:237
+msgid "Choose which campaign you're posting for."
+msgstr ""
+
+#. apps/communities/views.py:411
+msgid "Choose who can read."
+msgstr ""
+
+#. apps/events/services.py:210
+msgid "Choose who can see the address."
+msgstr ""
+
+#. apps/accounts/settings_services.py:302
+msgid "Choose your LGA from the list."
+msgstr ""
+
+#. apps/geo/records.py:122
+msgid "Choose your LGA, ward and polling unit, or say your place isn't listed."
+msgstr ""
+
+#. apps/accounts/settings_services.py:307
+msgid "Choose your LGA."
+msgstr ""
+
+#. apps/accounts/settings_services.py:412
+msgid "Clerk is unavailable, so no devices were signed out. Try again in a few minutes."
+msgstr ""
+
+#. privacy notice
+msgid "Closed cases after 1 year, unless under a legal hold."
+msgstr ""
+
+#. apps/communities/services.py:576
+msgid "Comments are closed on this post."
+msgstr ""
+
+#. privacy notice
+msgid "Communities let you discuss politics with people in your state, LGA, ward and polling unit. Joining records which communities you're in, and what you post, comment and like there. If your PVC is verified, we place you in the communities for your polling unit. Nobody can see who is in a community; posts show your first name and last initial. You can leave any community or withdraw at any time from Your data."
+msgstr ""
+
+#. apps/news/announcements.py:43
+msgid "Community Announcements need a community to show in."
+msgstr ""
+
+#. rules
+msgid "Community news must be real, local, sourced and written by you (see the news rules). In communities, keep to politics and public life in that area."
+msgstr ""
+
+#. privacy notice
+msgid "Community news you submit"
+msgstr ""
+
+#. apps/moderation/services.py:550
+msgid "Community pauses apply to community authors."
+msgstr ""
+
+#. apps/candidates/services.py:248
+msgid "Confirm NDCConnect may publish this photo."
+msgstr ""
+
+#. apps/events/services.py:325
+msgid "Confirm every declaration before publishing."
+msgstr ""
+
+#. apps/access/security.py:111
+msgid "Confirm it's you to continue."
+msgstr ""
+
+#. apps/membership/services.py:166
+msgid "Confirm this is a recent photo of you that NDC may use on your membership card and register."
+msgstr ""
+
+#. apps/events/services.py:405
+msgid "Confirm you took this photo or have the right to share it."
+msgstr ""
+
+#. apps/volunteers/services.py:195
+msgid "Contact details show only for accepted volunteers."
+msgstr ""
+
+#. privacy notice
+msgid "Contract (providing the service you signed up for), NDPA s. 25(1)(b)."
+msgstr ""
+
+#. privacy notice
+msgid "Contract and legal obligation, NDPA s. 25(1)(b)–(c); explicit consent for the political element, s. 30."
+msgstr ""
+
+#. privacy notice
+msgid "Contract with the campaign, NDPA s. 25(1)(b)."
+msgstr ""
+
+#. privacy notice
+msgid "Contract, NDPA s. 25(1)(b)."
+msgstr ""
+
+#. privacy notice
+msgid "Contract, NDPA s. 25(1)(b); your explicit consent for the public profile, s. 30(1)(a) (it shows that you use a party platform)."
+msgstr ""
+
+#. rules
+msgid "Copied articles"
+msgstr ""
+
+#. rules
+msgid "Copyright (my content was used)"
+msgstr ""
+
+#. rules
+msgid "Copyright Act 2022 s. 54"
+msgstr ""
+
+#. privacy notice
+msgid "Correct it"
+msgstr ""
+
+#. apps/accounts/settings_services.py:325
+msgid "Couldn't create a profile address. Try again."
+msgstr ""
+
+#. apps/privacy/incidents.py:113
+msgid "Couldn't create a reference. Try again."
+msgstr ""
+
+#. apps/moderation/services.py:809
+msgid "Counter-notices are for copyright removals."
+msgstr ""
+
+#. rules
+msgid "Cybercrimes (Amendment) Act 2024 s. 24; NITDA Code of Practice Part V"
+msgstr ""
+
+#. rules
+msgid "Cybercrimes Act"
+msgstr ""
+
+#. apps/geo/services.py:255
+msgid "Dataset not found."
+msgstr ""
+
+#. core/exceptions.py
+msgid "Date has wrong format. Use one of these formats instead: YYYY-MM-DD."
+msgstr ""
+
+#. privacy notice
+msgid "Declined, withdrawn or ended: 90 days. Accepted: until 90 days after the candidate's election. Updates: 1 year."
+msgstr ""
+
+#. privacy notice
+msgid "Delete it"
+msgstr ""
+
+#. privacy notice
+msgid "Delete your account from Your data. Some records are kept where the law requires (listed above)."
+msgstr ""
+
+#. privacy notice
+msgid "Deleted 90 days after the event ends; counts are kept."
+msgstr ""
+
+#. privacy notice
+msgid "Deleted or removed posts after 1 year."
+msgstr ""
+
+#. privacy notice
+msgid "Deleted. A public-profile address is retired so nobody else gets it."
+msgstr ""
+
+#. privacy notice
+msgid "Depends on the location (to be confirmed)"
+msgstr ""
+
+#. apps/privacy/incidents.py:157
+msgid "Describe the step."
+msgstr ""
+
+#. rules
+msgid "Don't post adverts, chain messages, fake giveaways or requests for money."
+msgstr ""
+
+#. rules
+msgid "Don't post claims you know are false, or present rumours as facts."
+msgstr ""
+
+#. rules
+msgid "Don't pretend to be another person, a candidate, the party or an official body."
+msgstr ""
+
+#. rules
+msgid "Don't share someone's phone number, address, ID numbers or other private details without their consent."
+msgstr ""
+
+#. rules
+msgid "Don't threaten anyone, call for violence, or praise violence against people or groups."
+msgstr ""
+
+#. rules
+msgid "Don't use language that insults or stirs hatred because of religion, ethnicity, tribe or section."
+msgstr ""
+
+#. apps/donations/services.py:132
+msgid "Donations aren't open yet."
+msgstr ""
+
+#. privacy notice
+msgid "Download your data from Your data, or ask the DPO for anything not in it."
+msgstr ""
+
+#. privacy notice
+msgid "Drafts are cleared and your byline hidden; published stories stay as 'a member'."
+msgstr ""
+
+#. privacy notice
+msgid "Edit your profile, membership or PVC details, or ask the DPO."
+msgstr ""
+
+#. rules
+msgid "Edited or AI-made intimate images of a real person"
+msgstr ""
+
+#. rules
+msgid "Edited result sheets"
+msgstr ""
+
+#. rules
+msgid "Election results not from INEC"
+msgstr ""
+
+#. rules
+msgid "Election results only from INEC"
+msgstr ""
+
+#. rules
+msgid "Electoral Act 2026 s. 124(4)"
+msgstr ""
+
+#. rules
+msgid "Electoral Act 2026 s. 96"
+msgstr ""
+
+#. rules
+msgid "Electoral Act 2026 s. 96; Cybercrimes (Amendment) Act 2024 s. 24"
+msgstr ""
+
+#. rules
+msgid "Electoral Act 2026 ss. 22, 96"
+msgstr ""
+
+#. privacy notice
+msgid "Email, sign-in methods, sessions"
+msgstr ""
+
+#. apps/accounts/validators.py:23
+msgid "Enter a Nigerian mobile number, like 0803 123 4567."
+msgstr ""
+
+#. core/exceptions.py
+msgid "Enter a valid email address."
+msgstr ""
+
+#. apps/pvc/services.py:115
+msgid "Enter the LGA you registered in."
+msgstr ""
+
+#. apps/pvc/services.py:97
+msgid "Enter the VIN exactly as printed on your card (19 letters and numbers), or its last 10 characters."
+msgstr ""
+
+#. apps/access/views.py:95
+msgid "Enter the person's email."
+msgstr ""
+
+#. apps/moderation/views.py:545
+msgid "Enter when the notice was received."
+msgstr ""
+
+#. apps/moderation/services.py:702
+msgid "Enter who sent the notice and how to contact them."
+msgstr ""
+
+#. apps/membership/services.py:104
+msgid "Enter your 11-digit NIN."
+msgstr ""
+
+#. apps/accounts/validators.py:33
+msgid "Enter your first and last name."
+msgstr ""
+
+#. apps/donations/serializers.py:39
+msgid "Enter your full name."
+msgstr ""
+
+#. apps/moderation/views.py:220
+msgid "Escalated cases are for system administrators."
+msgstr ""
+
+#. privacy notice
+msgid "Event listings"
+msgstr ""
+
+#. privacy notice
+msgid "Event registration"
+msgstr ""
+
+#. apps/events/services.py:189
+msgid "Events can be at most a year ahead."
+msgstr ""
+
+#. rules
+msgid "Events can't offer money, gifts or goods for attending or voting (a \"transport refund\" counts), can't be held at places of worship, police stations or public offices, and must say truthfully who organises them."
+msgstr ""
+
+#. privacy notice
+msgid "Events published by campaigns and the party, their updates and their history, and which account created them."
+msgstr ""
+
+#. privacy notice
+msgid "Events stay under the organiser; the creator link is cleared."
+msgstr ""
+
+#. privacy notice
+msgid "Every follow and notification bell is removed."
+msgstr ""
+
+#. privacy notice
+msgid "Everything above"
+msgstr ""
+
+#. apps/moderation/services.py:807
+msgid "Explain why the content doesn't infringe copyright."
+msgstr ""
+
+#. rules
+msgid "False or misleading"
+msgstr ""
+
+#. apps/membership/services.py:208
+msgid "Fill in your details first."
+msgstr ""
+
+#. apps/news/services.py:80
+msgid "Finish setting up your profile first."
+msgstr ""
+
+#. apps/communities/services.py:346
+msgid "Finish your profile first."
+msgstr ""
+
+#. privacy notice
+msgid "First published."
+msgstr ""
+
+#. rules
+msgid "First published: rules R1–R10."
+msgstr ""
+
+#. privacy notice
+msgid "Following a candidate tells NDCConnect your political interest. Only you can see who you follow; admins see counts only. You can withdraw this at any time from Your data, which removes every follow."
+msgstr ""
+
+#. privacy notice
+msgid "Following candidates"
+msgstr ""
+
+#. privacy notice
+msgid "From Your data, at any time. It takes effect at once."
+msgstr ""
+
+#. apps/membership/services.py:435
+msgid "Give a reason for cancelling."
+msgstr ""
+
+#. apps/accounts/admin_views.py:106
+msgid "Give a reason for deactivating this account."
+msgstr ""
+
+#. apps/news/services.py:270
+msgid "Give a reason for removing it."
+msgstr ""
+
+#. apps/membership/services.py:417
+msgid "Give a reason the applicant will understand."
+msgstr ""
+
+#. apps/news/services.py:247
+msgid "Give a reason the author can act on."
+msgstr ""
+
+#. apps/moderation/services.py:665
+msgid "Give a reason the author will see."
+msgstr ""
+
+#. apps/posts/services.py:231
+msgid "Give a reason the campaign team will understand."
+msgstr ""
+
+#. apps/pvc/services.py:175
+msgid "Give a reason the voter will understand."
+msgstr ""
+
+#. apps/news/translations.py:76
+msgid "Give it a title (up to 150 characters)."
+msgstr ""
+
+#. apps/news/announcements.py:53
+msgid "Give it a title."
+msgstr ""
+
+#. apps/events/services.py:198
+msgid "Give the address (3 to 200 characters)."
+msgstr ""
+
+#. apps/accounts/language_views.py:109
+msgid "Give the catalogue version the reviewer checked."
+msgstr ""
+
+#. apps/privacy/incidents.py:98
+msgid "Give the incident a title (at least 5 characters)."
+msgstr ""
+
+#. apps/events/services.py:196
+msgid "Give the venue's name (3 to 200 characters)."
+msgstr ""
+
+#. apps/access/models.py:92
+msgid "Global roles must not have a scope id."
+msgstr ""
+
+#. privacy notice
+msgid "Hosting provider"
+msgstr ""
+
+#. apps/events/views.py:418
+msgid "Image storage is unavailable right now. Try again later."
+msgstr ""
+
+#. apps/news/views.py:99
+msgid "Image storage is unavailable right now. Your article was saved without the new image; try again later."
+msgstr ""
+
+#. apps/posts/views.py:194
+msgid "Image storage is unavailable right now. Your post was saved without the new image; try again later."
+msgstr ""
+
+#. apps/media/views.py:46
+msgid "Image upload isn't working right now."
+msgstr ""
+
+#. apps/media/http.py:19
+msgid "Image upload isn't working right now. Your changes are saved without the new image."
+msgstr ""
+
+#. privacy notice
+msgid "Images of your community news are deleted with it; the uploader link is cleared."
+msgstr ""
+
+#. privacy notice
+msgid "Images published with candidate profiles, campaign posts, community news and announcements, the image's size and type, and which account uploaded it. Location and camera details are removed before storage."
+msgstr ""
+
+#. apps/privacy/incidents.py:123
+msgid "Incident not found."
+msgstr ""
+
+#. rules
+msgid "Intimate image shared without consent"
+msgstr ""
+
+#. apps/news/views.py:132
+msgid "Invalid page."
+msgstr ""
+
+#. core/exceptions.py
+msgid "Invalid pk \"{pk_value}\" - object does not exist."
+msgstr ""
+
+#. apps/privacy/incidents.py:188
+msgid "Keep the notice under 1,000 characters."
+msgstr ""
+
+#. apps/posts/services.py:90
+msgid "Keep the title under 150 characters."
+msgstr ""
+
+#. apps/accounts/validators.py:31
+msgid "Keep your name under 150 characters."
+msgstr ""
+
+#. privacy notice
+msgid "Kept as part of the audit record (6 years)."
+msgstr ""
+
+#. privacy notice
+msgid "Kept as the record of what you asked and agreed; detached from contact details."
+msgstr ""
+
+#. privacy notice
+msgid "Kept for the party's financial returns. IP hashes are cleared after 90 days."
+msgstr ""
+
+#. privacy notice
+msgid "Kept; your name and email are removed from your account record."
+msgstr ""
+
+#. apps/geo/services.py:234
+msgid "LGA not found."
+msgstr ""
+
+#. rules
+msgid "Lawful events and campaigning"
+msgstr ""
+
+#. rules
+msgid "Leaked private photos"
+msgstr ""
+
+#. privacy notice
+msgid "Legal obligation (NDPA s. 39) and legitimate interest, s. 25(1)(c), (f)."
+msgstr ""
+
+#. privacy notice
+msgid "Legal obligation and legitimate interest, NDPA s. 25(1)(c), (f)."
+msgstr ""
+
+#. privacy notice
+msgid "Legal obligation, NDPA ss. 26 and 34–38."
+msgstr ""
+
+#. privacy notice
+msgid "Legitimate interest and the candidate's agreement, NDPA s. 25(1)(f)."
+msgstr ""
+
+#. privacy notice
+msgid "Legitimate interest and the publisher's agreement, NDPA s. 25(1)(f)."
+msgstr ""
+
+#. privacy notice
+msgid "Legitimate interest in publishing public campaign activity, NDPA s. 25(1)(b)."
+msgstr ""
+
+#. privacy notice
+msgid "Legitimate interest in securing the platform, NDPA s. 25(1)(f)."
+msgstr ""
+
+#. apps/privacy/incidents.py:192
+msgid "Links to other sites aren't allowed. Use NDCConnect paths like /account/privacy."
+msgstr ""
+
+#. privacy notice
+msgid "Members of a community see its posts and comments with your first name and last initial. Nobody, admins included, can see who is in a community or who liked a post. Moderators see items in their queue; system administrators can open an author's account through an audited view."
+msgstr ""
+
+#. apps/membership/services.py:202
+msgid "Membership registration opens soon."
+msgstr ""
+
+#. privacy notice
+msgid "Memberships and likes are deleted; your posts and comments stay as 'Former member'."
+msgstr ""
+
+#. rules
+msgid "Mocking someone's religion to provoke anger"
+msgstr ""
+
+#. apps/posts/services.py:219
+msgid "Moderator access is required."
+msgstr ""
+
+#. apps/events/services.py:220
+msgid "More people have registered than that. Close registration instead."
+msgstr ""
+
+#. apps/candidates/serializers.py:126
+msgid "More than one account uses that email. Contact support to resolve it."
+msgstr ""
+
+#. core/exceptions.py
+msgid "Must be a valid boolean."
+msgstr ""
+
+#. privacy notice
+msgid "NDC membership"
+msgstr ""
+
+#. privacy notice
+msgid "NDC membership application"
+msgstr ""
+
+#. privacy notice
+msgid "NDC — Data Protection Officer"
+msgstr ""
+
+#. apps/accounts/serializers.py:118
+msgid "NDCConnect is for voters: you need to be 18 or older."
+msgstr ""
+
+#. privacy notice
+msgid "NIN, date of birth and photo are erased and the membership cancelled; payments are kept."
+msgstr ""
+
+#. rules
+msgid "NITDA Code of Practice Part I"
+msgstr ""
+
+#. privacy notice
+msgid "Name, email, phone and home state are erased; the record stays, anonymised, so history still adds up."
+msgstr ""
+
+#. rules
+msgid "Never share intimate or sexual images of someone without their consent, including fakes."
+msgstr ""
+
+#. rules
+msgid "New R11 for events: no inducements, no campaigning at places of worship, police stations or public offices, and no misstating who organises an event."
+msgstr ""
+
+#. apps/communities/services.py:411
+msgid "New-post notifications are for LGA, ward and polling-unit communities."
+msgstr ""
+
+#. rules
+msgid "Nigeria Data Protection Act 2023"
+msgstr ""
+
+#. apps/access/views.py:98
+msgid "No NDCConnect account uses that email. They need to sign in once first."
+msgstr ""
+
+#. rules
+msgid "No abusive or hateful language"
+msgstr ""
+
+#. apps/privacy/incidents.py:252
+msgid "No accounts matched."
+msgstr ""
+
+#. apps/candidates/serializers.py:124
+msgid "No active NDCConnect account uses that email. They need to sign up first."
+msgstr ""
+
+#. apps/moderation/views.py:633
+msgid "No attachment."
+msgstr ""
+
+#. rules
+msgid "No impersonation"
+msgstr ""
+
+#. rules
+msgid "No intimate images shared without consent"
+msgstr ""
+
+#. rules
+msgid "No knowingly false or misleading information"
+msgstr ""
+
+#. rules
+msgid "No one's private information without consent"
+msgstr ""
+
+#. apps/geo/services.py:89
+msgid "No polling unit has that code."
+msgstr ""
+
+#. apps/events/services.py:642
+msgid "No registration with that code."
+msgstr ""
+
+#. rules
+msgid "No spam, scams or advertising"
+msgstr ""
+
+#. rules
+msgid "No threats or incitement to violence"
+msgstr ""
+
+#. privacy notice
+msgid "Not a transfer abroad"
+msgstr ""
+
+#. core/exceptions.py
+msgid "Not a valid string."
+msgstr ""
+
+#. rules
+msgid "Not an NDC candidate"
+msgstr ""
+
+#. apps/communities/views.py:72
+msgid "Not found."
+msgstr ""
+
+#. privacy notice
+msgid "Not linked to a member account's deletion."
+msgstr ""
+
+#. apps/accounts/settings_services.py:315
+msgid "Nothing to change."
+msgstr ""
+
+#. apps/accounts/settings_services.py:398
+msgid "Nothing to copy."
+msgstr ""
+
+#. apps/notifications/views.py:139
+msgid "Notification not found."
+msgstr ""
+
+#. apps/follows/serializers.py:30
+msgid "Notifications must be true or false."
+msgstr ""
+
+#. privacy notice
+msgid "Object or restrict"
+msgstr ""
+
+#. apps/volunteers/services.py:81
+msgid "Offer at least one role."
+msgstr ""
+
+#. rules
+msgid "Offers money or gifts to attend or vote"
+msgstr ""
+
+#. apps/news/announcements.py:67
+msgid "Official Election Updates need a source (e.g. INEC)."
+msgstr ""
+
+#. rules
+msgid "Old photos presented as today's events"
+msgstr ""
+
+#. apps/search/services.py:49
+msgid "One of the filters isn't valid."
+msgstr ""
+
+#. apps/pvc/services.py:135
+msgid "Only a check that's still pending can be withdrawn."
+msgstr ""
+
+#. apps/membership/services.py:439
+msgid "Only active or pending memberships can be cancelled."
+msgstr ""
+
+#. apps/accounts/settings_services.py:449
+msgid "Only an administrator can reactivate this account."
+msgstr ""
+
+#. apps/membership/services.py:403
+msgid "Only applications pending approval can be approved."
+msgstr ""
+
+#. apps/membership/services.py:421
+msgid "Only applications pending approval can be rejected."
+msgstr ""
+
+#. apps/candidates/services.py:238
+msgid "Only archived candidates can be restored."
+msgstr ""
+
+#. apps/moderation/services.py:326
+msgid "Only community posts, comments and events can be hidden."
+msgstr ""
+
+#. apps/candidates/services.py:181
+msgid "Only draft or unpublished candidates can be published."
+msgstr ""
+
+#. apps/candidates/services.py:156
+msgid "Only draft or unpublished candidates can be verified."
+msgstr ""
+
+#. apps/events/services.py:318
+msgid "Only drafts can be published."
+msgstr ""
+
+#. apps/integrations/views.py:152
+msgid "Only failed or waiting tasks can be retried."
+msgstr ""
+
+#. apps/access/views.py:106
+msgid "Only moderators can be given a community."
+msgstr ""
+
+#. apps/moderation/services.py:553
+msgid "Only moderators for every community can pause posting everywhere."
+msgstr ""
+
+#. apps/moderation/services.py:271
+msgid "Only open cases can be escalated."
+msgstr ""
+
+#. apps/events/services.py:226
+msgid "Only party events can be for NDC members only."
+msgstr ""
+
+#. apps/moderation/services.py:620
+msgid "Only pauses can be appealed."
+msgstr ""
+
+#. apps/volunteers/services.py:181
+msgid "Only pending applications can be decided."
+msgstr ""
+
+#. rules
+msgid "Only post words, photos and videos you made or have the right to share."
+msgstr ""
+
+#. apps/news/services.py:276
+msgid "Only published articles can be removed."
+msgstr ""
+
+#. apps/candidates/services.py:205
+msgid "Only published candidates can be unpublished."
+msgstr ""
+
+#. apps/events/services.py:349
+msgid "Only published events can be cancelled."
+msgstr ""
+
+#. apps/events/services.py:653
+msgid "Only published events can be hidden."
+msgstr ""
+
+#. apps/moderation/services.py:409
+msgid "Only published items can be removed."
+msgstr ""
+
+#. apps/news/announcements.py:140
+msgid "Only published official announcements can be pinned."
+msgstr ""
+
+#. apps/posts/services.py:159
+msgid "Only published posts can be changed."
+msgstr ""
+
+#. apps/posts/services.py:130
+msgid "Only published posts can be edited."
+msgstr ""
+
+#. apps/posts/services.py:238
+msgid "Only published posts can be removed."
+msgstr ""
+
+#. apps/moderation/services.py:614
+msgid "Only removals can be appealed."
+msgstr ""
+
+#. apps/news/services.py:304
+msgid "Only removed articles can be restored."
+msgstr ""
+
+#. apps/events/services.py:684
+msgid "Only removed events can be restored."
+msgstr ""
+
+#. apps/communities/services.py:707
+msgid "Only removed items can be restored."
+msgstr ""
+
+#. apps/posts/services.py:259
+msgid "Only removed posts can be restored."
+msgstr ""
+
+#. rules
+msgid "Only share results announced by INEC. Never present unofficial or made-up figures as results."
+msgstr ""
+
+#. apps/moderation/services.py:983
+msgid "Only system administrators can see who filed a report."
+msgstr ""
+
+#. apps/moderation/views.py:429
+msgid "Only system administrators can set legal holds."
+msgstr ""
+
+#. apps/communities/services.py:515
+msgid "Only the author can do this."
+msgstr ""
+
+#. apps/communities/services.py:671
+msgid "Only visible items can be hidden."
+msgstr ""
+
+#. apps/events/services.py:671
+msgid "Only visible or hidden events can be removed."
+msgstr ""
+
+#. apps/communities/services.py:692
+msgid "Only visible or hidden items can be removed."
+msgstr ""
+
+#. apps/communities/services.py:469
+msgid "Only web links (http or https) are allowed."
+msgstr ""
+
+#. privacy notice
+msgid "Only you."
+msgstr ""
+
+#. privacy notice
+msgid "Only you. Admins see counts, never names."
+msgstr ""
+
+#. privacy notice
+msgid "Only you. The public profile, when on, is public; admins see counts only (for example how many people chose dark mode)."
+msgstr ""
+
+#. rules
+msgid "Opinion pieces presented as news"
+msgstr ""
+
+#. privacy notice
+msgid "PVC check"
+msgstr ""
+
+#. apps/moderation/services.py:908
+msgid "Paste the link to a public page on NDCConnect."
+msgstr ""
+
+#. apps/moderation/services.py:515
+msgid "Pauses apply to community news authors."
+msgstr ""
+
+#. privacy notice
+msgid "Payment details you enter on Paystack's page; NDCConnect never sees card numbers"
+msgstr ""
+
+#. privacy notice
+msgid "Payments for donations and membership fees"
+msgstr ""
+
+#. apps/privacy/incidents.py:74
+msgid "People affected can't be negative."
+msgstr ""
+
+#. apps/candidates/views.py:241
+msgid "Photo storage is unavailable right now. The candidate was saved without the new photo; try again later."
+msgstr ""
+
+#. apps/membership/services.py:181
+msgid "Photo storage is unavailable. Your details are saved; try the photo again later."
+msgstr ""
+
+#. apps/privacy/incidents.py:190
+msgid "Plain text only."
+msgstr ""
+
+#. core/exceptions.py
+msgid "Please correct the highlighted fields."
+msgstr ""
+
+#. apps/posts/views.py:165
+msgid "Post not found."
+msgstr ""
+
+#. rules
+msgid "Posting a 'final tally' before INEC announces it"
+msgstr ""
+
+#. rules
+msgid "Posting a voter's phone number"
+msgstr ""
+
+#. rules
+msgid "Posting as if you were INEC"
+msgstr ""
+
+#. privacy notice
+msgid "Posts are public under the candidate's name; who wrote them: system administrators only."
+msgstr ""
+
+#. privacy notice
+msgid "Posts stay under the candidate; the author link is kept for the record."
+msgstr ""
+
+#. privacy notice
+msgid "Posts written by campaign accounts, and which account wrote or edited them."
+msgstr ""
+
+#. privacy notice
+msgid "Posts you delete: text erased after 30 days. Removed posts: 1 year. Ended memberships: 30 days."
+msgstr ""
+
+#. rules
+msgid "Private information about someone"
+msgstr ""
+
+#. privacy notice
+msgid "Public candidate details (name, office, area, biography, photo, links) and which admins created or edited them."
+msgstr ""
+
+#. privacy notice
+msgid "Public once published; editing history: system administrators."
+msgstr ""
+
+#. privacy notice
+msgid "Public profile"
+msgstr ""
+
+#. privacy notice
+msgid "Public verified-voter badge"
+msgstr ""
+
+#. privacy notice
+msgid "Public with their content; who uploaded: system administrators."
+msgstr ""
+
+#. privacy notice
+msgid "Published events are public under the campaign's or the party's name; who created them: system administrators only."
+msgstr ""
+
+#. apps/events/services.py:364
+msgid "Published events can't be deleted, only cancelled."
+msgstr ""
+
+#. privacy notice
+msgid "Published stories are public (your name only if you choose); drafts: you and news reviewers."
+msgstr ""
+
+#. rules
+msgid "R10 now covers communities: keep to politics and public life in that area."
+msgstr ""
+
+#. privacy notice
+msgid "Read after 180 days, unread after 365 days."
+msgstr ""
+
+#. privacy notice
+msgid "Registering for an event tells NDCConnect, and the event's organiser, that you plan to attend a political event. The organiser sees your first name and last initial with your ticket code around the event, and how many people registered. Nobody else sees that you registered. You can cancel any time."
+msgstr ""
+
+#. apps/events/services.py:224
+msgid "Registration must close by the start."
+msgstr ""
+
+#. privacy notice
+msgid "Rejected checks lose their VIN after 90 days."
+msgstr ""
+
+#. privacy notice
+msgid "Rejected or withdrawn after 180 days; removed after 1 year."
+msgstr ""
+
+#. apps/moderation/services.py:895
+msgid "Removed by NDCConnect."
+msgstr ""
+
+#. rules
+msgid "Repeated promotional posts"
+msgstr ""
+
+#. privacy notice
+msgid "Reporters stay anonymous to authors; moderators see 'Signed-in member' or 'Guest'; only an audited system-admin reveal shows who."
+msgstr ""
+
+#. privacy notice
+msgid "Reports and moderation"
+msgstr ""
+
+#. privacy notice
+msgid "Reports you make (reason, details, optional contact email, hashed IP), decisions about your content, warnings, pauses, appeals, and legal or copyright notices."
+msgstr ""
+
+#. apps/privacy/requests.py:127
+msgid "Request not found."
+msgstr ""
+
+#. rules
+msgid "Respect copyright"
+msgstr ""
+
+#. apps/candidates/services.py:250
+msgid "Restore this candidate before changing the photo."
+msgstr ""
+
+#. apps/candidates/services.py:115
+msgid "Restore this candidate before editing it."
+msgstr ""
+
+#. apps/candidates/services.py:290
+msgid "Restore this candidate before linking accounts."
+msgstr ""
+
+#. privacy notice
+msgid "Roles are revoked; the grant history stays for the audit record."
+msgstr ""
+
+#. privacy notice
+msgid "Runs NDCConnect's servers, database and backups"
+msgstr ""
+
+#. apps/moderation/views.py:576
+msgid "Say how it was acknowledged."
+msgstr ""
+
+#. apps/privacy/incidents.py:169
+msgid "Say how it was sent (e.g. NDPC portal, email to ngCERT)."
+msgstr ""
+
+#. apps/volunteers/services.py:79
+msgid "Say what volunteers will do, in 30 to 1,000 characters."
+msgstr ""
+
+#. apps/moderation/services.py:770
+msgid "Say why it wasn't removed."
+msgstr ""
+
+#. apps/moderation/services.py:265
+msgid "Say why you're escalating it."
+msgstr ""
+
+#. apps/events/services.py:344
+msgid "Say why, in 10 to 300 characters. Registrants see it."
+msgstr ""
+
+#. apps/search/services.py:162
+msgid "Search is busy. Try again in a moment."
+msgstr ""
+
+#. privacy notice
+msgid "Security and audit records"
+msgstr ""
+
+#. privacy notice
+msgid "See what we hold"
+msgstr ""
+
+#. apps/accounts/settings_views.py:92
+msgid "Send a JSON object."
+msgstr ""
+
+#. apps/accounts/settings_services.py:250
+msgid "Send donation_name_default."
+msgstr ""
+
+#. apps/accounts/settings_services.py:486
+msgid "Send notification categories as true or false."
+msgstr ""
+
+#. apps/accounts/settings_services.py:379
+msgid "Send one or more categories as true or false."
+msgstr ""
+
+#. apps/accounts/settings_services.py:240
+msgid "Send theme, text_size, contrast or motion."
+msgstr ""
+
+#. apps/accounts/settings_services.py:291
+msgid "Send true or false."
+msgstr ""
+
+#. privacy notice
+msgid "Sensitive admin actions (who did what, when, from which IP address) and security events."
+msgstr ""
+
+#. apps/accounts/settings_services.py:304
+msgid "Set your home state in My account first."
+msgstr ""
+
+#. rules
+msgid "Sharing someone's home address"
+msgstr ""
+
+#. core/exceptions.py
+msgid "Sign in to continue."
+msgstr ""
+
+#. apps/communities/views.py:82
+msgid "Sign in to read community posts."
+msgstr ""
+
+#. apps/communities/views.py:178
+msgid "Sign in to take part."
+msgstr ""
+
+#. apps/volunteers/services.py:101
+msgid "Sign in to volunteer."
+msgstr ""
+
+#. privacy notice
+msgid "Sign-in and account security"
+msgstr ""
+
+#. rules
+msgid "Slurs about an ethnic group"
+msgstr ""
+
+#. apps/moderation/services.py:227
+msgid "Someone else is working on this case."
+msgstr ""
+
+#. apps/news/translations.py:103
+msgid "Someone else must review and publish a version you wrote."
+msgstr ""
+
+#. apps/moderation/services.py:660
+msgid "Someone other than the original decider has to decide this appeal."
+msgstr ""
+
+#. rules
+msgid "Something else"
+msgstr ""
+
+#. core/exceptions.py
+msgid "Something went wrong on our side."
+msgstr ""
+
+#. rules
+msgid "Spam or advertising"
+msgstr ""
+
+#. apps/geo/services.py:33
+msgid "State not found."
+msgstr ""
+
+#. rules
+msgid "Stay on topic and follow the news and community rules"
+msgstr ""
+
+#. privacy notice
+msgid "System administrators (searches of the log are themselves audited)."
+msgstr ""
+
+#. privacy notice
+msgid "System administrators."
+msgstr ""
+
+#. privacy notice
+msgid "Take it elsewhere"
+msgstr ""
+
+#. apps/moderation/services.py:331
+msgid "Take the case first."
+msgstr ""
+
+#. apps/privacy/requests.py:41
+msgid "Tell us a little more (at least 10 characters)."
+msgstr ""
+
+#. apps/moderation/services.py:607
+msgid "Tell us why you think the decision was wrong."
+msgstr ""
+
+#. apps/accounts/settings_services.py:309
+msgid "That LGA isn't in your home state."
+msgstr ""
+
+#. apps/candidates/services.py:301
+msgid "That account isn't linked to this candidate."
+msgstr ""
+
+#. apps/donations/services.py:143
+msgid "That candidate isn't available for donations. Choose another, or give to the NDC general fund."
+msgstr ""
+
+#. apps/communities/services.py:352
+msgid "That community isn't open."
+msgstr ""
+
+#. apps/candidates/services.py:71
+msgid "That constituency is no longer in INEC's current list."
+msgstr ""
+
+#. apps/candidates/services.py:66
+msgid "That constituency isn't one this office stands in, in the chosen state."
+msgstr ""
+
+#. apps/news/translations.py:63
+msgid "That is the announcement's own language; edit the original instead."
+msgstr ""
+
+#. apps/geo/services.py:274
+msgid "That place already has this name."
+msgstr ""
+
+#. apps/communities/services.py:465
+msgid "That's too long."
+msgstr ""
+
+#. apps/pvc/services.py:187
+msgid "The badge is available once your PVC is verified."
+msgstr ""
+
+#. privacy notice
+msgid "The badge is turned off."
+msgstr ""
+
+#. privacy notice
+msgid "The badge shows next to your name on community news you publish with your name, and on your community posts and comments. It tells readers you're a verified voter."
+msgstr ""
+
+#. apps/accounts/settings_services.py:259
+msgid "The bio must be text."
+msgstr ""
+
+#. privacy notice
+msgid "The candidates you follow (Vote) and whether their notifications are on."
+msgstr ""
+
+#. apps/events/services.py:625
+msgid "The check-in list opens 24 hours before the event and closes 24 hours after it."
+msgstr ""
+
+#. privacy notice
+msgid "The consents you gave or withdrew (with versions and dates) and your privacy requests."
+msgstr ""
+
+#. privacy notice
+msgid "The download is in a common format (JSON)."
+msgstr ""
+
+#. apps/events/services.py:185
+msgid "The end must be after the start."
+msgstr ""
+
+#. privacy notice
+msgid "The events you register for, your ticket code, whether you were waitlisted and when you were checked in."
+msgstr ""
+
+#. apps/membership/services.py:405
+msgid "The fee hasn't been confirmed by the payment provider."
+msgstr ""
+
+#. apps/geo/views.py:283
+msgid "The file is larger than 50 MB."
+msgstr ""
+
+#. apps/moderation/views.py:616
+msgid "The file must be 10 MB or smaller."
+msgstr ""
+
+#. apps/donations/services.py:313
+msgid "The payment provider didn't answer. Try again in a minute."
+msgstr ""
+
+#. privacy notice
+msgid "The public name becomes 'Anonymous Donor'; the finance record is kept."
+msgstr ""
+
+#. privacy notice
+msgid "The register details the Electoral Act s. 77(2) asks for (name, sex, date of birth, address, state, LGA, ward, polling unit, NIN, photo), your declarations, membership number, status and fee payments. NIN is encrypted."
+msgstr ""
+
+#. core/exceptions.py
+msgid "The request could not be completed."
+msgstr ""
+
+#. apps/news/translations.py:101
+msgid "There is no version in that language yet."
+msgstr ""
+
+#. apps/news/translations.py:117
+msgid "There is no version in that language."
+msgstr ""
+
+#. apps/moderation/views.py:406
+msgid "There's no author account to warn."
+msgstr ""
+
+#. apps/geo/records.py:210
+msgid "There's no choice waiting to accept."
+msgstr ""
+
+#. apps/membership/services.py:365
+msgid "There's no payment to check."
+msgstr ""
+
+#. apps/accounts/settings_services.py:429
+msgid "This account is already inactive."
+msgstr ""
+
+#. apps/moderation/services.py:658
+msgid "This appeal has already been decided."
+msgstr ""
+
+#. apps/membership/services.py:407
+msgid "This applicant's PVC isn't verified."
+msgstr ""
+
+#. apps/volunteers/services.py:163
+msgid "This application isn't open."
+msgstr ""
+
+#. apps/news/services.py:164
+msgid "This article can't be withdrawn."
+msgstr ""
+
+#. apps/news/services.py:229
+msgid "This article has already been decided."
+msgstr ""
+
+#. apps/volunteers/services.py:106
+msgid "This campaign isn't taking volunteers right now."
+msgstr ""
+
+#. apps/communities/services.py:520
+msgid "This can't be edited now."
+msgstr ""
+
+#. apps/candidates/services.py:219
+msgid "This candidate is already archived."
+msgstr ""
+
+#. apps/events/services.py:96
+msgid "This candidate isn't published, so events can't be changed right now."
+msgstr ""
+
+#. apps/posts/services.py:57
+msgid "This candidate isn't published, so posts can't go out right now."
+msgstr ""
+
+#. apps/volunteers/services.py:40
+msgid "This candidate isn't published, so volunteering can't be changed right now."
+msgstr ""
+
+#. apps/candidates/services.py:170
+msgid "This candidate isn't verified."
+msgstr ""
+
+#. apps/moderation/services.py:310
+msgid "This case is already closed."
+msgstr ""
+
+#. apps/moderation/services.py:241
+msgid "This case is closed."
+msgstr ""
+
+#. apps/moderation/services.py:220
+msgid "This case was escalated to system administrators."
+msgstr ""
+
+#. apps/pvc/services.py:148
+msgid "This check has already been decided."
+msgstr ""
+
+#. apps/communities/services.py:623
+msgid "This comment can't be deleted now."
+msgstr ""
+
+#. apps/events/services.py:546
+msgid "This event and its waitlist are full."
+msgstr ""
+
+#. apps/events/services.py:287
+msgid "This event has started, so it can't be changed."
+msgstr ""
+
+#. apps/events/services.py:589
+msgid "This event has started."
+msgstr ""
+
+#. apps/events/services.py:661
+msgid "This event isn't hidden."
+msgstr ""
+
+#. core/exceptions.py
+msgid "This field is required."
+msgstr ""
+
+#. core/exceptions.py
+msgid "This field may not be blank."
+msgstr ""
+
+#. core/exceptions.py
+msgid "This field may not be null."
+msgstr ""
+
+#. apps/geo/loading.py:367
+msgid "This file has already been applied."
+msgstr ""
+
+#. apps/privacy/incidents.py:128
+msgid "This incident is closed."
+msgstr ""
+
+#. apps/donations/services.py:308
+msgid "This is demo data, not a real payment, so there's nothing to check with the provider."
+msgstr ""
+
+#. apps/communities/services.py:680
+msgid "This item isn't hidden."
+msgstr ""
+
+#. apps/privacy/account.py:58
+msgid "This person's account has been deleted."
+msgstr ""
+
+#. apps/communities/services.py:566
+msgid "This post can't be deleted now."
+msgstr ""
+
+#. apps/communities/services.py:633
+msgid "This post can't be liked now."
+msgstr ""
+
+#. apps/posts/services.py:203
+msgid "This post has already been deleted."
+msgstr ""
+
+#. apps/accounts/settings_views.py:199
+msgid "This profile isn't available."
+msgstr ""
+
+#. apps/moderation/services.py:379
+msgid "This report has already been resolved."
+msgstr ""
+
+#. apps/privacy/requests.py:69
+msgid "This request can't do that in its current state."
+msgstr ""
+
+#. apps/privacy/account.py:60
+msgid "This request is closed."
+msgstr ""
+
+#. apps/access/models.py:94
+msgid "This scope needs a scope id."
+msgstr ""
+
+#. rules
+msgid "Threat or incitement to violence"
+msgstr ""
+
+#. rules
+msgid "Threatening an official or a voter"
+msgstr ""
+
+#. apps/pvc/serializers.py:23
+msgid "Tick this so we can check your details on INEC's register."
+msgstr ""
+
+#. privacy notice
+msgid "To check your voter details against INEC's public checker so you can pay for membership."
+msgstr ""
+
+#. privacy notice
+msgid "To control who can use the admin and to review access every 90 days."
+msgstr ""
+
+#. privacy notice
+msgid "To give you a place at events and send you updates and reminders."
+msgstr ""
+
+#. privacy notice
+msgid "To handle complaints under the NITDA Code of Practice and the Copyright Act 2022."
+msgstr ""
+
+#. privacy notice
+msgid "To let you discuss politics with people where you vote."
+msgstr ""
+
+#. privacy notice
+msgid "To let you volunteer for a campaign and let the campaign coordinate with you (FR-047–FR-050)."
+msgstr ""
+
+#. privacy notice
+msgid "To process your application, issue your card and keep the party register that goes to INEC."
+msgstr ""
+
+#. privacy notice
+msgid "To protect your data and prove who accessed it."
+msgstr ""
+
+#. privacy notice
+msgid "To prove consent and answer your requests, as the NDPA requires."
+msgstr ""
+
+#. privacy notice
+msgid "To publish campaign and party events."
+msgstr ""
+
+#. privacy notice
+msgid "To publish candidates' posts."
+msgstr ""
+
+#. privacy notice
+msgid "To publish verified candidate profiles."
+msgstr ""
+
+#. privacy notice
+msgid "To review and publish community news."
+msgstr ""
+
+#. privacy notice
+msgid "To run your account, show your name where you choose to, and contact you about your own requests."
+msgstr ""
+
+#. privacy notice
+msgid "To show NDCConnect the way you asked, on every device, and to publish the profile you chose."
+msgstr ""
+
+#. privacy notice
+msgid "To show the images with the content they belong to."
+msgstr ""
+
+#. privacy notice
+msgid "To show your Following page and send you candidates' posts when you ask for them."
+msgstr ""
+
+#. privacy notice
+msgid "To take the payment, send your receipt, and keep the records the party must file under the Electoral Act 2026 (ss. 89–93)."
+msgstr ""
+
+#. privacy notice
+msgid "To tell you about announcements, decisions on your requests and posts you asked for."
+msgstr ""
+
+#. privacy notice
+msgid "To the Nigeria Data Protection Commission (NDPC) if you're not satisfied with our answer."
+msgstr ""
+
+#. apps/privacy/account.py:30
+msgid "Type \"delete\" to confirm."
+msgstr ""
+
+#. apps/accounts/settings_services.py:425
+msgid "Type \"pause\" to confirm."
+msgstr ""
+
+#. apps/accounts/admin_views.py:66
+msgid "Type at least 3 characters of a name or email."
+msgstr ""
+
+#. apps/geo/views.py:147
+msgid "Type at least the state and LGA parts of the code, like 24-07."
+msgstr ""
+
+#. privacy notice
+msgid "United States"
+msgstr ""
+
+#. apps/privacy/account.py:55
+msgid "Unknown action."
+msgstr ""
+
+#. apps/geo/views.py:157
+msgid "Unknown kind."
+msgstr ""
+
+#. apps/privacy/consent.py:24
+msgid "Unknown purpose."
+msgstr ""
+
+#. apps/candidates/services.py:168
+msgid "Unpublish this candidate before removing verification."
+msgstr ""
+
+#. privacy notice
+msgid "Until you unfollow or withdraw consent."
+msgstr ""
+
+#. apps/events/services.py:391
+msgid "Updates go to published events that haven't ended."
+msgstr ""
+
+#. apps/moderation/views.py:621
+msgid "Upload a PDF, JPEG or PNG."
+msgstr ""
+
+#. apps/events/services.py:218
+msgid "Use 1 to 100,000, or leave it empty for no limit."
+msgstr ""
+
+#. apps/events/services.py:178
+msgid "Use 10 to 120 characters."
+msgstr ""
+
+#. apps/events/services.py:386
+msgid "Use 10 to 500 characters."
+msgstr ""
+
+#. apps/events/services.py:180
+msgid "Use 30 to 4,000 characters."
+msgstr ""
+
+#. apps/privacy/incidents.py:86
+msgid "Use Close to close an incident."
+msgstr ""
+
+#. apps/membership/views.py:171
+msgid "Use YYYY-MM-DD dates."
+msgstr ""
+
+#. apps/events/views.py:338
+msgid "Use a date and time."
+msgstr ""
+
+#. apps/news/serializers.py:170
+msgid "Use a link that starts with https://"
+msgstr ""
+
+#. apps/events/services.py:215
+msgid "Use a whole number."
+msgstr ""
+
+#. apps/volunteers/services.py:177
+msgid "Use up to 200 characters."
+msgstr ""
+
+#. apps/events/services.py:228
+msgid "Use up to 300 characters."
+msgstr ""
+
+#. apps/candidates/services.py:183
+msgid "Verify this candidate before publishing."
+msgstr ""
+
+#. apps/membership/services.py:204
+msgid "Verify your PVC first."
+msgstr ""
+
+#. privacy notice
+msgid "Volunteering tells NDCConnect, and the campaign you apply to, that you support that candidate. The campaign sees your first name and last initial, state, LGA, roles, availability and note; if they accept you, your full name, and your phone number if you choose to share it. You can withdraw any time."
+msgstr ""
+
+#. apps/geo/services.py:79
+msgid "Ward not found."
+msgstr ""
+
+#. apps/privacy/account.py:34
+msgid "We couldn't delete your account just now. Nothing was removed. Try again in a few minutes."
+msgstr ""
+
+#. apps/moderation/views.py:132
+msgid "We couldn't find a report with that reference."
+msgstr ""
+
+#. apps/donations/services.py:182
+msgid "We couldn't reach the payment provider. No money was taken. Try again."
+msgstr ""
+
+#. privacy notice
+msgid "Which admin or campaign roles you hold, who granted them and when."
+msgstr ""
+
+#. privacy notice
+msgid "Which communities you're in (state, LGA, ward and polling unit) and how you were placed there, what you post and comment, the posts you like, and the history of edits and moderation decisions on your posts."
+msgstr ""
+
+#. privacy notice
+msgid "While the candidacy is relevant; archived profiles are kept for the record."
+msgstr ""
+
+#. privacy notice
+msgid "While the content is published; removed when it's replaced, deleted or pruned."
+msgstr ""
+
+#. privacy notice
+msgid "While you're a member; cancelled applications keep only what the party needs for its records."
+msgstr ""
+
+#. privacy notice
+msgid "While your account exists."
+msgstr ""
+
+#. privacy notice
+msgid "Who you follow"
+msgstr ""
+
+#. privacy notice
+msgid "Withdraw consent"
+msgstr ""
+
+#. apps/privacy/views.py:193
+msgid "Withdraw consents directly on this page."
+msgstr ""
+
+#. apps/communities/services.py:461
+msgid "Write a little more."
+msgstr ""
+
+#. apps/news/announcements.py:57
+msgid "Write the announcement."
+msgstr ""
+
+#. apps/privacy/incidents.py:186
+msgid "Write the notice (at least 20 characters)."
+msgstr ""
+
+#. apps/posts/services.py:95
+msgid "Write the post."
+msgstr ""
+
+#. apps/privacy/incidents.py:273
+msgid "Write the root cause (at least 10 characters)."
+msgstr ""
+
+#. rules
+msgid "Wrong or out-of-date details"
+msgstr ""
+
+#. privacy notice
+msgid "You and privacy officers."
+msgstr ""
+
+#. privacy notice
+msgid "You and the campaign you applied to: first name and last initial, state, LGA, roles, availability and note; if they accept you, your full name and, if you chose, your phone number (each view is recorded). Nobody else."
+msgstr ""
+
+#. apps/events/services.py:538
+msgid "You can be registered for at most 20 upcoming events."
+msgstr ""
+
+#. apps/privacy/views.py:38
+msgid "You can download your data 3 times a day. Try again tomorrow."
+msgstr ""
+
+#. apps/moderation/services.py:611
+msgid "You can only appeal decisions about your own content."
+msgstr ""
+
+#. apps/news/services.py:184
+msgid "You can only change the image while the article is pending or rejected."
+msgstr ""
+
+#. apps/news/services.py:123
+msgid "You can only edit an article while it's pending or after it was rejected."
+msgstr ""
+
+#. apps/moderation/services.py:812
+msgid "You can only respond about your own content."
+msgstr ""
+
+#. apps/moderation/services.py:217
+msgid "You can't act on this case."
+msgstr ""
+
+#. apps/moderation/services.py:662
+msgid "You can't decide this appeal."
+msgstr ""
+
+#. apps/pvc/services.py:146
+msgid "You can't decide your own PVC check."
+msgstr ""
+
+#. apps/moderation/services.py:222
+msgid "You can't moderate your own content or a candidate you're linked to."
+msgstr ""
+
+#. apps/geo/records.py:195
+msgid "You can't review these records."
+msgstr ""
+
+#. apps/geo/records.py:205
+msgid "You can't review your own record."
+msgstr ""
+
+#. apps/news/services.py:220
+msgid "You can't review your own submission."
+msgstr ""
+
+#. apps/media/services.py:125
+msgid "You can't upload an image for this."
+msgstr ""
+
+#. core/exceptions.py
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#. apps/membership/views.py:141
+msgid "You don't have a membership to cancel."
+msgstr ""
+
+#. privacy notice
+msgid "You leave every community. Your posts and comments stay, shown as 'Former member', unless you choose to delete them too."
+msgstr ""
+
+#. apps/membership/services.py:111
+msgid "You must be 18 or older to join."
+msgstr ""
+
+#. apps/moderation/services.py:224
+msgid "You reported this item, so someone else has to decide."
+msgstr ""
+
+#. apps/events/services.py:541
+msgid "You're already registered."
+msgstr ""
+
+#. apps/posts/services.py:221
+msgid "You're linked to this candidate, so someone else has to moderate its posts."
+msgstr ""
+
+#. apps/follows/services.py:73
+msgid "You're not following this candidate."
+msgstr ""
+
+#. apps/communities/services.py:409
+msgid "You're not in this community."
+msgstr ""
+
+#. apps/communities/services.py:230
+msgid "You're not linked to that candidate."
+msgstr ""
+
+#. apps/posts/services.py:52
+msgid "You're not linked to this candidate."
+msgstr ""
+
+#. apps/events/services.py:587
+msgid "You're not registered for this event."
+msgstr ""
+
+#. apps/moderation/services.py:625
+msgid "You've already appealed this decision."
+msgstr ""
+
+#. apps/volunteers/services.py:147
+msgid "You've already applied to volunteer for this campaign."
+msgstr ""
+
+#. apps/communities/services.py:497
+msgid "You've already posted this."
+msgstr ""
+
+#. apps/events/services.py:543
+msgid "You've cancelled this event too many times to register again."
+msgstr ""
+
+#. privacy notice
+msgid "You, and PVC and membership officers (the VIN only through an audited reveal)."
+msgstr ""
+
+#. privacy notice
+msgid "You, and finance officers and system administrators (audited)."
+msgstr ""
+
+#. privacy notice
+msgid "You, and membership officers and system administrators (NIN and photo only through audited reveals)."
+msgstr ""
+
+#. privacy notice
+msgid "You. System administrators can open an account page (audited); a phone number needs an audited reveal."
+msgstr ""
+
+#. privacy notice
+msgid "You. The event's organiser sees how many people registered and, from 24 hours before to 24 hours after the event, your first name and last initial with your ticket code for check-in. Nobody else, admins included, sees that you registered."
+msgstr ""
+
+#. apps/membership/services.py:153
+msgid "Your NIN is 11 digits."
+msgstr ""
+
+#. privacy notice
+msgid "Your PVC details are deleted. Paying for membership needs a verified PVC again."
+msgstr ""
+
+#. privacy notice
+msgid "Your VIN (encrypted), surname, state, LGA and polling unit, the check's result, and whether you show the verified-voter badge."
+msgstr ""
+
+#. privacy notice
+msgid "Your account"
+msgstr ""
+
+#. apps/accounts/settings_services.py:388
+msgid "Your account already has its own settings."
+msgstr ""
+
+#. apps/membership/services.py:176
+msgid "Your application can't be changed at this stage."
+msgstr ""
+
+#. apps/membership/services.py:213
+msgid "Your application isn't waiting for payment."
+msgstr ""
+
+#. privacy notice
+msgid "Your application records your party membership and the register details the Electoral Act asks for, including your NIN and photo. The party sends the register to INEC before primaries."
+msgstr ""
+
+#. privacy notice
+msgid "Your applications are deleted."
+msgstr ""
+
+#. privacy notice
+msgid "Your consent at sign-up (NDPA s. 43(1)(a))"
+msgstr ""
+
+#. apps/privacy/views.py:167
+msgid "Your download couldn't be prepared just now. Try again later."
+msgstr ""
+
+#. privacy notice
+msgid "Your explicit consent, NDPA s. 30(1)(a) (it shows your political interests)."
+msgstr ""
+
+#. privacy notice
+msgid "Your explicit consent, NDPA s. 30(1)(a) (it shows your political opinions and where you vote)."
+msgstr ""
+
+#. privacy notice
+msgid "Your explicit consent, NDPA s. 30(1)(a) (registering for a political event shows your political opinions)."
+msgstr ""
+
+#. privacy notice
+msgid "Your explicit consent, NDPA s. 30(1)(a) (volunteering shows which candidate you support)."
+msgstr ""
+
+#. privacy notice
+msgid "Your explicit consent, NDPA s. 30(1)(a), and the party's legal obligation under the Electoral Act s. 77."
+msgstr ""
+
+#. privacy notice
+msgid "Your explicit consent, NDPA s. 30(1)(a)."
+msgstr ""
+
+#. privacy notice
+msgid "Your in-app notifications and settings."
+msgstr ""
+
+#. privacy notice
+msgid "Your language, display and notification-category choices, the name style for your bylines, the default name on your donations, and, if you turn it on, your public profile: its address, bio, the location you chose to show and whether to show your photo."
+msgstr ""
+
+#. privacy notice
+msgid "Your membership is cancelled and your NIN, date of birth and photo are erased. Payments are kept for the party's records."
+msgstr ""
+
+#. privacy notice
+msgid "Your name, email, phone number, the profile photo you uploaded in Clerk (if any), an optional home state, that you confirmed you're 18 or older, and when you last used the admin (admin roles only)."
+msgstr ""
+
+#. privacy notice
+msgid "Your open applications are withdrawn and the campaign can no longer see your contact details."
+msgstr ""
+
+#. apps/membership/services.py:511
+msgid "Your payment is still being checked. Try again in a few minutes."
+msgstr ""
+
+#. privacy notice
+msgid "Your privacy choices and requests"
+msgstr ""
+
+#. privacy notice
+msgid "Your public profile is turned off at once."
+msgstr ""
+
+#. privacy notice
+msgid "Your registrations are deleted."
+msgstr ""
+
+#. privacy notice
+msgid "Your reports are detached from your account; decisions stay for the record."
+msgstr ""
+
+#. privacy notice
+msgid "Your settings and public profile"
+msgstr ""
+
+#. privacy notice
+msgid "Your submissions, images, byline choice, declarations and the review history."
+msgstr ""
+
+#. privacy notice
+msgid "Your upcoming registrations are cancelled and deleted."
+msgstr ""
+
+#. privacy notice
+msgid "Your volunteer applications (roles, state and LGA, availability, a note, whether to share your phone), the campaign's decision, the updates campaigns send their volunteers, and campaigns' volunteer settings."
+msgstr ""
+
+#. apps/communities/views.py:347
+msgid "notify_new_posts must be true or false."
+msgstr ""
+
+#. apps/membership/views.py:246
+msgid "requires_approval must be true or false."
+msgstr ""
+
+#. apps/pvc/views.py:80
+msgid "show_badge must be true or false."
+msgstr ""
+
+#. privacy notice
+msgid "to be confirmed (spec 14 §15.6)"
+msgstr ""

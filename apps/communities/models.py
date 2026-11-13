@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models import Q
 
 from apps.core.fields import StateField, choice_check, state_check
+from apps.core.i18n import language_check, language_field
 
 
 class Level(models.TextChoices):
@@ -165,6 +166,7 @@ class CommunityPost(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="community_posts")
     campaign_candidate = models.ForeignKey("candidates.Candidate", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     body = models.TextField(max_length=2000)
+    language = language_field()
     status = models.CharField(max_length=10, choices=ItemStatus.choices, default=ItemStatus.PUBLISHED)
     hidden_at = models.DateTimeField(null=True, blank=True)
     hidden_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
@@ -187,7 +189,7 @@ class CommunityPost(models.Model):
             models.Index(fields=["author", "created_at"], name="communities_post_author_idx"),
             models.Index(fields=["body_hash", "author", "created_at"], name="communities_post_dupe_idx"),
         ]
-        constraints = _item_constraints("post")
+        constraints = [*_item_constraints("post"), language_check("communities_post_language_valid", "language")]
 
 
 class CommunityComment(models.Model):
@@ -198,6 +200,7 @@ class CommunityComment(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="community_comments")
     campaign_candidate = models.ForeignKey("candidates.Candidate", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     body = models.TextField(max_length=1000)
+    language = language_field()
     status = models.CharField(max_length=10, choices=ItemStatus.choices, default=ItemStatus.PUBLISHED)
     hidden_at = models.DateTimeField(null=True, blank=True)
     hidden_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
@@ -214,7 +217,7 @@ class CommunityComment(models.Model):
         ordering = ["created_at"]
         indexes = [models.Index(fields=["post", "status", "created_at"], name="communities_comment_idx"),
                    models.Index(fields=["author", "created_at"], name="communities_comment_author_idx")]
-        constraints = _item_constraints("comment")
+        constraints = [*_item_constraints("comment"), language_check("communities_comment_language_valid", "language")]
 
 
 class ReactionKind(models.TextChoices):

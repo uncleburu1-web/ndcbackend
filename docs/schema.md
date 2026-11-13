@@ -36,6 +36,30 @@ Indexes:
 
 - `access_role_user_id_267653_idx`: (user, role, is_active)
 
+### `accounts.LanguageReview` — `accounts_languagereview`
+
+Spec 21 §14: a native speaker's (or, for legal texts, a lawyer's) sign-off of one catalogue version. Append-only; the reviewer is named in free text because translators need no account. A language can be enabled only with an interface review of a complete catalogue; translated legal texts show only with a legal review of their version.
+
+Data register: Not personal.
+
+| Column | Type | Null | Notes |
+|---|---|---|---|
+| `id` | uuid |  | primary key |
+| `language` | varchar(3) |  |  |
+| `scope` | varchar(9) |  | one of interface, legal |
+| `catalogue_version` | varchar(40) |  |  |
+| `interface_percent` | smallint ≥ 0 |  |  |
+| `backend_percent` | smallint ≥ 0 |  |  |
+| `reviewer_name` | varchar(120) |  |  |
+| `note` | varchar(500) |  |  |
+| `recorded_by_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
+| `created_at` | timestamptz |  |  |
+
+Constraints:
+
+- `accounts_review_language_valid`: check language in (ha, ig, yo, pcm)
+- `accounts_review_scope_valid`: check scope in (interface, legal)
+
 ### `accounts.RetiredHandle` — `accounts_retiredhandle`
 
 Public-profile handles that belonged to a deleted account: never handed out again (spec 20 §16.2).
@@ -121,6 +145,7 @@ Data register: Your settings and public profile.
 | `public_profile` | boolean |  |  |
 | `profile_handle` | varchar(6) | yes | unique |
 | `bio` | varchar(300) |  |  |
+| `bio_language` | varchar(3) |  | one of en, ha, ig, yo, pcm, und |
 | `profile_location` | varchar(5) |  | one of none, state, lga |
 | `profile_lga_id` | → | yes | → `geo.Lga`, on delete PROTECT (reference data is deactivated, never deleted) |
 | `profile_photo` | boolean |  |  |
@@ -131,6 +156,7 @@ Data register: Your settings and public profile.
 
 Constraints:
 
+- `accounts_prefs_bio_language_valid`: check bio_language in (en, ha, ig, yo, pcm, und)
 - `accounts_prefs_profile_has_handle`: check public_profile = False or profile_handle is not null
 - `accounts_prefs_lga_only_for_lga`: check profile_lga is null or profile_location = 'lga'
 
@@ -145,7 +171,7 @@ Data register: Security and audit records.
 | `id` | uuid |  | primary key |
 | `actor_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
 | `actor_label` | varchar(32) |  |  |
-| `action` | varchar(48) |  | one of 116 values; indexed |
+| `action` | varchar(48) |  | one of 120 values; indexed |
 | `target_type` | varchar(64) |  |  |
 | `target_id` | varchar(64) |  | indexed |
 | `metadata` | jsonb |  | per-action details from an allow-list; displayed, never joined |
@@ -185,6 +211,7 @@ Data register: Candidate profiles.
 | `geo_ward_id` | → | yes | → `geo.Ward`, on delete PROTECT (reference data is deactivated, never deleted) |
 | `geo_constituency_id` | → | yes | → `geo.Constituency`, on delete PROTECT (reference data is deactivated, never deleted) |
 | `biography` | text |  |  |
+| `biography_language` | varchar(3) |  | one of en, ha, ig, yo, pcm, und |
 | `campaign_summary` | text |  |  |
 | `priorities` | jsonb |  | a short ordered list of the candidate's own words, always read with the profile |
 | `links` | jsonb |  | a few labelled links, always read with the profile |
@@ -201,6 +228,7 @@ Data register: Candidate profiles.
 
 Constraints:
 
+- `candidates_bio_language_valid`: check biography_language in (en, ha, ig, yo, pcm, und)
 - `candidates_published_requires_verified`: check not (status = 'published') or verified_at is not null
 - `candidates_state_valid`: check state in (37 values) or state = ''
 - `candidates_status_valid`: check status in (draft, published, unpublished, archived)
@@ -563,6 +591,7 @@ Data register: Community news you submit.
 | `category` | varchar(20) |  | one of election_updates, party, campaign, community, election_news |
 | `title` | varchar(150) |  |  |
 | `body` | text |  |  |
+| `language` | varchar(3) |  | one of en, ha, ig, yo, pcm, und |
 | `state` | varchar(20) |  | one of 37 values |
 | `source_name` | varchar(120) |  |  |
 | `source_url` | varchar(500) |  |  |
@@ -592,6 +621,7 @@ Data register: Community news you submit.
 
 Constraints:
 
+- `news_article_language_valid`: check language in (en, ha, ig, yo, pcm, und)
 - `news_official_shape`: check source = 'community' or (not (category = '') and not (status = 'pending'))
 - `news_community_shape`: check source = 'official' or (category = '' and pinned_at is null)
 - `news_article_published_shape`: check not (status = 'successful') or published_at is not null
@@ -623,6 +653,35 @@ Data register: Community news you submit.
 | `note` | varchar(300) |  |  |
 | `created_at` | timestamptz |  |  |
 
+### `news.ArticleTranslation` — `news_articletranslation`
+
+Spec 21 §10: an official announcement in another language, entered by a person (never machine-made) and reviewed by a second person before it is published. The image and source link are the original's.
+
+Data register: Not personal.
+
+| Column | Type | Null | Notes |
+|---|---|---|---|
+| `id` | uuid |  | primary key |
+| `article_id` | → |  | → `news.Article`, on delete CASCADE (a version of an announcement in another language has no meaning without it (spec 21 §10)) |
+| `language` | varchar(3) |  |  |
+| `title` | varchar(150) |  |  |
+| `body` | text |  |  |
+| `status` | varchar(9) |  | one of draft, published |
+| `translated_by_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
+| `reviewed_by_id` | → | yes | → `accounts.User`, on delete SET_NULL (a person as actor; the record outlives the account) |
+| `published_at` | timestamptz | yes |  |
+| `original_updated_at` | timestamptz |  |  |
+| `created_at` | timestamptz |  |  |
+| `updated_at` | timestamptz |  |  |
+
+Constraints:
+
+- `news_translation_one_per_language`: unique (article, language)
+- `news_translation_language_valid`: check language in (ha, ig, yo, pcm, en)
+- `news_translation_status_valid`: check status in (draft, published)
+- `news_translation_published_shape`: check not (status = 'published') or (published_at is not null and reviewed_by is not null)
+- `news_translation_second_person`: check reviewed_by is null or not (reviewed_by = F(translated_by))
+
 ### `posts.CandidatePost` — `posts_candidatepost`
 
 An announcement or news post published by a candidate's linked campaign accounts (spec 09).
@@ -636,6 +695,7 @@ Data register: Candidate posts.
 | `kind` | varchar(12) |  | one of announcement, news |
 | `title` | varchar(150) |  |  |
 | `body` | text |  |  |
+| `language` | varchar(3) |  | one of en, ha, ig, yo, pcm, und |
 | `image` | varchar(255) |  |  |
 | `image_thumb` | varchar(255) |  |  |
 | `image_asset_id` | → | yes | → `media.MediaAsset`, on delete SET_NULL (assets are released through media.services) |
@@ -657,6 +717,7 @@ Data register: Candidate posts.
 
 Constraints:
 
+- `posts_language_valid`: check language in (en, ha, ig, yo, pcm, und)
 - `posts_post_removed_shape`: check not (status = 'removed') or removed_at is not null
 - `posts_post_deleted_shape`: check not (status = 'deleted') or deleted_at is not null
 - `posts_status_valid`: check status in (published, deleted, removed)
@@ -742,6 +803,7 @@ Data register: Reports and moderation.
 | `state` | varchar(20) |  | one of 37 values |
 | `opened_at` | timestamptz |  |  |
 | `closed_at` | timestamptz | yes |  |
+| `language` | varchar(3) |  | one of en, ha, ig, yo, pcm, und |
 
 Constraints:
 
@@ -887,6 +949,24 @@ Indexes:
 
 - `moderation_restriction_idx`: (user, kind, ends_at)
 
+### `moderation.StaffLanguage` — `moderation_stafflanguage`
+
+Spec 21 §9: a language a moderator or news reviewer reads. Their queues default to these. Set by the person only.
+
+Data register: Not personal.
+
+| Column | Type | Null | Notes |
+|---|---|---|---|
+| `id` | bigint (auto) |  | primary key |
+| `user_id` | → |  | → `accounts.User`, on delete CASCADE (the languages a staff member reads are a convenience setting for their own queues (spec 21 §9)) |
+| `language` | varchar(3) |  |  |
+| `created_at` | timestamptz |  |  |
+
+Constraints:
+
+- `moderation_staff_language_once`: unique (user, language)
+- `moderation_staff_language_valid`: check language in (en, ha, ig, yo, pcm)
+
 ## Notifications
 
 ### `notifications.Notification` — `notifications_notification`
@@ -993,6 +1073,7 @@ Data register: Your privacy choices and requests.
 | `user_id` | → |  | → `accounts.User`, on delete CASCADE (owner of private data; erased through the owning service) |
 | `purpose` | varchar(24) |  | one of political_following, membership, pvc_check, verified_badge, community_membership, event_registration, volunteering, public_profile |
 | `version` | smallint ≥ 0 |  |  |
+| `language` | varchar(3) |  |  |
 | `method` | varchar(16) |  | one of dialog, form, before_records |
 | `granted_at` | timestamptz |  |  |
 | `withdrawn_at` | timestamptz | yes |  |

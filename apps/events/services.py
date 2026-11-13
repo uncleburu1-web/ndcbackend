@@ -14,10 +14,26 @@ from apps.audit.models import AuditLog
 from apps.audit.services import record
 from apps.core import blackouts
 from apps.core.exceptions import ServiceError
+from apps.core.i18n import clean_content_language
 from apps.news.services import clean_text
 
-from .models import (CAMPAIGNING_TYPES, AddressVisibility, ChangeKind, Event, EventChange, EventRegistration, EventStatus,
-                     EventType, EventUpdate, MaterialChange, Mode, Organiser, Registration, RegistrationStatus, VenueType)
+from .models import (
+    CAMPAIGNING_TYPES,
+    AddressVisibility,
+    ChangeKind,
+    Event,
+    EventChange,
+    EventRegistration,
+    EventStatus,
+    EventType,
+    EventUpdate,
+    MaterialChange,
+    Mode,
+    Organiser,
+    Registration,
+    RegistrationStatus,
+    VenueType,
+)
 
 PURPOSE = "event_registration"
 MAX_DAYS_LONG = 3
@@ -136,7 +152,7 @@ def required_declarations(event) -> list[str]:
 # ------------------------------------------------------------------ validation (§4.2)
 FIELDS = ("type", "mode", "title", "description", "starts_at", "ends_at", "venue_name", "venue_address", "venue_type", "address_visibility",
           "state", "lga_text", "geo_lga", "online_url", "accessibility_notes", "capacity", "registration", "registration_closes_at",
-          "members_only")
+          "members_only", "language")
 
 
 def _clean(event, data, *, now):
@@ -147,6 +163,11 @@ def _clean(event, data, *, now):
             setattr(event, k if k != "geo_lga" else "geo_lga_id", data[k])
     event.title = " ".join((event.title or "").split())
     event.description = clean_text(event.description)
+    if "language" in data:
+        try:
+            event.language = clean_content_language(data["language"], "und")
+        except serializers.ValidationError:
+            errors["language"] = ["Choose English, Hausa, Igbo, Yoruba, Nigerian Pidgin or “Not sure”."]
     for k in ("venue_name", "venue_address", "lga_text", "accessibility_notes"):
         setattr(event, k, " ".join((getattr(event, k) or "").split()))
     if event.type not in EventType.values:

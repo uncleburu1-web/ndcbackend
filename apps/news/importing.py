@@ -203,6 +203,7 @@ def run(data: dict, *, admin, kind: str, base: Path, dry_run=False) -> Result:
         if dry_run:
             continue
         payload = {k: it.get(k, "") for k in ("category", "title", "body", "state", "source_name", "source_url")}
+        payload["language"] = it.get("language") or "en"  # spec 21 §16: the researched items are written in English
         with transaction.atomic():
             a = announcements.publish(admin, payload, notify=False)
             if kind == "news":

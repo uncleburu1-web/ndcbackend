@@ -6,9 +6,15 @@ import re
 import unicodedata
 
 _SPACE = re.compile(r"\s+")
+# Spec 21 §12: letters with no Unicode decomposition (Hausa hooked letters, the open vowels some Pidgin and Igbo
+# writers use) fold to the plain letter people type on any keyboard; the Hausa apostrophe (ʼy) is dropped.
+_PLAIN = {"ɓ": "b", "ɗ": "d", "ƙ": "k", "ƴ": "y", "Ɓ": "b", "Ɗ": "d", "Ƙ": "k", "Ƴ": "y", "ɛ": "e", "Ɛ": "e", "ɔ": "o", "Ɔ": "o",
+          "ʼ": "", "ꞌ": "", "Ꞌ": ""}
 
 
 def _fold_char(ch: str) -> str:
+    if ch in _PLAIN:
+        return _PLAIN[ch]
     if ch in "'’‘`-–—_/":
         return " "
     if ch == "ß":

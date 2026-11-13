@@ -9,7 +9,8 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.db.models import Q
 
-from apps.core.fields import StateField, state_check
+from apps.core.fields import StateField, choice_check, state_check
+from apps.core.i18n import language_check, language_field
 
 
 class UserManager(BaseUserManager):
@@ -174,6 +175,7 @@ class UserPreferences(models.Model):
     public_profile = models.BooleanField(default=False)
     profile_handle = models.CharField(max_length=6, unique=True, null=True, blank=True)
     bio = models.CharField(max_length=300, blank=True)
+    bio_language = language_field()
     profile_location = models.CharField(max_length=5, choices=ProfileLocation.choices, default=ProfileLocation.NONE)
     profile_lga = models.ForeignKey("geo.Lga", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
     profile_photo = models.BooleanField(default=False)
@@ -185,7 +187,7 @@ class UserPreferences(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        constraints = [
+        constraints = [language_check("accounts_prefs_bio_language_valid", "bio_language"), 
             models.CheckConstraint(condition=Q(public_profile=False) | Q(profile_handle__isnull=False), name="accounts_prefs_profile_has_handle"),
             models.CheckConstraint(condition=Q(profile_lga__isnull=True) | Q(profile_location="lga"), name="accounts_prefs_lga_only_for_lga"),
         ]
@@ -219,3 +221,34 @@ class SettingsDefaults(models.Model):
 
     class Meta:
         constraints = [models.CheckConstraint(condition=Q(id=1), name="accounts_settings_defaults_single_row")]
+
+
+class ReviewScope(models.TextChoices):
+    INTERFACE = "interface", "Interface"
+    LEGAL = "legal", "Legal texts"
+
+
+class LanguageReview(models.Model):
+    """Spec 21 §14: a native speaker's (or, for legal texts, a lawyer's) sign-off of one catalogue version. Append-only;
+    the reviewer is named in free text because translators need no account. A language can be enabled only with an
+    interface review of a complete catalogue; translated legal texts show only with a legal review of their version."""
+
+    Scope = ReviewScope
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    language = models.CharField(max_length=3)
+    scope = models.CharField(max_length=9, choices=ReviewScope.choices)
+    catalogue_version = models.CharField(max_length=40)
+    interface_percent = models.PositiveSmallIntegerField(default=0)  # the web app's completeness when reviewed
+    backend_percent = models.PositiveSmallIntegerField(default=0)
+    reviewer_name = models.CharField(max_length=120)
+    note = models.CharField(max_length=500, blank=True)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.CheckConstraint(condition=Q(language__in=["ha", "ig", "yo", "pcm"]), name="accounts_review_language_valid"),
+            choice_check("scope", ReviewScope.values, "accounts_review_scope_valid"),
+        ]

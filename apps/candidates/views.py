@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
-from apps.core import filters as F
 from apps.access.permissions import IsSystemAdmin
+from apps.core import filters as F
 from apps.core.exceptions import ServiceError
 
 from . import services

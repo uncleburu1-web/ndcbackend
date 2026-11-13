@@ -14,16 +14,23 @@ from apps.access.permissions import IsSignedIn, IsSystemAdmin
 from apps.audit.services import client_ip
 from apps.candidates.models import Candidate
 from apps.core.exceptions import ServiceError
-from apps.news.images import PhotoError
 from apps.moderation import services as moderation
 from apps.moderation.models import Report, ReportStatus
+from apps.news.images import PhotoError
 from apps.news.serializers import ReportSerializer
 from apps.news.views import PublicThrottle, ReportThrottle
 
 from . import reports, services
 from .models import CandidatePost, PostStatus
-from .serializers import (AdminPostDetailSerializer, AdminPostSerializer, CampaignPostSerializer, PostWriteSerializer,
-                          PublicPostDetailSerializer, PublicPostSerializer, candidate_summary)
+from .serializers import (
+    AdminPostDetailSerializer,
+    AdminPostSerializer,
+    CampaignPostSerializer,
+    PostWriteSerializer,
+    PublicPostDetailSerializer,
+    PublicPostSerializer,
+    candidate_summary,
+)
 
 
 class Page10(PageNumberPagination):

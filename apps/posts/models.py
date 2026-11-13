@@ -8,6 +8,7 @@ from django.conf import settings
 from django.db import models
 
 from apps.core.fields import choice_check
+from apps.core.i18n import language_check, language_field
 
 
 class PostKind(models.TextChoices):
@@ -34,6 +35,7 @@ class CandidatePost(models.Model):
     kind = models.CharField(max_length=12, choices=PostKind.choices)
     title = models.CharField(max_length=150)
     body = models.TextField(max_length=10_000)
+    language = language_field()
     image = models.CharField(max_length=255, blank=True)
     image_thumb = models.CharField(max_length=255, blank=True)
     image_asset = models.ForeignKey("media.MediaAsset", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")  # spec 15 §7.4
@@ -61,7 +63,7 @@ class CandidatePost(models.Model):
             models.Index(fields=["candidate", "status", "-published_at"], name="posts_candidate_idx"),
             models.Index(fields=["status", "-published_at"], name="posts_feed_idx"),
         ]
-        constraints = [  # spec 16 §6.3
+        constraints = [language_check("posts_language_valid", "language"),   # spec 16 §6.3
             models.CheckConstraint(condition=~models.Q(status="removed") | models.Q(removed_at__isnull=False), name="posts_post_removed_shape"),
             models.CheckConstraint(condition=~models.Q(status="deleted") | models.Q(deleted_at__isnull=False), name="posts_post_deleted_shape"),
             choice_check("status", PostStatus.values, "posts_status_valid"),

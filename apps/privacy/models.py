@@ -39,6 +39,8 @@ class ConsentRecord(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="consents")
     purpose = models.CharField(max_length=24, choices=Purpose.choices)
     version = models.PositiveSmallIntegerField()
+    # spec 21 §8: the language of the text the person saw (NDPA s. 26(1): we must be able to show what they agreed to)
+    language = models.CharField(max_length=3, default="en", db_default="en")
     method = models.CharField(max_length=16, choices=Method.choices)
     granted_at = models.DateTimeField(auto_now_add=True)
     withdrawn_at = models.DateTimeField(null=True, blank=True)

@@ -2,6 +2,7 @@ from drf_spectacular.utils import extend_schema_field, inline_serializer
 from rest_framework import serializers
 
 from apps.candidates.reference import State
+from apps.core.i18n import CONTENT_CHOICES
 
 from . import images
 from .models import Article, Category
@@ -53,7 +54,7 @@ class PublicArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ["id", "source", "category", "category_label", "title", "excerpt", "state", "state_label", "image", "published_at",
-                  "edited_at", "byline", "byline_verified", "byline_profile", "pinned", "audience"]
+                  "edited_at", "byline", "byline_verified", "byline_profile", "pinned", "audience", "language"]
 
     @extend_schema_field(inline_serializer("ArticleAudience", {"id": serializers.UUIDField(), "name": serializers.CharField(),
                                                                 "path": serializers.CharField()}, allow_null=True))
@@ -162,6 +163,7 @@ class SubmitSerializer(serializers.Serializer):
     source_url = serializers.CharField(max_length=500, required=False, allow_blank=True)
     show_author_name = serializers.BooleanField(required=False, default=False)
     declarations = serializers.DictField(child=serializers.BooleanField(), required=False)
+    language = serializers.ChoiceField(choices=CONTENT_CHOICES, required=False, help_text="Spec 21 §9: the language it is written in")
 
     def validate_source_url(self, v):
         if v and not v.lower().startswith("https://"):
@@ -185,6 +187,7 @@ class AnnouncementSerializer(serializers.Serializer):
     source_name = serializers.CharField(max_length=120, required=False, allow_blank=True)
     source_url = serializers.CharField(max_length=500, required=False, allow_blank=True)
     notify = serializers.BooleanField(required=False, default=False)
+    language = serializers.ChoiceField(choices=CONTENT_CHOICES, required=False, help_text="Spec 21 §10: the original's language")
     audience_community = serializers.UUIDField(required=False, allow_null=True,
                                                help_text="Spec 17 §9: show pinned in this community and below; required for Community Announcements")
 

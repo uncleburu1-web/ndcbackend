@@ -89,7 +89,11 @@ class PrivacyNotice(APIView):
     authentication_classes = []
 
     def get(self, request):
-        resp = Response(register.public_payload())
+        from apps.core.i18n import legal_payload, param_language
+
+        payload, translation = legal_payload(register.public_payload(), param_language(request))  # spec 21 §8, rule 7
+        resp = Response(payload | {"translation": translation})
+        resp["Content-Language"] = translation["language"]
         patch_cache_control(resp, public=True, max_age=300)
         return resp
 
@@ -111,7 +115,8 @@ class MyPrivacy(_Private):
             "consents": consent.summary(u),
             "requests": [Q_.payload(r) for r in reqs.filter(self_served=False)[:50]],
             "downloads": [r.received_at for r in reqs.filter(self_served=True)[:50]],
-            "consent_history": [{"purpose": c.purpose, "label": c.get_purpose_display(), "version": c.version, "granted_at": c.granted_at,
+            "consent_history": [{"purpose": c.purpose, "label": c.get_purpose_display(), "version": c.version, "language": c.language,
+                                 "granted_at": c.granted_at,
                                  "withdrawn_at": c.withdrawn_at, "effect": c.withdrawal_effect, "method": c.method}
                                 for c in u.consents.all().order_by("-granted_at")[:50]],
             "security_notices": security_notices(u),
@@ -129,8 +134,9 @@ class MyConsent(_Private):
 
     def post(self, request, purpose):
         _purpose(purpose)
-        rec = consent.grant(request.user, purpose)
-        return Response({"purpose": purpose, "version": rec.version, "granted_at": rec.granted_at}, status=201)
+        rec = consent.grant(request.user, purpose, language=consent.shown_language(purpose, request.data.get("language")))
+        return Response({"purpose": purpose, "version": rec.version, "language": rec.language, "granted_at": rec.granted_at},
+                        status=201)
 
     def delete(self, request, purpose):
         _purpose(purpose)

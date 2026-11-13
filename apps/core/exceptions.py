@@ -42,6 +42,15 @@ def _request_id(context):
     return getattr(getattr(req, "_request", req), "request_id", "") or current()
 
 
+def _translated(message):
+    """Spec 21 §6: the message in the request's language when the catalogue has it (msgid = the English text)."""
+    from django.utils import translation
+
+    if not isinstance(message, str) or translation.get_language() in (None, "en", "en-us"):
+        return message
+    return translation.gettext(message)
+
+
 def api_exception_handler(exc, context):
     response = exception_handler(exc, context)
     rid = _request_id(context)
@@ -77,6 +86,7 @@ def api_exception_handler(exc, context):
         if isinstance(exc, (exceptions.NotAuthenticated, exceptions.AuthenticationFailed)) and code in ("not_authenticated", "authentication_failed"):
             code, message = "not_authenticated", "Sign in to continue."
 
+    message, fields = _translated(message), {k: [_translated(m) for m in v] if isinstance(v, list) else v for k, v in fields.items()}
     response.data = {"error": {"status": response.status_code, "code": code, "message": message, "fields": fields, "request_id": rid}}
     if isinstance(exc, exceptions.Throttled):
         response.data["error"]["retry_after"] = int(exc.wait or 60)

@@ -43,11 +43,35 @@ def require_consent(user, purpose):
         p = _purpose(purpose)
         e = ServiceError(f"Agree to how NDCConnect uses this information first: {p.label.lower()}.", code="consent_required",
                          status_code=403)
-        e.extra = {"purpose": p.key, "version": p.version, "text": p.text, "label": p.label}
+        from django.utils import translation
+
+        shown = text_for(purpose, translation.get_language() or "en")
+        e.extra = {"purpose": p.key, "version": p.version, "text": shown["text"], "label": shown["label"], "language": shown["language"]}
         raise e
 
 
-def grant(user, purpose, method=ConsentRecord.Method.DIALOG) -> ConsentRecord:
+def shown_language(purpose, language) -> str:
+    """Spec 21 §8: the language of the consent text the person read. Only a language whose translated text of this
+    version is legally reviewed and complete counts; anything else was shown in English."""
+    from apps.core.i18n import legal_payload
+
+    p = _purpose(purpose)
+    if not language or language == "en":
+        return "en"
+    _, tr = legal_payload({"text": p.text, "label": p.label}, language)
+    return tr["language"]
+
+
+def text_for(purpose, language) -> dict:
+    """The consent dialog's text in `language` when it may be shown (§8), else English; with the language used."""
+    from apps.core.i18n import legal_payload
+
+    p = _purpose(purpose)
+    data, tr = legal_payload({"text": p.text, "label": p.label}, language or "en")
+    return {**data, "language": tr["language"]}
+
+
+def grant(user, purpose, method=ConsentRecord.Method.DIALOG, language="en") -> ConsentRecord:
     p = _purpose(purpose)
     with transaction.atomic():
         rec = ConsentRecord.objects.select_for_update().filter(user=user, purpose=purpose, withdrawn_at__isnull=True).first()
@@ -61,7 +85,7 @@ def grant(user, purpose, method=ConsentRecord.Method.DIALOG) -> ConsentRecord:
             rec.save(update_fields=["withdrawn_at", "withdrawal_effect"])
         try:
             with transaction.atomic():
-                new = ConsentRecord.objects.create(user=user, purpose=purpose, version=p.version, method=method)
+                new = ConsentRecord.objects.create(user=user, purpose=purpose, version=p.version, method=method, language=language or "en")
         except IntegrityError:  # a parallel grant
             return active(user, purpose)
         if purpose == Purpose.COMMUNITY_MEMBERSHIP:  # spec 17 §5.2: placement runs once consent is given

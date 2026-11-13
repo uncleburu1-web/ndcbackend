@@ -5,7 +5,12 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.cache import add_never_cache_headers, patch_cache_control
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, inline_serializer
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    extend_schema,
+    inline_serializer,
+)
 from rest_framework import serializers as DS
 from rest_framework import status
 from rest_framework.pagination import CursorPagination
@@ -25,7 +30,14 @@ from apps.news.views import PublicThrottle, ReportThrottle
 
 from . import serializers as P
 from . import services
-from .models import Event, EventRegistration, EventStatus, Mode, Organiser, RegistrationStatus
+from .models import (
+    Event,
+    EventRegistration,
+    EventStatus,
+    Mode,
+    Organiser,
+    RegistrationStatus,
+)
 
 
 def _throttle(scope_name, methods=("POST", "PATCH", "PUT", "DELETE")):

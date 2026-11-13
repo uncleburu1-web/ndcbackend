@@ -83,7 +83,7 @@ def _open_case(kind, obj, source=CaseSource.USER_REPORT, priority="normal", acto
             with transaction.atomic():
                 case = Case.objects.create(target_kind=kind, target_id=obj.pk, source=source, priority=priority,
                                            priority_rank=R.PRIORITY_RANK[priority], due_at=now + timedelta(hours=R.TARGET_HOURS[priority]),
-                                           title=T.title(kind, obj), state=T.state(kind, obj))
+                                           title=T.title(kind, obj), state=T.state(kind, obj), language=T.language(kind, obj))
         except IntegrityError:  # a parallel report opened it
             return Case.objects.select_for_update().get(target_kind=kind, target_id=obj.pk, status__in=[CaseStatus.OPEN, CaseStatus.ESCALATED])
         _event(case, E.OPENED, actor, note or dict(CaseSource.choices)[source])

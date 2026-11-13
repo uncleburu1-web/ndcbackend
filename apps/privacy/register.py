@@ -199,6 +199,10 @@ CATEGORIES = [
 
 # Models with no personal data, or only derived/public data, and why (the coverage test needs a reason).
 NOT_PERSONAL = {
+    "accounts.LanguageReview": "a translation review sign-off: the reviewer's name as written by an admin, the catalogue version and "
+                               "the admin who recorded it (spec 21 §14)",
+    "moderation.StaffLanguage": "which languages a moderator or news reviewer reads, for their own queues (spec 21 §9)",
+    "news.ArticleTranslation": "an official announcement in another language and the admins who wrote and reviewed it (spec 21 §10)",
     "accounts.SettingsDefaults": "platform defaults for new accounts and the enabled languages; who last changed them (spec 20 §14)",
     "core.JobRun": "background job records: counts only (spec 11)",
     "integrations.WebhookReceipt": "webhook event IDs, types and body hashes; payloads are never stored (spec 15 §12.4)",

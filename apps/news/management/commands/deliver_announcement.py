@@ -1,8 +1,8 @@
 from django.core.management.base import CommandError
 
+from apps.core.jobs import TrackedCommand
 from apps.news.models import Article
 from apps.notifications.services import deliver_announcement
-from apps.core.jobs import TrackedCommand
 
 
 class Command(TrackedCommand):

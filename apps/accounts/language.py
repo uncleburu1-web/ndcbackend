@@ -1,6 +1,6 @@
 """
-The language a request should be answered in (spec 20 §6). Spec 21 uses `request.ndc_language` to translate error
-messages and notifications; until then everything is English, but the choice is already worked out here.
+The language a request should be answered in (spec 20 §6, 21 §6): `request.ndc_language`, activated for Django's
+gettext so error messages and field errors come back translated; `Content-Language` on every response.
 
 Guests: the best enabled match in Accept-Language. Signed-in: their saved language (if still enabled).
 """
@@ -53,8 +53,18 @@ class LanguageMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        from django.utils import translation
+
         request.ndc_language = from_header(request.META.get("HTTP_ACCEPT_LANGUAGE", ""))
-        return self.get_response(request)
+        translation.activate(request.ndc_language)  # spec 21 §6; authentication may switch it to the account's language
+        try:
+            response = self.get_response(request)
+        finally:
+            lang = getattr(request, "ndc_language", "en")
+            translation.deactivate()
+        if response is not None and not response.has_header("Content-Language"):
+            response["Content-Language"] = lang
+        return response
 
 
 def attach_account_language(request, user):
@@ -62,4 +72,7 @@ def attach_account_language(request, user):
 
     lang = UserPreferences.objects.filter(user=user).values_list("language", flat=True).first()
     if lang and lang in enabled():
+        from django.utils import translation
+
         request._request.ndc_language = lang
+        translation.activate(lang)

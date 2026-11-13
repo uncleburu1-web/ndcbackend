@@ -2,6 +2,7 @@ from drf_spectacular.utils import extend_schema_field, inline_serializer
 from rest_framework import serializers
 
 from apps.accounts.models import User
+from apps.core.i18n import CONTENT_CHOICES
 
 from . import photos
 from .models import Candidate
@@ -28,7 +29,7 @@ class PublicCandidateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Candidate
         fields = ["slug", "full_name", "party", "position", "position_label", "election_year", "state", "area_display",
-                  "biography", "campaign_summary", "priorities", "links", "photo", "verified", "published_at"]
+                  "biography", "biography_language", "campaign_summary", "priorities", "links", "photo", "verified", "published_at"]
         read_only_fields = fields
 
     def get_photo(self, obj) -> dict | None:
@@ -67,6 +68,7 @@ class CandidateWriteSerializer(serializers.Serializer):
     lga_id = serializers.IntegerField(required=False, allow_null=True, help_text="LGA chairmen and councillors")
     ward_id = serializers.IntegerField(required=False, allow_null=True, help_text="Councillors")
     biography = serializers.CharField(max_length=5000, required=False, allow_blank=True, trim_whitespace=False)
+    biography_language = serializers.ChoiceField(choices=CONTENT_CHOICES, required=False, help_text="Spec 21 §9")
     campaign_summary = serializers.CharField(max_length=1000, required=False, allow_blank=True)
     priorities = serializers.ListField(child=serializers.CharField(max_length=500, allow_blank=True), required=False)
     links = LinkSerializer(many=True, required=False)
@@ -90,7 +92,7 @@ class AdminCandidateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Candidate
         fields = ["id", "slug", "full_name", "party", "position", "position_label", "election_year", "state",
-                  "area_name", "ward_name", "area_display", "constituency", "lga_id", "ward_id", "biography", "campaign_summary", "priorities", "links",
+                  "area_name", "ward_name", "area_display", "constituency", "lga_id", "ward_id", "biography", "biography_language", "campaign_summary", "priorities", "links",
                   "photo", "status", "is_verified", "verified_at", "verified_by_email", "verification_notes",
                   "published_at", "created_at", "updated_at"]
         read_only_fields = fields

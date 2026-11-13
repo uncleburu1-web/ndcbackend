@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models import Q
 
 from apps.core.fields import StateField, choice_check, state_check
+from apps.core.i18n import language_check, language_field
 
 
 class Organiser(models.TextChoices):
@@ -84,6 +85,7 @@ class Event(models.Model):
     mode = models.CharField(max_length=10, choices=Mode.choices, default=Mode.IN_PERSON)
     title = models.CharField(max_length=120)
     description = models.TextField(max_length=4000)
+    language = language_field()
     starts_at = models.DateTimeField()
     ends_at = models.DateTimeField()
     venue_name = models.CharField(max_length=200, blank=True)
@@ -127,7 +129,7 @@ class Event(models.Model):
                    models.Index(fields=["state", "starts_at"], name="events_state_start_idx"),
                    models.Index(fields=["candidate", "starts_at"], name="events_candidate_start_idx"),
                    models.Index(fields=["geo_lga", "starts_at"], name="events_lga_start_idx")]
-        constraints = [
+        constraints = [language_check("events_language_valid", "language"), 
             choice_check("organiser_kind", Organiser.values, "events_organiser_valid"),
             choice_check("type", EventType.values, "events_type_valid"),
             choice_check("mode", Mode.values, "events_mode_valid"),

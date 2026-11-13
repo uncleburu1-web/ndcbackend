@@ -2,27 +2,37 @@
 from django.db.models import Min, Q
 from django.shortcuts import get_object_or_404
 from django.utils.cache import add_never_cache_headers, patch_cache_control
-from rest_framework import status
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle, SimpleRateThrottle, UserRateThrottle
+from rest_framework.throttling import (
+    AnonRateThrottle,
+    SimpleRateThrottle,
+    UserRateThrottle,
+)
 from rest_framework.views import APIView
 
-from apps.core import filters as F
 from apps.access.models import Role
-from apps.access.permissions import HasRole, IsProfileComplete, IsSignedIn, IsSystemAdmin
+from apps.access.permissions import (
+    HasRole,
+    IsProfileComplete,
+    IsSignedIn,
+    IsSystemAdmin,
+)
 from apps.audit.services import client_ip
 from apps.candidates.reference import State
+from apps.core import filters as F
 from apps.core.exceptions import ServiceError
+from apps.core.i18n import CONTENT_LANGUAGES
+from apps.moderation import services as moderation
+from apps.moderation.models import Report, ReportStatus
 
 from . import announcements, reports, services
 from .feed import feed_page
 from .images import PhotoError
-from apps.moderation import services as moderation
-from apps.moderation.models import Report, ReportStatus
-
 from .models import Article, ArticleStatus, Source
 from .serializers import (
     AdminArticleDetailSerializer,
@@ -113,7 +123,8 @@ class NewsList(APIView):
             page = max(1, int(request.query_params.get("page", 1)))
         except ValueError:
             page = 1
-        pinned, items, count = feed_page(source, state, page)
+        language = F.choice(request, "language", list(CONTENT_LANGUAGES))  # spec 21 §9
+        pinned, items, count = feed_page(source, state, page, language=language)
         ctx = {"request": request}
         results = [FeedPostSerializer(i, context=ctx).data if isinstance(i, CandidatePost) else PublicArticleSerializer(i, context=ctx).data
                    for i in items]
@@ -135,7 +146,11 @@ class NewsDetail(APIView):
         if a is None:
             moderation.raise_if_removed("article", Article.objects.filter(pk=pk, status=ArticleStatus.REMOVED).first())
             raise ServiceError("Not found.", code="not_found", status_code=404)
-        response = Response(PublicArticleDetailSerializer(a, context={"request": request}).data)
+        data = PublicArticleDetailSerializer(a, context={"request": request}).data
+        from .translations import public_versions
+
+        data |= public_versions(a, request.query_params.get("lang", ""))  # spec 21 §10: ?lang= picks a published translation
+        response = Response(data)
         patch_cache_control(response, public=True, max_age=60)
         return response
 
@@ -245,6 +260,8 @@ class AdminNewsList(_Private):
             qs = qs.order_by("-created_at")
         if qp.get("source") in Source.values:
             qs = qs.filter(source=qp["source"])
+        if qp.get("language") in CONTENT_LANGUAGES:  # spec 21 §9
+            qs = qs.filter(language=qp["language"])
         q = (qp.get("q") or "").strip()[:100]
         if q:
             qs = qs.filter(Q(title__icontains=q) | Q(author__email__icontains=q))
@@ -381,3 +398,52 @@ class AnnouncementAction(_Private):
         elif self.action_name == "restore":
             services.restore(a, request.user, request=request, note=str(request.data.get("note", ""))[:1000])
         return Response(AdminArticleDetailSerializer(_official(pk), context={"request": request}).data)
+
+
+# ------------------------------------------------------------------ spec 21 §10: versions in other languages
+VERSION = inline_serializer("AnnouncementVersion", {
+    "language": serializers.CharField(), "title": serializers.CharField(), "body": serializers.CharField(),
+    "status": serializers.ChoiceField(["draft", "published"]), "out_of_date": serializers.BooleanField(),
+    "translated_by": serializers.CharField(), "reviewed_by": serializers.CharField(),
+    "published_at": serializers.DateTimeField(allow_null=True), "updated_at": serializers.DateTimeField()})
+VERSION_IN = inline_serializer("AnnouncementVersionIn", {"title": serializers.CharField(), "body": serializers.CharField()})
+TRANSLATIONS = inline_serializer("AnnouncementVersions", {"language": serializers.CharField(), "versions": VERSION.__class__(many=True)})
+class AnnouncementTranslations(_Private):
+    permission_classes = [IsSystemAdmin]
+
+    @extend_schema(summary="An announcement's versions in other languages", responses=TRANSLATIONS)
+    def get(self, request, pk):
+        from . import translations as T
+
+        a = T._official(pk)
+        return Response({"language": a.language, "versions": [T.payload(t, a) for t in a.translations.select_related(
+            "translated_by", "reviewed_by")]})
+
+
+class AnnouncementTranslation(_Private):
+    permission_classes = [IsSystemAdmin]
+
+    @extend_schema(summary="Write or change the version in one language (goes back to draft; audited)", request=VERSION_IN,
+                   responses=VERSION)
+    def put(self, request, pk, code):
+        from . import translations as T
+
+        t = T.save(pk, code, request.user, request.data, request=request)
+        return Response(T.payload(t))
+
+    @extend_schema(summary="Delete the version in one language (audited)", responses={204: None})
+    def delete(self, request, pk, code):
+        from . import translations as T
+
+        T.delete(pk, code, request.user, request=request)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AnnouncementTranslationPublish(_Private):
+    permission_classes = [IsSystemAdmin]
+
+    @extend_schema(summary="Review and publish a version someone else wrote (audited)", request=None, responses=VERSION)
+    def post(self, request, pk, code):
+        from . import translations as T
+
+        return Response(T.payload(T.publish(pk, code, request.user, request=request)))

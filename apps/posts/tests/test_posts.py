@@ -18,10 +18,10 @@ from apps.accounts.tests.helpers import signed_webhook
 from apps.audit.models import AuditLog
 from apps.candidates.models import Candidate
 from apps.follows.models import CandidateFollow
+from apps.moderation.models import Report
 from apps.news.models import Article
 from apps.notifications.models import Notification
 from apps.notifications.services import deliver_post
-from apps.moderation.models import Report
 from apps.posts.models import CandidatePost, PostEvent
 
 TMP_MEDIA = tempfile.mkdtemp(prefix="ndc-posts-test-")

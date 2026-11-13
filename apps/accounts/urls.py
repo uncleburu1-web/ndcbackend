@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import admin_views
+from . import language_views as lv
 from . import settings_views as sv
 from .views import MeView
 from .webhooks import clerk_webhook
@@ -22,6 +23,11 @@ urlpatterns = [
     path("people/<str:handle>/", sv.PublicProfileView.as_view(), name="public-profile"),
     path("people/<str:handle>/report/", sv.PublicProfileReport.as_view(), name="public-profile-report"),
     path("admin/settings/defaults/", sv.AdminSettingsDefaults.as_view(), name="admin-settings-defaults"),
+    # spec 21
+    path("languages/", lv.PublicLanguages.as_view(), name="languages"),
+    path("admin/languages/", lv.AdminLanguages.as_view(), name="admin-languages"),
+    path("admin/languages/<str:code>/reviews/", lv.AdminLanguageReviews.as_view(), name="admin-language-reviews"),
+    path("admin/me/languages/", lv.MyStaffLanguages.as_view(), name="admin-my-languages"),
     path("webhooks/clerk/", clerk_webhook, name="clerk-webhook"),
     # spec 11: admin users
     path("admin/users/", admin_views.UsersView.as_view(), name="admin-users"),

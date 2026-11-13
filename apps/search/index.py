@@ -56,10 +56,14 @@ def _candidate_entry(c):
 
 
 def _article_entry(a):
+    # spec 21 §10: published versions in other languages are searchable too (found by their own words)
+    versions = list(a.translations.filter(status="published").values_list("title", "body")) if a.source == "official" else []
+    titles = " ".join([a.title] + [t for t, _ in versions])
+    bodies = " ".join([a.body[:BODY_MAX]] + [b[:BODY_MAX] for _, b in versions])
     return {
         "title": a.title, "body_text": a.body[:BODY_MAX], "state": a.state or "", "position": "", "election_year": None,
         "source": a.source, "published_at": a.published_at, "rank_order": 0,
-        "_weights": {"A": a.title, "B": a.body[:BODY_MAX], "C": place_words(a.state), "D": a.source_name or ""},
+        "_weights": {"A": titles, "B": bodies, "C": place_words(a.state), "D": a.source_name or ""},
     }
 
 

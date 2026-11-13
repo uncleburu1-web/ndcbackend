@@ -13,10 +13,25 @@ from django.utils import timezone
 from apps.access.models import Role, RoleAssignment, ScopeType
 from apps.access.services import is_system_admin
 from apps.core.exceptions import ServiceError
+from apps.core.i18n import clean_content_language, user_language
 
 from . import text as T
-from .models import (LOWER_LEVELS, Community, CommunityComment, CommunityEvent, CommunityMembership, CommunityPost, CommunityReaction,
-                     CommunitySettings, EndReason, How, ItemStatus, Level, MembershipStatus, ReadScope)
+from .models import (
+    LOWER_LEVELS,
+    Community,
+    CommunityComment,
+    CommunityEvent,
+    CommunityMembership,
+    CommunityPost,
+    CommunityReaction,
+    CommunitySettings,
+    EndReason,
+    How,
+    ItemStatus,
+    Level,
+    MembershipStatus,
+    ReadScope,
+)
 
 PURPOSE = "community_membership"
 EDIT_MINUTES = 30
@@ -472,7 +487,7 @@ def _fanout_post(post):
         outbox.enqueue("community_post_fanout", {"post": str(post.pk)}, dedupe_key=f"community_post_fanout:{post.pk}")
 
 
-def create_post(user, community, body, campaign_candidate_id=None):
+def create_post(user, community, body, campaign_candidate_id=None, language=None):
     require_can_post(user, community)
     body = _check_body(body, POST_MIN, POST_MAX, POST_LINKS)
     candidate = _campaign(user, campaign_candidate_id)
@@ -481,7 +496,8 @@ def create_post(user, community, body, campaign_candidate_id=None):
     if CommunityPost.objects.filter(author=user, body_hash=h, created_at__gte=since).exclude(status=ItemStatus.DELETED).exists():
         raise _err("You've already posted this.", "duplicate_post", 409)
     with transaction.atomic():
-        p = CommunityPost.objects.create(community=community, author=user, campaign_candidate=candidate, body=body, body_hash=h)
+        p = CommunityPost.objects.create(community=community, author=user, campaign_candidate=candidate, body=body, body_hash=h,
+                                         language=clean_content_language(language, user_language(user)))
         _event(p, E.CREATED, user)
         Community.objects.filter(pk=community.pk).update(post_count=F("post_count") + 1)
         _fanout_post(p)
@@ -554,14 +570,15 @@ def delete_post(user, post):
     return p
 
 
-def create_comment(user, post, body, campaign_candidate_id=None):
+def create_comment(user, post, body, campaign_candidate_id=None, language=None):
     require_can_post(user, post.community)
     if post.status != ItemStatus.PUBLISHED:
         raise _err("Comments are closed on this post.", "invalid_transition", 409)
     body = _check_body(body, COMMENT_MIN, COMMENT_MAX, COMMENT_LINKS)
     candidate = _campaign(user, campaign_candidate_id)
     with transaction.atomic():
-        c = CommunityComment.objects.create(post=post, author=user, campaign_candidate=candidate, body=body)
+        c = CommunityComment.objects.create(post=post, author=user, campaign_candidate=candidate, body=body,
+                                            language=clean_content_language(language, user_language(user)))
         _event(post, E.CREATED, user, comment=c)
         CommunityPost.objects.filter(pk=post.pk).update(comment_count=F("comment_count") + 1)
         if post.author_id and post.author_id != user.pk:

@@ -5,7 +5,12 @@ DESCRIPTION = "Your communities (how you were placed), your community posts and 
 
 
 def export_for(user) -> dict:
-    from .models import CommunityComment, CommunityMembership, CommunityPost, CommunityReaction
+    from .models import (
+        CommunityComment,
+        CommunityMembership,
+        CommunityPost,
+        CommunityReaction,
+    )
 
     ms = CommunityMembership.objects.filter(user=user).select_related("community").order_by("joined_at")
     posts = CommunityPost.objects.filter(author=user).select_related("community", "campaign_candidate").order_by("created_at")

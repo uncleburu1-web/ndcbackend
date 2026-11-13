@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.utils.text import slugify
 
 from apps.core.fields import StateField, choice_check, state_check
+from apps.core.i18n import language_check, language_field
 from apps.core.models import TimeStampedModel
 
 from .reference import (
@@ -55,6 +56,7 @@ class Candidate(TimeStampedModel):
     geo_constituency = models.ForeignKey("geo.Constituency", null=True, blank=True, on_delete=models.PROTECT, related_name="+")
 
     biography = models.TextField(max_length=5000, blank=True, default="")
+    biography_language = language_field()
     campaign_summary = models.TextField(max_length=1000, blank=True, default="")
     priorities = models.JSONField(default=list, blank=True)
     links = models.JSONField(default=list, blank=True)
@@ -74,7 +76,7 @@ class Candidate(TimeStampedModel):
 
     class Meta:
         ordering = ["full_name"]
-        constraints = [
+        constraints = [language_check("candidates_bio_language_valid", "biography_language"), 
             models.CheckConstraint(
                 condition=~Q(status=CandidateStatus.PUBLISHED) | Q(verified_at__isnull=False),
                 name="candidates_published_requires_verified",

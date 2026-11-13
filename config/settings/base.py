@@ -224,6 +224,10 @@ CORS_ALLOW_HEADERS = (*default_headers, "x-request-id")
 CORS_PREFLIGHT_MAX_AGE = 3600
 
 LANGUAGE_CODE = "en-us"
+# Spec 21: the five interface languages. Translations live in locale/<code>/LC_MESSAGES/django.po (compiled .mo committed,
+# `manage.py i18n_compile`); a language is answered in only once a system admin has enabled it (spec 20 §14, 21 §14).
+LANGUAGES = [("en", "English"), ("ha", "Hausa"), ("ig", "Igbo"), ("yo", "Yoruba"), ("pcm", "Nigerian Pidgin")]
+LOCALE_PATHS = [BASE_DIR / "locale"]
 TIME_ZONE = "Africa/Lagos"
 USE_I18N = True
 USE_TZ = True
