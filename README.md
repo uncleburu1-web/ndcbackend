@@ -328,6 +328,28 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **Checks:** `check_integrity` adds broken location chains, active places under retired ones, constituencies covering retired places
   and officer-confirmed PVC locations without a polling unit. Readiness shows "Geography" and "Constituencies".
 
+## Languages (spec 21)
+
+- **Interface languages:** `en`, `ha`, `ig`, `yo`, `pcm` (`LANGUAGES`). `LanguageMiddleware` activates Django's gettext for the
+  request's language (the account's, else `Accept-Language`; only enabled languages), so error messages and field errors come back
+  translated, with `Content-Language`. Cached public texts (rules, privacy notice) use `?lang=` instead, and show a translation only
+  after a recorded legal review of the current versions (`legal_version()`); English is authoritative.
+- **Catalogues:** `locale/<code>/LC_MESSAGES/django.po`, msgid = the English text. `python manage.py i18n_export --update` refreshes
+  them from the code (error raises, `errors[...] = [...]`, rules, privacy register); `i18n_export --lang ha --out ha.csv` and
+  `i18n_import --lang ha --file ha.csv [--status …]` for translators; `i18n_compile [--check]` writes the `.mo` files in pure
+  Python (the Railway image has no GNU gettext), and they are committed. CI runs `i18n_compile --check`.
+- **Switching a language on:** `GET /admin/languages/` (completeness and reviews) and `POST /admin/languages/<code>/reviews/`
+  (audited). Enabling one in `/admin/settings/defaults/` is refused (`language_not_ready`) until the server catalogue is 100% and an
+  interface review of a complete web-app catalogue is recorded. Public `GET /languages/` lists the enabled ones.
+- **Content language:** `language` on news, candidate posts, community posts and comments and events; `biography_language` on
+  candidates and `bio_language` on profiles (`und` = not sure; default the writer's interface language). Feeds and the moderation
+  and news queues accept `?language=` (`mine` in moderation = the languages the moderator reads, `PUT /admin/me/languages/`).
+  Consent records keep the `language` of the text shown. People's words are saved as NFC; search folds Hausa ɓ ɗ ƙ ƴ and ɛ ɔ
+  (`rebuild_search_text` after changing the folding).
+- **Announcement versions:** `GET /admin/announcements/<id>/translations/`, `PUT|DELETE …/translations/<code>/`,
+  `POST …/translations/<code>/publish/` (a second system admin; `translation_self_review` otherwise). `GET /news/<id>/?lang=ha` returns
+  that version (`version_language`, `version_out_of_date`) and `translations` lists the published ones.
+
 ## Settings (spec 20)
 
 - **Endpoints:** everything for one person under `/api/v1/me/settings/` (private, `no-store`, `settings_write` 60/min): `GET` all;
