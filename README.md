@@ -261,6 +261,9 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **Candidate import:** `python manage.py import_candidates [--file data/candidates/ndc_2027.json] [--dry-run] [--list]` loads
   researched candidate profiles as unverified drafts for admin review (50 NDC 2027 candidates; see `data/candidates/README.md`).
   Safe to run again: it never changes a verified, published or hand-made record.
+- **News import:** `python manage.py import_news --as <admin email> [--announcements] [--file …] [--dry-run] [--list]` publishes
+  researched election news (50 items) or NDCConnect's own announcements with graphics as official articles, without
+  notifying anyone (see `data/news/README.md`). Safe to run again: anything already there is left as it is.
 - **Demo donations (local only):** `python manage.py seed_demo_donations --count 1500 --total 557000000` seeds simulated donations
   to preview the Finance pages: synthetic names, `example.com/.org/.net` emails, `+23480000…` demo phone numbers, fictional
   addresses, varied states, named and anonymous donors, the NDC fund and published candidates, dates over `--days` or

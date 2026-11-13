@@ -1,0 +1,29 @@
+{
+  "about": "NDCConnect's own announcements, published by `manage.py import_news --announcements`. Idempotent by title.",
+  "items": [
+    {
+      "key": "welcome",
+      "category": "party",
+      "image": "images/welcome.png",
+      "image_alt": "NDCConnect: politics beyond election day",
+      "title": "Welcome to NDCConnect",
+      "body": "NDCConnect is a place to take part in politics beyond election day.\n\nHere you can follow candidates and read their updates, join the community for your state, LGA, ward and polling unit, find campaign events near you, sign up to volunteer, and read election news from cited sources. If you support the NDC, you can also apply for party membership and donate securely through our payment provider.\n\nEvery news item here links to its source so you can read the original. Community news from members is checked by a reviewer before it appears. If you see something that breaks the rules, use Report on the post or page.\n\nStart by completing your profile and choosing your home state, so the news and communities that matter to you come first."
+    },
+    {
+      "key": "pvc",
+      "category": "party",
+      "image": "images/pvc.png",
+      "image_alt": "Verify your PVC on NDCConnect",
+      "title": "Verify your PVC and collect your card before the election",
+      "body": "The presidential and National Assembly elections are on 16 January 2027, and you need your Permanent Voter Card (PVC) to vote.\n\nIf you have not collected your card, INEC says collection returns to the registration areas (wards) from 1 December 2026. Cards can only be collected in person. NDCConnect isn't INEC: only INEC issues and replaces PVCs. Use the links on our PVC page to check your registration on INEC's site.\n\nOnce you have your card, verify it on NDCConnect from the PVC page. Your details are encrypted and only the last four characters of your VIN are ever shown. A verified PVC lets you join your LGA, ward and polling-unit communities, and you can choose whether to show a Verified voter badge."
+    },
+    {
+      "key": "settings",
+      "category": "party",
+      "image": "images/settings.png",
+      "image_alt": "New on NDCConnect: dark mode, larger text and more control",
+      "title": "New: dark mode, larger text and more control over your account",
+      "body": "NDCConnect now has a full Settings area.\n\nIn Accessibility you can switch to dark mode or follow your device, make text larger, turn on more contrast and reduce motion. These work even when you're signed out.\n\nIn Notifications you choose what we send you and how. In Profile you decide whether to have a public profile at all; it is off unless you turn it on, and it never shows your ward or polling unit. Privacy lets you download your data, and Manage lets you pause or delete your account.\n\nOpen Settings from the menu to have a look."
+    }
+  ]
+}

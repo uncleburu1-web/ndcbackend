@@ -1,0 +1,506 @@
+{
+  "about": "Researched 2027 election news for NDCConnect. Every item is written in our own words from the cited source. Imported by `manage.py import_news`; idempotent by source_url.",
+  "researched_on": "2026-11-12",
+  "items": [
+    {
+      "key": "inec-mock-vote-nov-28",
+      "category": "election_updates",
+      "title": "2027: INEC plans nationwide mock accreditation and voting on 28 November",
+      "body": "INEC chairman Joash Amupitan says the commission will hold a nationwide mock accreditation and voting exercise on 28 November to test its readiness for the 2027 general election. The exercise will simulate the presidential election and test how results are transmitted. Speaking at a Chatham House conference in London, he pointed to the Anambra and Osun governorship elections, where results were declared the day after voting, as signs that logistics have improved.",
+      "state": "",
+      "source_name": "Vanguard",
+      "source_url": "https://www.vanguardngr.com/2026/11/2027-inec-to-simulate-presidential-election-in-nationwide-mock-vote/",
+      "published_at": "2026-11-12"
+    },
+    {
+      "key": "inec-non-sensitive-materials",
+      "category": "election_updates",
+      "title": "INEC begins moving non-sensitive election materials to the zones",
+      "body": "INEC has started deploying non-sensitive materials to its zones ahead of the 2027 general election, National Commissioner Rhoda Gumus said in Abuja on Thursday. She said the commission had completed nine of its scheduled activities and that PVC collection was continuing. She spoke while receiving a delegation from Kenya's electoral commission, which is studying Nigeria's arrangements before Kenya's own general election in August 2027.",
+      "state": "fct",
+      "source_name": "Vanguard",
+      "source_url": "https://www.vanguardngr.com/2026/11/2027-inec-begins-deploying-non-sensitive-materials/",
+      "published_at": "2026-11-12"
+    },
+    {
+      "key": "inec-suspends-staff-leave",
+      "category": "election_updates",
+      "title": "INEC suspends annual leave for staff as 2027 preparations intensify",
+      "body": "INEC has told its staff to stop taking annual leave as preparations for the 2027 elections gather pace, warning that negligence, partisanship, absenteeism and financial misconduct will be punished. Chairman Joash Amupitan gave the directive in Lokoja, Kogi State, at a North-Central readiness meeting. He also announced a new salary structure for the commission's staff, effective from January 2026, and an expanded intelligence-led security coordination framework under the Inter-Agency Consultative Committee on Election Security.",
+      "state": "kogi",
+      "source_name": "PRNigeria",
+      "source_url": "https://prnigeria.com/2026/11/06/elections-inec-suspends-annual/",
+      "published_at": "2026-11-06"
+    },
+    {
+      "key": "inec-hod-workshop",
+      "category": "election_updates",
+      "title": "INEC trains state heads of department for the 2027 election",
+      "body": "INEC has begun a three-day workshop in Abuja for heads of department from its state offices and the FCT. The training, which started on Monday, 9 November, brings together officers responsible for electoral operations, ICT, election and party monitoring, and legal services. The commission says the programme is meant to improve coordination between departments ahead of the 2027 polls.",
+      "state": "fct",
+      "source_name": "TVC News",
+      "source_url": "https://www.tvcnews.tv/inec-trains-state-heads-of-departments-ahead-of-2027-general-election/",
+      "published_at": "2026-11-11"
+    },
+    {
+      "key": "inec-removes-invalid-records",
+      "category": "election_updates",
+      "title": "INEC removes 1.6 million invalid records from the voters' register",
+      "body": "INEC says it has removed 1,609,553 records from the preliminary register of voters: 1,608,660 confirmed invalid registrations and 873 records of voters confirmed dead. The clean-up followed public scrutiny of the preliminary register displayed from 9 to 15 October and a technical audit with the commission's biometric identification system. The final register is due to be published on 15 December 2026.",
+      "state": "",
+      "source_name": "ThisDay",
+      "source_url": "https://www.thisdaylive.com/2026/11/09/inec-removes-1-6m-invalid-registrations-from-voters-register/",
+      "published_at": "2026-11-09"
+    },
+    {
+      "key": "inec-54-staff-flagged",
+      "category": "election_updates",
+      "title": "INEC identifies 54 staff in 10 states over registration irregularities",
+      "body": "Alongside the register clean-up, INEC has identified 54 members of staff across 10 states linked to irregularities in voter registration, and says they face disciplinary action, including possible prosecution. The audit reportedly found unusual registration patterns, substituted photographs and multiple registrations. The commission says safeguards such as the BVAS will still prevent anyone from being accredited or voting more than once.",
+      "state": "",
+      "source_name": "Blueprint",
+      "source_url": "https://blueprint.ng/?p=861249",
+      "published_at": "2026-11-09"
+    },
+    {
+      "key": "inec-webcam-ban-ai-framework",
+      "category": "election_updates",
+      "title": "INEC stops webcam photo uploads for registration and adopts an AI framework",
+      "body": "INEC has told its ICT department to stop using external webcam uploads for voter registration photographs; pictures must now be captured through an approved application. The commission also approved a framework to govern how artificial intelligence is used in its work. Chairman Joash Amupitan said early voting for journalists and officials on election duty is not possible under the current law because the proposal did not get the needed support in the National Assembly.",
+      "state": "",
+      "source_name": "Arise News",
+      "source_url": "https://www.arise.tv/inec-bans-webcam-uploads-rejects-early-voting-for-journalists-electoral-officials-ahead-of-2027-polls/",
+      "published_at": "2026-11-09"
+    },
+    {
+      "key": "third-phase-pvcs",
+      "category": "election_updates",
+      "title": "Third-phase PVCs printed abroad; collection returns to wards from 1 December",
+      "body": "INEC chairman Joash Amupitan says most of the PVCs for people who registered in the third phase of continuous voter registration are produced outside Nigeria, which explains the delay. Some have arrived and are being sent to the states. Cards from the first and second phases, and transfers, are available at local government offices, and from 1 December 2026 collection moves back to the registration areas (wards). He asked third-phase registrants to be patient.",
+      "state": "",
+      "source_name": "Sahara Reporters",
+      "source_url": "https://saharareporters.com/2026/11/10/inec-chairman-amupitan-says-most-pvcs-newly-registered-voters-are-printed-abroad-appeals",
+      "published_at": "2026-11-10"
+    },
+    {
+      "key": "pvc-collection-starts",
+      "category": "election_updates",
+      "title": "Nationwide PVC collection begins as register passes 103 million",
+      "body": "INEC began nationwide collection of Permanent Voter Cards on Friday, 9 October 2026, ahead of the 2027 elections. The commission said the national register had risen above 103 million after the three phases of continuous voter registration. Collection is in person only; nobody can collect a card for someone else.",
+      "state": "",
+      "source_name": "Sahara Reporters",
+      "source_url": "https://saharareporters.com/2026/10/05/2027-collection-pvcs-begins-friday-inec-announces-voter-register-now-103million",
+      "published_at": "2026-10-05"
+    },
+    {
+      "key": "pvc-low-turnout",
+      "category": "election_news",
+      "title": "Low turnout at PVC collection points in Jos, Bayelsa, Niger and Ondo",
+      "body": "Several collection points recorded low turnout on the first Monday of PVC collection, with INEC officials on duty but few voters coming forward in parts of Jos (Plateau), Bayelsa, Niger and Ondo. Collection at registration areas ran from 9 to 15 October before moving to local government offices. Registered voters who have not collected their cards can still do so at their LGA office.",
+      "state": "",
+      "source_name": "Leadership",
+      "source_url": "https://leadership.ng/?p=727067",
+      "published_at": "2026-10-12"
+    },
+    {
+      "key": "aac-boycott-threat",
+      "category": "election_news",
+      "title": "AAC threatens boycott over removal of 1.6 million registrations",
+      "body": "The African Action Congress (AAC) says it could join other opposition parties in boycotting the 2027 elections unless INEC reverses the removal of about 1.6 million registrations from the voters' register. The party argues that the affected people registered in good faith. INEC says the records it removed were confirmed invalid or belonged to people who have died.",
+      "state": "",
+      "source_name": "Sahara Reporters",
+      "source_url": "https://saharareporters.com/2026/11/10/aac-party-threatens-election-boycott-mass-protests-over-inec-deletion-16million-voter",
+      "published_at": "2026-11-10"
+    },
+    {
+      "key": "ad-hoc-staff-deadline",
+      "category": "election_updates",
+      "title": "INEC ad hoc staff applications close on 18 November",
+      "body": "Applications to work as INEC ad hoc staff for the 2027 elections close at midnight on Wednesday, 18 November 2026. Applications are made only through the commission's official INECPRES portal (pres.inecnigeria.org); INEC has warned about fake recruitment sites and messages. The commission plans to deploy about 1.4 million temporary workers across more than 176,000 polling units.",
+      "state": "",
+      "source_name": "Within Nigeria",
+      "source_url": "https://www.withinnigeria.com/2026/09/19/inec-ad-hoc-staff-recruitment-2027-how-to-apply-on-the-inecpres-portal-before-november-18/",
+      "published_at": "2026-09-19"
+    },
+    {
+      "key": "inec-100-days-register",
+      "category": "election_updates",
+      "title": "100 days to the polls: INEC says register goes to parties on 15 December",
+      "body": "At a stakeholders' meeting marking 100 days to the first ballot, INEC chairman Joash Amupitan said the commission had completed nine of the 14 statutory milestones in the revised 2027 timetable. The register of voters for the election is to be presented to political parties on 15 December 2026. He also said INEC would like an early-voting arrangement for people on essential election duty, but only if the law is changed to allow it.",
+      "state": "fct",
+      "source_name": "Voice of Nigeria",
+      "source_url": "https://von.gov.ng/?p=648864",
+      "published_at": "2026-10-06"
+    },
+    {
+      "key": "tribunal-judges-sworn-in",
+      "category": "election_updates",
+      "title": "375 judges sworn in for 2027 election petition tribunals",
+      "body": "The Chief Justice of Nigeria, Kudirat Kekere-Ekun, swore in members of the 2027 election petition tribunals in Abuja on Monday, 9 November, and urged them to resist political pressure. The President of the Court of Appeal, Monica Dongban-Mensem, said 375 judges will serve: 138 with previous tribunal experience and 237 newly nominated.",
+      "state": "fct",
+      "source_name": "TheNigeriaLawyer",
+      "source_url": "https://thenigerialawyer.com/?p=478046",
+      "published_at": "2026-11-09"
+    },
+    {
+      "key": "amupitan-tribunals-deepfakes",
+      "category": "election_updates",
+      "title": "INEC chairman warns tribunal judges about manipulated digital evidence",
+      "body": "Speaking at a workshop for Court of Appeal justices and tribunal members, INEC chairman Joash Amupitan warned that the 2027 petitions could involve fabricated videos, cloned audio of officials and fake result declarations. He urged judges to build the skills to authenticate electronic evidence, and cautioned that speed must never cost parties a fair hearing or let technicalities defeat substantial justice.",
+      "state": "fct",
+      "source_name": "The Sun",
+      "source_url": "https://thesun.ng/2027-cjn-reads-riot-act-to-judges/",
+      "published_at": "2026-11-10"
+    },
+    {
+      "key": "supreme-court-membership-register",
+      "category": "election_updates",
+      "title": "Supreme Court restores Electoral Act rules on party membership registers",
+      "body": "In a unanimous judgment on 24 September 2026, the Supreme Court restored sections 77(5), 77(6), 77(7) and 84(2) of the Electoral Act 2026, setting aside a Court of Appeal decision that had voided them. The sections require parties to submit membership registers to INEC before primaries and limit who can take part. INEC has said the ruling does not automatically disqualify individual candidates; the consequence falls on parties that did not comply.",
+      "state": "",
+      "source_name": "THEWILL",
+      "source_url": "https://thewillnews.com/supreme-court-ruling-inec-draws-line-says-party-non-compliance-at-stake-in-2027/",
+      "published_at": "2026-10-06"
+    },
+    {
+      "key": "inec-dropped-candidates-window",
+      "category": "election_updates",
+      "title": "INEC explains why some candidates are missing from the governorship list",
+      "body": "INEC says some governorship and State Assembly candidates were left off its final list because of the Supreme Court's 24 September ruling on party membership registers. In a statement on 13 October, the commission said the presidential and National Assembly lists, published on 12 September, were released before the ruling and were not affected. It opened a window for affected parties that runs to 24 October.",
+      "state": "",
+      "source_name": "Legit.ng",
+      "source_url": "https://www.legit.ng/politics/1735982-breaking-inec-opens-window-candidates-dropped-final-list/",
+      "published_at": "2026-10-13"
+    },
+    {
+      "key": "court-adc-leadership",
+      "category": "election_news",
+      "title": "Court voids ADC leadership and the process that produced Atiku's candidacy",
+      "body": "Justice Peter Lifu of the Federal High Court in Abuja ruled on 5 November that the David Mark-led leadership of the African Democratic Congress (ADC) was unlawful, and nullified its actions, including the process that produced Atiku Abubakar as the party's presidential candidate. The suit was brought by a former deputy national chairman, Nafiu Bala Gombe. Atiku and the ADC say they will appeal.",
+      "state": "",
+      "source_name": "Daily Trust",
+      "source_url": "https://dailytrust.com/fresh-hurdle-for-atiku-adc/",
+      "published_at": "2026-11-06"
+    },
+    {
+      "key": "adc-lawyer-candidacy",
+      "category": "election_news",
+      "title": "ADC lawyer says the judgment did not void Atiku's candidacy",
+      "body": "A lawyer for the ADC, Kalu Kalu, says the 5 November judgment against the party's leadership does not cancel Atiku Abubakar's candidacy for the 16 January 2027 presidential election. He pointed to an earlier ruling of the same court, delivered on 2 July 2026 by Justice Musa Liman, in a related dispute. The ADC's appeal is pending at the Court of Appeal.",
+      "state": "",
+      "source_name": "NewsClick Nigeria",
+      "source_url": "https://newsclickng.com/news/court-did-not-nullify-atikus-candidacy-adc-lawyer-insists/",
+      "published_at": "2026-11-12"
+    },
+    {
+      "key": "inec-fake-adc-poster",
+      "category": "election_updates",
+      "title": "INEC disowns a fake poster about the ADC leadership",
+      "body": "INEC says a poster circulating on social media, claiming the commission had reaffirmed the David Mark-led leadership of the ADC after the 5 November court judgment, did not come from it. The commission asked the public not to share or act on the poster. Official INEC statements are published on its own website and verified social media accounts.",
+      "state": "",
+      "source_name": "Legit.ng",
+      "source_url": "https://www.legit.ng/nigeria/1739984-court-sacks-atiku-inec-opens-position-verdict-adc/",
+      "published_at": "2026-11-07"
+    },
+    {
+      "key": "presidential-final-list",
+      "category": "election_updates",
+      "title": "Final presidential list: 18 candidates for 16 January",
+      "body": "INEC's final list for the presidential election has 18 candidates and 18 running mates. They include President Bola Tinubu (APC), Atiku Abubakar (ADC), Peter Obi (NDC), Seyi Makinde (APM), Sandy Onor (PDP), Omoyele Sowore (AAC), Adewole Adebayo (SDP), Donald Duke (PRP) and Chibuzo Okereke (LP). Two of the presidential candidates are women: Ada Okwori (NDP) and Nkem Okereke (NRM).",
+      "state": "",
+      "source_name": "NGElections",
+      "source_url": "https://ngelections.com/blog/2027-presidential-final-candidates-running-mates/",
+      "published_at": "2026-09-13"
+    },
+    {
+      "key": "nass-final-list-women",
+      "category": "election_updates",
+      "title": "4,408 candidates cleared for the Senate and House; 443 are women",
+      "body": "INEC's final list for the 2027 National Assembly elections has 4,408 candidates for the Senate and House of Representatives. Women make up 443 of them, about one in ten. The Allied Peoples Movement (APM) fielded the most women across the two chambers.",
+      "state": "",
+      "source_name": "Sahara Reporters",
+      "source_url": "https://saharareporters.com/2026/09/13/inec-releases-final-2027-national-assembly-list-4408-candidates-contest-senate-reps",
+      "published_at": "2026-09-13"
+    },
+    {
+      "key": "kaduna-assembly-women",
+      "category": "election_news",
+      "title": "Kaduna: 27 women among 317 State Assembly candidates",
+      "body": "Twenty-seven women are among the 317 candidates on INEC's final list for the Kaduna State House of Assembly. Women are contesting in 18 of the state's 34 constituencies, with Jema'a and Kaura having the most female candidates (four each).",
+      "state": "kaduna",
+      "source_name": "Peoples Gazette",
+      "source_url": "https://gazettengr.com/of-317-kaduna-assembly-candidates-only-27-are-female/",
+      "published_at": "2026-10-16"
+    },
+    {
+      "key": "election-explainer",
+      "category": "election_news",
+      "title": "Explainer: when are the 2027 elections and who is running?",
+      "body": "The presidential and National Assembly elections hold on 16 January 2027, and the governorship and State Assembly elections on 6 February 2027. Campaigns for the first opened on 19 August 2026 and for the second on 9 September 2026. INEC's final presidential list has 18 candidates from 18 parties. The 2027 polls will be Nigeria's eighth general election since the return to democracy in 1999.",
+      "state": "",
+      "source_name": "allAfrica",
+      "source_url": "https://allafrica.com/stories/202610220358.html",
+      "published_at": "2026-10-22"
+    },
+    {
+      "key": "adc-governorship-candidates",
+      "category": "election_news",
+      "title": "ADC names 28 governorship candidates",
+      "body": "The African Democratic Congress has announced governorship candidates in 28 states for 2027. They include Gbadebo Rhodes-Vivour in Lagos, Isa Mohammed Ashiru in Kaduna, Great Ogboru in Delta, Ahmad Babba Kaita in Katsina and Abubakar Malami in Kebbi.",
+      "state": "",
+      "source_name": "Vanguard",
+      "source_url": "https://www.vanguardngr.com/2026/09/full-list-adc-unveils-28-governorship-candidates-for-2027-election/",
+      "published_at": "2026-09-04"
+    },
+    {
+      "key": "kaduna-adc-miqati",
+      "category": "election_news",
+      "title": "Kaduna ADC aspirant says he is the rightful governorship candidate",
+      "body": "Shuaibu Idris Miqati, an ADC governorship aspirant in Kaduna, says an appeal committee of the party declared him winner of its primary although his name was not sent to INEC. He has gone to court and explained that his posters across Kaduna are meant to show he is still in the race. INEC's final Kaduna list names Isa Mohammed Ashiru as the ADC candidate.",
+      "state": "kaduna",
+      "source_name": "New Telegraph",
+      "source_url": "https://newtelegraphng.com/2027-why-my-campaign-posters-flood-streets-kaduna-adc-guber-aspirant/",
+      "published_at": "2026-11-11"
+    },
+    {
+      "key": "pdp-sandy-onor",
+      "category": "election_news",
+      "title": "PDP affirms Sandy Onor as presidential candidate",
+      "body": "The Peoples Democratic Party (PDP) presented Senator Sandy Onor, a former senator for Cross River Central, as its consensus presidential candidate at Wadata Plaza, Abuja. He was the only aspirant. Onor promised an issue-based campaign on rural poverty, unemployment and insecurity.",
+      "state": "cross_river",
+      "source_name": "Channels Television",
+      "source_url": "https://www.channelstv.com/2026/05/26/pdp-announces-sandy-onor-as-consensus-presidential-candidate-for-2027/",
+      "published_at": "2026-05-26"
+    },
+    {
+      "key": "lp-okereke-konto",
+      "category": "election_news",
+      "title": "Labour Party endorses the Okereke–Konto ticket",
+      "body": "The Labour Party leadership formally endorsed Dr Chibuzo Okereke as its presidential candidate and Hajia Bintu Konto as his running mate at its national secretariat in Abuja. National chairman Nenadi Usman said putting a woman on the ticket reflects the party's commitment to inclusion.",
+      "state": "fct",
+      "source_name": "allAfrica",
+      "source_url": "https://allafrica.com/stories/202607220168.html",
+      "published_at": "2026-07-22"
+    },
+    {
+      "key": "tinubu-port-harcourt-rally",
+      "category": "election_news",
+      "title": "Tinubu campaigns in Port Harcourt, praises Wike–Fubara reconciliation",
+      "body": "President Bola Tinubu addressed an APC campaign rally organised by the Rainbow Coalition at the Adokiye Amiesimaka Stadium, Port Harcourt, on Saturday, 7 November. He praised Governor Siminalayi Fubara for accepting reconciliation with FCT Minister Nyesom Wike after their long dispute, and Fubara pledged support for the president's re-election. It was Tinubu's third rally since his campaign launch in Kaduna.",
+      "state": "rivers",
+      "source_name": "Sahara Reporters",
+      "source_url": "https://saharareporters.com/2026/11/07/tinubu-assures-governor-fubara-rivers-crisis-you-wont-regret-what-you-have-done",
+      "published_at": "2026-11-07"
+    },
+    {
+      "key": "shettima-akure-rally",
+      "category": "election_news",
+      "title": "APC rally in Akure: Shettima speaks for Tinubu",
+      "body": "Vice-President Kashim Shettima represented President Tinubu at an APC presidential rally in Akure, Ondo State, on Wednesday, where he criticised Atiku Abubakar and Peter Obi as mainly campaigning online. Governor Lucky Aiyedatiwa, the party's campaign coordinator in Ondo, pledged at least one million votes for the president.",
+      "state": "ondo",
+      "source_name": "P.M. News",
+      "source_url": "https://pmnewsnigeria.com/2026/11/12/2027-atiku-obi-only-campaigning-on-facebook-tinubu/",
+      "published_at": "2026-11-12"
+    },
+    {
+      "key": "wike-rivers-council",
+      "category": "election_news",
+      "title": "Wike inaugurates Rivers campaign council for Tinubu",
+      "body": "FCT Minister Nyesom Wike, coordinator of the Tinubu campaign in Rivers and leader of the Rainbow Coalition, inaugurated a council of more than 700 members in Port Harcourt. He asked members to favour door-to-door mobilisation over rallies and set a target of three million votes for the president. The coalition brings together APC, PDP and Labour Party members.",
+      "state": "rivers",
+      "source_name": "Peoples Gazette",
+      "source_url": "https://gazettengr.com/wike-inaugurates-rivers-campaign-council-for-tinubu-targets-three-million-votes-in-2027/",
+      "published_at": "2026-11-12"
+    },
+    {
+      "key": "apc-kaduna-flagoff",
+      "category": "election_news",
+      "title": "APC launches Tinubu's campaign in Kaduna and hands flags to North-West candidates",
+      "body": "The APC flagged off President Tinubu's re-election campaign in Kaduna on Saturday, 24 October. National chairman Nentawe Yilwatda presented party flags to seven North-West governorship candidates: Uba Sani (Kaduna), Abba Kabir Yusuf (Kano), Dikko Umar Radda (Katsina), Nasir Idris (Kebbi), Umar Namadi (Jigawa), Ahmed Aliyu (Sokoto) and Dauda Lawal (Zamfara).",
+      "state": "kaduna",
+      "source_name": "Naija News",
+      "source_url": "https://www.naijanews.com/2026/10/24/northwest-apc-governorship-candidates-get-party-flags/",
+      "published_at": "2026-10-24"
+    },
+    {
+      "key": "apc-campaign-schedule",
+      "category": "election_news",
+      "title": "APC releases its national campaign schedule",
+      "body": "The APC's campaign timetable runs from the Kaduna flag-off on 24 October 2026 to a grand finale in Lagos on 9 January 2027. Other stops include Port Harcourt (7 November), Jos (14 November), Ibadan (21 November), Asaba (12 December), Kano (17 December) and Yola (4 January).",
+      "state": "",
+      "source_name": "The Gazelle News",
+      "source_url": "https://www.thegazellenews.com/starts-in-kaduna-ends-on-28th-year-of-his-election-as-gov-in-lagos-apc-releases-campaign-schedule-full-list/",
+      "published_at": "2026-10-17"
+    },
+    {
+      "key": "atiku-sokoto-launch",
+      "category": "election_news",
+      "title": "Atiku launches ADC presidential campaign in Sokoto",
+      "body": "Atiku Abubakar launched the ADC presidential campaign at the party's state secretariat in Sokoto, accompanied by his running mate, Rotimi Amaechi. The campaign's economic message centred on a targeted, production-based subsidy for petroleum products refined in Nigeria. The day before, Atiku had accused security agencies of trying to disrupt the launch; the event went ahead.",
+      "state": "sokoto",
+      "source_name": "Premium Times",
+      "source_url": "https://www.premiumtimesng.com/news/top-news/922892-2027-politics-watch-from-atikus-sokoto-rally-to-obis-convoy-attack.html",
+      "published_at": "2026-11-05"
+    },
+    {
+      "key": "makinde-bauchi-flagoff",
+      "category": "election_news",
+      "title": "Makinde flags off APM presidential campaign in Bauchi",
+      "body": "Oyo State Governor Seyi Makinde, presidential candidate of the Allied Peoples Movement (APM), launched his campaign in Bauchi on Saturday with the state's governor, Bala Mohammed. He urged voters not to let money offered by politicians decide their votes, and presented his Reset Agenda on the economy, security and governance.",
+      "state": "bauchi",
+      "source_name": "Premium Times",
+      "source_url": "https://www.premiumtimesng.com/news/top-news/923618-2027-collect-politicians-money-but-vote-your-conscience-makinde-tells-nigerians.html",
+      "published_at": "2026-11-07"
+    },
+    {
+      "key": "makinde-why-running",
+      "category": "election_news",
+      "title": "Makinde explains why he is challenging Tinubu",
+      "body": "Seyi Makinde says he is running against President Tinubu because of concerns about the country's economic direction and governance. He rejected suggestions that he wait until 2031 or 2035, and urged Nigerians who feel let down by politics to still take part in the 2027 election.",
+      "state": "oyo",
+      "source_name": "Tribune Online",
+      "source_url": "https://tribuneonlineng.com/why-im-contesting-against-tinubu-in-2027-makinde",
+      "published_at": "2026-11-12"
+    },
+    {
+      "key": "obi-calabar-town-hall",
+      "category": "election_news",
+      "title": "Obi holds NDC town hall in Calabar",
+      "body": "Peter Obi, the Nigeria Democratic Congress (NDC) presidential candidate, arrived in Calabar on Wednesday, 4 November, for a town hall meeting with party members and supporters at the Metropolitan Hotel. Supporters received him at the Margaret Ekpo International Airport and along the city's main roads. Cross River police later arrested a suspect after an attack on vehicles in his convoy near Watt Market.",
+      "state": "cross_river",
+      "source_name": "Vanguard",
+      "source_url": "https://www.vanguardngr.com/2026/11/peter-obi-storms-calabar-for-ndc-town-hall-as-supporters-throng-airport-streets/",
+      "published_at": "2026-11-04"
+    },
+    {
+      "key": "ndc-lagos-town-hall-attack",
+      "category": "election_news",
+      "title": "Thugs disrupt NDC town hall in Lagos",
+      "body": "Suspected political thugs armed with cutlasses, sticks and stones attacked NDC supporters on Thursday at a venue in Oregun, Ikeja, before a town hall for Peter Obi and the party's Lagos governorship candidate, Funsho Doherty. Obi had not arrived. Party members said several people were injured; a police source said the organisers had not informed the security agencies, which the party disputes.",
+      "state": "lagos",
+      "source_name": "Vanguard",
+      "source_url": "https://www.vanguardngr.com/2026/11/thugs-attack-ndc-supporters-in-lagos/",
+      "published_at": "2026-11-12"
+    },
+    {
+      "key": "ndc-asaba-march",
+      "category": "election_news",
+      "title": "NDC march in Asaba disrupted; campaign buses damaged",
+      "body": "Supporters of Peter Obi and Rabiu Kwankwaso were attacked during an NDC march in Asaba, Delta State, on Saturday, 7 November. Delta North senatorial candidate Victor Ochei said more than 30 campaign buses were damaged. The NDC called on the police, DSS and civil defence corps to protect participants; the APC in Delta restated its commitment to non-violent campaigns.",
+      "state": "delta",
+      "source_name": "Vanguard via Ghanamma",
+      "source_url": "https://www.ghanamma.com/2026/11/07/obi-kwankwaso-rally-attacked-again-several-injured-campaign-vehicles-destroyed/",
+      "published_at": "2026-11-07"
+    },
+    {
+      "key": "obi-benue-yelwata",
+      "category": "election_news",
+      "title": "Obi stopped on the way to Yelwata; Benue government denies role",
+      "body": "Peter Obi said hired thugs blocked his convoy on the Makurdi–Gboko road when he tried to visit families affected by the 2025 killings in Yelwata, Benue State. The state government denied any involvement and said it had not been told of the visit; a document later showed the NDC had notified the police the day before. Obi then continued to Plateau State.",
+      "state": "benue",
+      "source_name": "The ICIR",
+      "source_url": "https://www.icirnigeria.org/govt-denies-role-in-convoy-blockade-as-thugs-thwart-obis-visit-to-benue/",
+      "published_at": "2026-09-08"
+    },
+    {
+      "key": "aac-campaign-council",
+      "category": "election_news",
+      "title": "AAC inaugurates Sowore–Magashi campaign council",
+      "body": "The African Action Congress (AAC) has inaugurated the campaign council for its presidential candidate, Omoyele Sowore, and running mate Haruna Garba Magashi, led by Director-General Abdullahi Usman. The party says the structure will reach down to state, LGA, ward and polling-unit coordinators, combining digital tools with grassroots organising.",
+      "state": "",
+      "source_name": "Sahara Reporters",
+      "source_url": "https://saharareporters.com/2026/10/10/aac-party-inaugurates-sowore-magashi-2027-campaign-council-begins-nationwide",
+      "published_at": "2026-10-10"
+    },
+    {
+      "key": "factcheck-ghana-rally",
+      "category": "election_news",
+      "title": "Fact-check: video of a Ghana rally shared as an Obi crowd in Enugu",
+      "body": "A viral Facebook video claiming to show a huge crowd for Peter Obi in Enugu actually shows a rally in Accra, Ghana, by Ghana's National Democratic Congress, according to FactCheckHub. A school name visible in the footage places it in Ghana. Check images and videos before sharing them, whichever candidate they appear to support.",
+      "state": "enugu",
+      "source_name": "FactCheckHub",
+      "source_url": "https://factcheckhub.com/old-ghana-rally-footage-misrepresented-as-peter-obi-supporters-in-enugu/",
+      "published_at": "2026-11-11"
+    },
+    {
+      "key": "peace-accord",
+      "category": "election_news",
+      "title": "Presidential candidates sign the National Peace Accord",
+      "body": "Presidential candidates and party chairmen signed the first National Peace Accord for the 2027 elections in Abuja on 18 August, a day before campaigns opened. The accord, convened by the National Peace Committee chaired by former Head of State Abdulsalami Abubakar with The Kukah Centre, commits signatories to peaceful, issue-based campaigns. A second accord is planned closer to the polls.",
+      "state": "fct",
+      "source_name": "Voice of Nigeria",
+      "source_url": "https://von.gov.ng/2027-elections-presidential-candidates-sign-national-peace-accord/",
+      "published_at": "2026-08-18"
+    },
+    {
+      "key": "situation-room-violence",
+      "category": "election_news",
+      "title": "Situation Room warns of violence and high billboard fees",
+      "body": "The Nigeria Civil Society Situation Room has called on INEC, the judiciary and security agencies to act fairly ahead of the 2027 elections. Citing CLEEN Foundation data, it said 70 election-related incidents were recorded in 19 states and the FCT between 1 January and 27 October 2026, with 27 deaths. It also criticised state billboard permit fees for presidential campaigns, which it said reach up to N200 million.",
+      "state": "",
+      "source_name": "ThisDay",
+      "source_url": "https://www.thisdaylive.com/2026/11/07/2027-election-situation-room-urges-inec-judiciary-security-agencies-to-be-fair-just/",
+      "published_at": "2026-11-07"
+    },
+    {
+      "key": "survey-fear-violence",
+      "category": "election_news",
+      "title": "Survey: 61% of Nigerians fear violence could stop them voting",
+      "body": "A Yiaga Africa survey from September 2026, cited by the African Centre for Security, Governance and Development, found that 61 per cent of respondents feared violence could keep them from voting, rising to 78 per cent in the North-East. The same survey found 84 per cent were likely to vote in 2027, and 83 per cent said better security would make them more likely to take part.",
+      "state": "",
+      "source_name": "allAfrica",
+      "source_url": "https://allafrica.com/stories/202611090116.html",
+      "published_at": "2026-11-09"
+    },
+    {
+      "key": "osun-adeleke-reelected",
+      "category": "election_updates",
+      "title": "Osun: INEC declares Adeleke winner of the 2026 governorship election",
+      "body": "INEC declared Governor Ademola Adeleke of the Accord Party winner of the 15 August Osun governorship election with 511,067 votes. Bola Oyebamiji of the APC came second with 444,815 votes, and Najeem Salaam of the ADC third with 17,180. Adeleke won 19 of the 30 local government areas.",
+      "state": "osun",
+      "source_name": "News Agency of Nigeria",
+      "source_url": "https://nannews.ng/?p=335049",
+      "published_at": "2026-08-16"
+    },
+    {
+      "key": "osun-yiaga-verdict",
+      "category": "election_news",
+      "title": "Yiaga Africa: Osun results matched its independent projections",
+      "body": "Observer group Yiaga Africa said the official results of the Osun governorship election were consistent with its independent projections from polling-unit results. It noted the election was the last major governorship poll before 2027 and an early test of the Electoral Act 2026, including downloadable PVCs, and asked INEC for uniform guidance to presiding officers on accepting them.",
+      "state": "osun",
+      "source_name": "allAfrica",
+      "source_url": "https://allafrica.com/stories/202608170131.html",
+      "published_at": "2026-08-17"
+    },
+    {
+      "key": "ekiti-oyebanji-reelected",
+      "category": "election_updates",
+      "title": "Ekiti: Oyebanji re-elected, a first for the state",
+      "body": "INEC declared Governor Biodun Oyebanji of the APC winner of the 20 June Ekiti governorship election with 319,224 votes. Oluwole Oluyede of the PDP polled 40,543 and Oludare Bejide of the ADC 12,872. Oyebanji, who won all 16 local government areas, is the first Ekiti governor to win back-to-back terms.",
+      "state": "ekiti",
+      "source_name": "allAfrica",
+      "source_url": "https://allafrica.com/stories/202606220724.html",
+      "published_at": "2026-06-21"
+    },
+    {
+      "key": "inec-ecowas-neutrality",
+      "category": "election_updates",
+      "title": "Amupitan to ECOWAS mission: INEC has no candidate and no party",
+      "body": "INEC chairman Joash Amupitan told a visiting ECOWAS pre-election assessment mission in Abuja that the commission will remain neutral in the 2027 elections. He said INEC had completed nine of the 14 statutory milestones in its revised timetable, including all three phases of continuous voter registration and the nationwide display of the preliminary register of voters.",
+      "state": "fct",
+      "source_name": "Sahara Reporters",
+      "source_url": "https://saharareporters.com/2026/10/30/inec-has-no-candidate-no-party-amupitan-assures-ecowas-neutrality-2027-elections",
+      "published_at": "2026-10-30"
+    },
+    {
+      "key": "inec-corps-members",
+      "category": "election_updates",
+      "title": "INEC to call on about 1.4 million corps members for the 2027 polls",
+      "body": "INEC says it will need 707,384 ad hoc staff, mainly NYSC corps members, for the presidential and National Assembly elections, and the same number for the governorship and State Assembly elections: about 1.41 million in total. INEC chairman Joash Amupitan made the request when he visited the NYSC. In 2023 the commission used about 1.2 million ad hoc staff, more than 70 per cent of them corps members and student volunteers.",
+      "state": "",
+      "source_name": "allAfrica",
+      "source_url": "https://allafrica.com/stories/202605120426.html",
+      "published_at": "2026-05-12"
+    }
+  ]
+}
