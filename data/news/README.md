@@ -33,3 +33,28 @@ Load them with a system admin's email:
   civil society. No item says who should win.
 - `election_updates` (Official Election Updates) is used for INEC and court facts; everything else is
   `election_news` (General Election News).
+
+## Member news (`2026-11-member-news.json`)
+
+108 community news items (checked 14 Nov 2026) for seven named members to post as themselves, 10–20 each: party
+campaigns (APC, ADC, NDC, APM, PDP, SDP, LP, AAC, APGA, YPP), INEC and the courts, police and election security,
+state races (Lagos, Rivers, Oyo, Kano, Plateau, Gombe, Adamawa and more), and fact-checks of viral election claims.
+None repeats a story in the official file above (no shared source link).
+
+The authors are written as handles `m1`–`m7` (and the reviewers as `m7`, with `m6` for m7's own items), so no
+member's email address is stored in this public repository. Map them when you run it:
+
+    A=m1=<email>,m2=<email>,m3=<email>,m4=<email>,m5=<email>,m6=<email>,m7=<email>
+    python manage.py import_member_news --authors "$A" --dry-run --list   # check accounts and report, saves nothing
+    python manage.py import_member_news --authors "$A"                    # post and approve
+    python manage.py import_member_news --authors "$A" --pending          # post only; approve in the app (3 per author)
+    python manage.py import_member_news --authors "$A" --show-names       # show each author's name on their articles
+
+- Each item goes through `news.services.submit` as its author (profile complete, not paused, declarations, length,
+  https source) and then `services.approve` by the file's `reviewer` — or the `second_reviewer` for the reviewer's own
+  items, because nobody reviews their own article. Both must be news reviewers or system admins
+  (`--review-as` / `--second-reviewer`, a handle or an email, override the file). Approval notifications are not sent.
+- Every account is checked before anything is saved; a missing author or an unfinished profile stops the run.
+- Bylines stay hidden ("a member") unless `--show-names` is given, as in the app.
+- Idempotent by author + title: an item that author already posted (any status) is left alone.
+- Same research rules as above: own words, sources linked, allegations attributed with the response, neutral.

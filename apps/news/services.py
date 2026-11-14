@@ -220,7 +220,8 @@ def _no_self(a, reviewer):
         raise ServiceError("You can't review your own submission.", code="self_review", status_code=403)
 
 
-def approve(article, reviewer, *, request=None) -> Article:
+def approve(article, reviewer, *, request=None, notify=True) -> Article:
+    """`notify=False` is for bulk imports (import_member_news): the decision is still recorded, the author just isn't pinged."""
     from apps.notifications.services import notify_decision
 
     with transaction.atomic():
@@ -234,7 +235,8 @@ def approve(article, reviewer, *, request=None) -> Article:
         a.published_at = a.published_at or now
         a.save()
         _event(a, ArticleEvent.Kind.APPROVED, reviewer)
-        notify_decision(a, "approved")
+        if notify:
+            notify_decision(a, "approved")
     record(A.NEWS_APPROVED, target=a, actor=reviewer, request=request)
     return a
 

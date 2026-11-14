@@ -1,0 +1,1088 @@
+{
+ "about": "Election and politics news researched for NDCConnect members to post as community news. Every item is written in our own words from the cited source; allegations are attributed and responses included. Imported by `manage.py import_member_news`: each item is submitted as its author (same checks as the app) and approved by a news reviewer who is not the author. Authors are handles (m1–m7) so no email address is stored in the repository; map them with --authors when running. Idempotent by author + title.",
+ "researched_on": "2026-11-14",
+ "reviewer": "m7",
+ "second_reviewer": "m6",
+ "items": [
+  {
+   "key": "obi-kwankwaso-enugu-town-hall",
+   "author": "m1",
+   "title": "Obi and Kwankwaso hold NDC town hall in Enugu after Abakaliki stop",
+   "body": "NDC presidential candidate Peter Obi and his running mate, Rabiu Kwankwaso, held a town hall meeting in Enugu, following a similar meeting in Abakaliki, Ebonyi State, on 29 October.\n\nThey said they would unite and secure the country, tackle corruption, invest in health and education, and reduce poverty. Obi said the meeting drew a large turnout, with supporters lining the streets.\n\nBefore the town hall, the two met the leadership of the Christian Association of Nigeria (CAN) in Enugu State.\n\nThe NDC is relying on the Obi–Kwankwaso pairing to combine Obi's strength in the South-East, where he won heavily in 2023, with Kwankwaso's base in the North-West.",
+   "state": "enugu",
+   "source_url": "https://businessday.ng/life/article/ndc-peter-obi-kwankwaso-hold-town-hall-meeting-in-enugu/",
+   "published_at": "2026-11-01",
+   "language": "en"
+  },
+  {
+   "key": "kwankwaso-tells-atiku-to-stand-down",
+   "author": "m1",
+   "title": "Kwankwaso urges Atiku to withdraw and back Obi, citing North-South rotation",
+   "body": "NDC vice-presidential candidate Rabiu Kwankwaso has urged ADC candidate Atiku Abubakar to withdraw from the presidential race and support NDC candidate Peter Obi.\n\nSpeaking in Kano, Kwankwaso argued that the South has not yet had its turn under Nigeria's informal North-South rotation, and said his own acceptance of the vice-presidential slot reflects that principle. He questioned the ADC's choice of a northern candidate.\n\nNeither Atiku nor the ADC had issued a response by the time of reporting.\n\nThe Constitution does not reserve the presidency for any region, so Atiku remains eligible as long as he meets the legal requirements. Rotation is a political argument, not a legal rule.",
+   "state": "kano",
+   "source_url": "https://www.premiumtimesng.com/news/headlines/922071-2027-politics-watch-sundays-roundup-atiku-challenges-tinubu-on-power-as-kwankwaso-tells-him-to-stand-down.html",
+   "published_at": "2026-11-02",
+   "language": "en"
+  },
+  {
+   "key": "apc-enugu-campaign-nsukka",
+   "author": "m1",
+   "title": "Enugu APC flags off campaign in Nsukka, vows to deliver Mbah and Tinubu",
+   "body": "The APC in Enugu State flagged off its 2027 campaign at Nsukka Township Stadium on Wednesday, with party leaders pledging to mobilise voters across the three senatorial districts for the re-election of Governor Peter Mbah and President Tinubu.\n\nGovernor Mbah, who moved to the APC, listed his administration's work on security, roads, education, healthcare and reviving moribund assets, including the Presidential Hotel, the International Conference Centre and a rice mill, and described the state-owned Enugu Air as a sign of readiness for investment.\n\nThe campaign council is led by Chief Charlie Mbah, and speakers included senators, House members and party officials from the state.\n\nEnugu voted heavily for Peter Obi in 2023, and Mbah won the governorship that year by a very narrow margin.",
+   "state": "enugu",
+   "source_url": "https://www.vanguardngr.com/2026/11/2027-apc-flags-off-enugu-campaign-in-nsukka/",
+   "published_at": "2026-11-05",
+   "language": "en"
+  },
+  {
+   "key": "apga-launches-campaign-backing-tinubu",
+   "author": "m1",
+   "title": "APGA launches national campaign in Awka, backs Tinubu and fields no presidential candidate",
+   "body": "Anambra Governor Chukwuma Soludo has reaffirmed the All Progressives Grand Alliance's (APGA) support for President Tinubu at the party's national campaign launch at Alex Ekwueme Square, Awka.\n\nAPGA will not field a presidential candidate. It set a target of 50 per cent of Anambra's votes for Tinubu, arguing that a stronger vote would give the state more leverage for federal projects. National chairman Sly Ezeokenwa said in March that the party's working committee backed the alignment, with formal adoption awaiting a convention.\n\nIn 2023, Tinubu got 5,111 votes in Anambra, under one per cent of valid votes, while Peter Obi got 584,621 and APGA's own candidate, Peter Umeadi, got 7,388.\n\nAPGA presented flags to 44 legislative candidates, including three for the Senate and 11 for the House of Representatives. Its 30 State Assembly candidates contest on 6 February.",
+   "state": "anambra",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923342-2027-politics-watch-from-adcs-court-appeal-to-apgas-tinubu-endorsement.html",
+   "published_at": "2026-11-07",
+   "language": "en"
+  },
+  {
+   "key": "lagos-debate-transport-health",
+   "author": "m1",
+   "title": "Lagos governorship debate: candidates clash on rail funding, buses and health spending",
+   "body": "Four Lagos governorship candidates met on Sunday, 8 November, at a debate organised by the Nigeria Debate Consortium.\n\nOn transport, ADC candidate Gbadebo Rhodes-Vivour proposed private financing for rail, with investors repaid over a long period. APC candidate and Deputy Governor Obafemi Hamzat favoured major government investment, warning that recovering costs through fares could make rail unaffordable; he proposed expanding the bus fleet to 4,000 and introducing 77 electric ferries. NDC candidate Funso Doherty called for modern buses to replace ageing vehicles, and PDP candidate Deji Doherty pointed to heavy goods traffic, poor roads and delayed projects.\n\nOn health, Rhodes-Vivour proposed emergency response centres with two ambulances each in all 245 wards, and raising health spending towards 15 per cent of the budget. Hamzat promised health insurance for one in three residents. Funso Doherty proposed free maternal and child healthcare and raising combined health and education spending to 28 per cent. Deji Doherty stressed a larger health workforce and local medical production.\n\nLagos currently spends about eight per cent of its budget on health, according to the Health Commissioner.",
+   "state": "lagos",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923845-2027-politics-watch-atiku-fights-to-stay-on-ballot-tinubu-backers-claim-500-plus-vehicles.html",
+   "published_at": "2026-11-09",
+   "language": "en"
+  },
+  {
+   "key": "apc-ebonyi-vote-targets",
+   "author": "m1",
+   "title": "Ebonyi: APC sets target of at least 1.2 million votes for Tinubu, far above 2023 turnout",
+   "body": "At the APC presidential rally in Abakaliki, the Director-General of the party's campaign council, Abdulaziz Yari, set a minimum target of 1.2 million votes for President Tinubu in Ebonyi State. Works Minister David Umahi spoke of 1.3 million.\n\nVice-President Kashim Shettima, who represented Tinubu, pointed to federal infrastructure projects and appointments as proof of the administration's commitment to Ebonyi and the South-East.\n\nFor context: in 2023, INEC declared 42,402 votes for Tinubu and 259,738 for Peter Obi, then of the Labour Party, in Ebonyi. Only 337,887 voters were accredited across the state, and 325,351 valid presidential votes were recorded.\n\nThe party's minimum target is more than three times the number of voters accredited in 2023. Registration, turnout and party support could all change by 2027.",
+   "state": "ebonyi",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924051-2027-politics-watch-from-inecs-1-6m-voter-register-clean-up-to-wikes-%E2%82%A610m-pledge.html",
+   "published_at": "2026-11-10",
+   "language": "en"
+  },
+  {
+   "key": "makinde-reset-nigeria-jos",
+   "author": "m1",
+   "title": "Makinde takes APM's 'Reset Nigeria' campaign to Jos, meets traditional rulers",
+   "body": "Seyi Makinde, the presidential candidate of the Allied Peoples Movement (APM) and governor of Oyo State, visited Jos on Monday to present his Reset Nigeria programme.\n\nHe met the Gbong Gwom Jos, Da Jacob Gyang Buba, and other traditional rulers. Accompanied by his running mate, Lawal Daura, he spoke about security, honesty and accountable governance.\n\nPlateau has suffered repeated attacks on rural communities, and security is a central issue in the state.\n\nThe account of the visit did not include a Plateau-specific timetable or details of how his proposals would be carried out in the state.",
+   "state": "plateau",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924051-2027-politics-watch-from-inecs-1-6m-voter-register-clean-up-to-wikes-%E2%82%A610m-pledge.html",
+   "published_at": "2026-11-10",
+   "language": "en"
+  },
+  {
+   "key": "obi-jos-town-hall-unity-insecurity",
+   "author": "m1",
+   "title": "Jos: Obi pledges to return displaced people home and go after kidnappers",
+   "body": "NDC presidential candidate Peter Obi held a town hall meeting with supporters in Jos, Plateau State, on Tuesday.\n\nHe named national unity, security, economic recovery and accountable leadership as his main goals, and said Nigeria is divided along tribal and religious lines. He pledged to make returning internally displaced people to their communities a priority, saying anyone still in a camp would be a failure, and warned kidnappers that his government would come after them.\n\nObi proposed moving from a consumption-based to a production-based economy, directing more bank credit to small businesses, fighting corruption, investing in schools for about 18 million out-of-school children and strengthening primary healthcare. He urged voters to stay at polling units until results are counted, recorded and transmitted.\n\nDuring a courtesy visit to the Plateau State Traditional Council, the Gbong Gwom Jos, Da Jacob Gyang Buba, urged politicians not to let campaigning worsen the region's insecurity.",
+   "state": "plateau",
+   "source_url": "https://www.vanguardngr.com/2026/11/2027-countdown-obi-pledges-to-unite-nigeria-tackle-insecurity-poverty/",
+   "published_at": "2026-11-10",
+   "language": "en"
+  },
+  {
+   "key": "adc-gets-judgment-copy-will-appeal",
+   "author": "m1",
+   "title": "ADC finally gets certified copy of judgment that voided its leadership, says it will appeal",
+   "body": "The African Democratic Congress (ADC) received the certified true copy of the Federal High Court judgment that nullified its David Mark-led National Working Committee on Wednesday, 11 November, six days after Justice Peter Lifu delivered it in Abuja.\n\nThe judgment found that the process that installed the committee did not comply with the Electoral Act, and it also affected decisions that committee took, including the process that produced Atiku Abubakar as the party's presidential candidate.\n\nA key point in the ruling was a resignation letter said to have been written by Nafiu Bala Gombe, the former Deputy National Chairman who brought the suit. The judge compared the signature on it with the signatures on Gombe's sworn statements and rejected it. He did not declare Gombe the substantive national chairman, but directed INEC to recognise him as the only elected member of the committee whose four-year tenure is still valid.\n\nThe ADC rejects these findings. It says it holds the original resignation letter bearing Gombe's signature, and its National Publicity Secretary, Bolaji Abdullahi, said the party will appeal.",
+   "state": "fct",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924805-2027-politics-watch-political-violence-adcs-legal-internal-setback.html",
+   "published_at": "2026-11-13",
+   "language": "en"
+  },
+  {
+   "key": "amnesty-condemns-pantami-convoy-attack",
+   "author": "m1",
+   "title": "Gombe: Amnesty International condemns attack on Pantami's convoy; police say no arrests yet",
+   "body": "Armed attackers targeted the convoy of the PDP governorship candidate in Gombe State, Isa Ali Pantami, along Jekadafari Road on Wednesday, 11 November, as he arrived in the state capital.\n\nVideos of the incident showed armed people blocking the road with burning tyres, and several vehicles in the convoy reportedly had their windscreens smashed.\n\nIn a statement on Thursday, Amnesty International described the attack as a deliberate attempt to stop the candidate from entering the city. It said preliminary findings suggested the attackers were working for the APC; that claim has not been confirmed, and the APC has not been shown to be responsible. Amnesty said it was concerned that no one had been arrested and called for an investigation and prosecution.\n\nThe Gombe State Police Command confirmed the attack. Its spokesperson, Buhari Abdullahi, said investigations were ongoing and that no arrests had been made as of Wednesday.",
+   "state": "gombe",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924805-2027-politics-watch-political-violence-adcs-legal-internal-setback.html",
+   "published_at": "2026-11-13",
+   "language": "en"
+  },
+  {
+   "key": "makinde-oyo-campaign-flag-off",
+   "author": "m1",
+   "title": "Makinde flags off APM campaign in Oyo town; APC mocks turnout",
+   "body": "Oyo Governor and APM presidential candidate Seyi Makinde flagged off his party's statewide campaign at Durbar Stadium in Oyo town on Saturday, 14 November, pledging to reset Nigeria if elected. He said the 2027 election is a contest between the APC and Nigerians.\n\nThe APM governorship candidate, Bimbo Adekanmbi, said Makinde had laid a solid foundation for the state and promised to build on it, and urged supporters to vote for all the party's candidates. State chairman Adegbenro Fagbemi presented flags to the candidates. Members came from across the state's 33 local government areas.\n\nThe campaign organisation of the APC governorship candidate, Senator Sharafadeen Alli, said the turnout was poor and showed that voters had rejected Adekanmbi and Makinde. Crowd sizes at rallies are contested by all sides and are not a reliable guide to votes.",
+   "state": "oyo",
+   "source_url": "https://gazettengr.com/makinde-flags-off-campaign-in-oyo-pledges-to-reset-nigeria/",
+   "published_at": "2026-11-14",
+   "language": "en"
+  },
+  {
+   "key": "katsina-apm-members-back-pdp",
+   "author": "m2",
+   "title": "Katsina: APM members declare support for PDP governorship candidate Danmarke",
+   "body": "Members of the Allied Peoples Movement (APM) in Katsina State declared support for the PDP governorship candidate, Yakubu Danmarke, at a rally on Sunday, 1 November.\n\nOrganisers put the number of defectors at about 5,000. That figure has not been independently verified.\n\nDefection rallies are common during campaigns, and the numbers announced at them are often hard to check.\n\nThe APM has not responded to the claim.",
+   "state": "katsina",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922304-2027-politics-watch-battle-for-place-on-ballot-kano-question-inec-yet-to-answer.html",
+   "published_at": "2026-11-03",
+   "language": "en"
+  },
+  {
+   "key": "zamfara-north-rerun-rival-winners",
+   "author": "m2",
+   "title": "Zamfara North: court-ordered APC Senate primary produces two rival 'winners'",
+   "body": "A court-ordered rerun of the APC's Zamfara North senatorial primary has ended with two competing declarations.\n\nPremium Times reported Tijjani Yahaya Kaura as winner with 16,758 votes, against 1,465 for the incumbent senator, Sahabi Alhaji Ya'u, and 1,447 for Sani Abdullahi Shinkafi, although that tally's own totals do not add up. Channels Television reported that the primary committee chair, Auwal Abdullahi Aliyu, declared Ya'u the winner with 49,176 votes, against 9,628 for Kaura and 2,602 for Shinkafi.\n\nNeither declaration has been independently confirmed as the authorised result. Voting was disrupted at centres in Kaura Namoda, with reports of thugs, injuries and damage to a local government chairman's vehicle.\n\nThe rerun followed a 31 August Federal High Court order in Gusau nullifying the earlier primary, upheld by the Court of Appeal on 20 October. Kaura is linked to former governor Abdul'aziz Yari and Ya'u to former governor Bello Matawalle.",
+   "state": "zamfara",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922590-2027-politics-watch-tuesdays-roundup-from-sokotos-security-row-to-zamfaras-rival-winners.html",
+   "published_at": "2026-11-04",
+   "language": "en"
+  },
+  {
+   "key": "nasarawa-governor-orders-probe-rally-clash",
+   "author": "m2",
+   "title": "Nasarawa: Governor Sule orders probe after rival chants and tear gas cut APC rally short",
+   "body": "Nasarawa Governor Abdullahi Sule has ordered security agencies to investigate disturbances at Wednesday's APC rally for President Tinubu in Lafia, and the reported obstruction of Vice-President Kashim Shettima's convoy during a visit to the Emir of Lafia.\n\nAt the rally, Sule led chants for the APC governorship candidate, Senator Ahmed Wadada. Supporters of the SDP governorship candidate, former Inspector-General of Police Mohammed Adamu, answered with rival chants. Security officers fired tear gas and organisers ended the rally early. Sule questioned the police use of tear gas, which the state said reached the podium.\n\nThe state asked the SSS to investigate possible links to former governor Umaru Al-Makura and to Adamu. Adamu's campaign and Al-Makura's ally Danjuma Joseph both denied involvement, and no responsibility has been established.\n\nSome of Adamu's supporters back Tinubu for president while supporting the SDP for governor.",
+   "state": "nasarawa",
+   "source_url": "https://www.premiumtimesng.com/news/more-news/923079-2027-politics-watch-from-atikus-court-setback-to-apcs-divided-loyalty.html",
+   "published_at": "2026-11-06",
+   "language": "en"
+  },
+  {
+   "key": "malami-convoy-attack-kebbi-amnesty",
+   "author": "m2",
+   "title": "Kebbi: Malami says thugs attacked his convoy; government denies intimidation",
+   "body": "Abubakar Malami, the ADC governorship candidate in Kebbi State, says political thugs attacked his campaign convoy and damaged media equipment during Atiku Abubakar's visit to Birnin Kebbi on Thursday.\n\nAmnesty International said footage it reviewed showed assaults and damaged vehicles, and identified one clip as coming from Argungu.\n\nThe governor's chief press secretary, Ahmed Idris, denied that the state was intimidating the opposition and accused ADC supporters of damaging a billboard. The Kebbi APC asked security agencies to investigate alleged vandalism of campaign materials in Argungu and Birnin Kebbi.\n\nPolice had not confirmed the identity of the attackers, any injuries or any arrests at the time of reporting.",
+   "state": "kebbi",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923342-2027-politics-watch-from-adcs-court-appeal-to-apgas-tinubu-endorsement.html",
+   "published_at": "2026-11-07",
+   "language": "en"
+  },
+  {
+   "key": "lagos-debate-waste-records",
+   "author": "m2",
+   "title": "Lagos debate: candidates trade claims on waste collection and defend their own records",
+   "body": "Waste collection was one of the sharpest exchanges at Sunday's Lagos governorship debate.\n\nADC candidate Gbadebo Rhodes-Vivour said the state's waste trucks had fallen from about 1,000 under former governor Babatunde Fashola to about 200, blamed centralisation for weakening local governments, and proposed giving councils a role and requiring households to separate recyclables. APC candidate Obafemi Hamzat defended the shift from landfills towards recovery facilities and transfer stations. NDC candidate Funso Doherty said waste was piling up faster than it was collected. In September, Governor Sanwo-Olu declared a state of emergency on waste collection.\n\nCandidates were also pressed on their pasts. Rhodes-Vivour, runner-up in 2023 on the Labour Party ticket, questioned that election's conduct; INEC's declared result was 762,134 votes for Sanwo-Olu and 312,329 for him. Hamzat was asked whether he would govern independently of the establishment that has run Lagos since 1999, and cited his record on the Lekki-Ikoyi Bridge and BRT.\n\nFunso Doherty denied a claim by Naheem Balogun that Balogun won the NDC primary, and PDP candidate Deji Doherty was questioned about his ties to Nyesom Wike, whom he called his national leader.",
+   "state": "lagos",
+   "source_url": "https://allafrica.com/stories/202611090095.html",
+   "published_at": "2026-11-09",
+   "language": "en"
+  },
+  {
+   "key": "oyo-ndc-chairmanship-dispute",
+   "author": "m2",
+   "title": "Oyo NDC split as a group announces removal of state chairman; she rejects it",
+   "body": "A group of NDC officials, aspirants and members in Oyo State has announced the removal of the state chairman, Oyeronke Bolajoko, and named Akeem Aderogba as her replacement.\n\nBolajoko rejected the announcement and disputed the authority of the people behind it.\n\nAs of the latest reports, the party's national leadership had not publicly resolved the competing claims.\n\nThe dispute comes as parties in Oyo prepare for the 6 February governorship election, in which the NDC has a candidate among 16 cleared by INEC.",
+   "state": "oyo",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924051-2027-politics-watch-from-inecs-1-6m-voter-register-clean-up-to-wikes-%E2%82%A610m-pledge.html",
+   "published_at": "2026-11-10",
+   "language": "en"
+  },
+  {
+   "key": "ndc-says-obi-in-good-health",
+   "author": "m2",
+   "title": "NDC says Obi is tired from a heavy schedule but in good health",
+   "body": "The NDC has responded to rumours about the health of its presidential candidate, Peter Obi, which grew after he reportedly said at his Enugu rally that he planned to take a break.\n\nSam Omale, Deputy Spokesperson of the NDC Presidential Campaign Council, said on Channels Television that the concerns came from exhaustion after a demanding schedule, and that Obi is in perfect health. He said Obi had been advised to rest but will continue town hall meetings before the main campaign rallies begin.\n\nThe party's National Publicity Secretary, Osa Director, gave a slightly different account. He said he knew of no health incident, had spent a day with Obi in Bayelsa, and that the campaign council had not asked him to slow down.\n\nNo campaign events were reported cancelled.",
+   "state": "",
+   "source_url": "https://www.vanguardngr.com/2026/11/obi-exhausted-from-campaign-schedule-but-in-good-health-ndc/",
+   "published_at": "2026-11-11",
+   "language": "en"
+  },
+  {
+   "key": "arewa-house-sealing-row-kaduna",
+   "author": "m2",
+   "title": "Kaduna: ADC says Arewa House was sealed to block Atiku's meeting; state government denies it",
+   "body": "The ADC has accused the Kaduna State Government of sealing Arewa House, the venue it picked for a consultation between its presidential candidate, Atiku Abubakar, and Northern stakeholders on Thursday, 13 November.\n\nIn a statement signed by Phrank Shaibu, Director of Strategic Communication of the ADC Presidential Campaign Council, the party described Arewa House as shared heritage of the North's diverse peoples and said closing it to stop a political meeting was an affront to them. Atiku said his team chose the venue before the building was closed. The party linked the incident to its earlier complaints about its campaign launch in Sokoto, and said it will keep consulting and pursue its legal rights.\n\nThe Kaduna State Government denied sealing the building. Information Commissioner Ahmed Maiyaki said the government had no role in it and that Arewa House is not state property, and the government described the allegation as an attempt to tarnish Governor Uba Sani's image. Some reports said it was the Arewa Consultative Forum's secretariat that was closed, so exactly which building was shut, and by whom, is still disputed.",
+   "state": "kaduna",
+   "source_url": "https://www.vanguardngr.com/2026/11/adc-accuses-apc-govt-of-sealing-arewa-house-to-stop-atikus-consultation/",
+   "published_at": "2026-11-12",
+   "language": "en"
+  },
+  {
+   "key": "sdp-names-yunusa-tanko-campaign-coordinator",
+   "author": "m2",
+   "title": "SDP unveils 12,000-member campaign council, names ex-Obidient coordinator Yunusa Tanko to lead it",
+   "body": "The Social Democratic Party (SDP) has inaugurated its presidential campaign council for Prince Adewole Adebayo at its national secretariat in Abuja, and named Yunusa Tanko as the campaign's National Coordinator.\n\nTanko was a political adviser to NDC presidential candidate Peter Obi and National Coordinator of the Obidient Movement. His appointment came about two weeks after he resigned as Obi's political adviser for Northern Nigeria.\n\nParty chairman Abubakar Sadiq Gombe, who also chairs the council, said the council has 12,000 members and urged them to work to unseat President Bola Tinubu on 16 January 2027. In his acceptance speech, Tanko pledged to build a nationwide campaign organisation with Adebayo and said the SDP stands for ordinary Nigerians who feel neglected.\n\nThe move puts a former leading figure of Obi's movement inside another opposition candidate's campaign. Adebayo is one of 18 presidential candidates on the January ballot.",
+   "state": "fct",
+   "source_url": "https://blueprint.ng/sdp-unveils-presidential-campaign-council/",
+   "published_at": "2026-11-12",
+   "language": "en"
+  },
+  {
+   "key": "igp-cancels-leave-warns-officers",
+   "author": "m2",
+   "title": "IGP cancels leave for election-duty officers, warns: police are 'not a tool for any politician'",
+   "body": "Inspector-General of Police Olatunji Disu has cancelled leave for officers assigned to election security and told Commissioners of Police and senior officers to stay in their commands until the elections are over.\n\nSpeaking on Wednesday, 11 November, at the monthly conference of strategic senior officers in Abuja, he warned that any officer found colluding with politicians, facilitating thuggery or interfering with voters' rights will be disciplined, and said the police will protect all candidates and parties equally.\n\nHe ordered commissioners to check the readiness of election security equipment, communications, vehicles and protective gear and report by the end of the week, and to coordinate directly with INEC, the military, the DSS and the Civil Defence Corps.\n\nOn banditry, Disu ordered extra personnel, vehicles and air support to affected communities and gave commissioners in those states 72 hours to submit updated threat assessments.",
+   "state": "fct",
+   "source_url": "https://thenicheng.com/igp-cancels-police-leave-ahead-of-2027-elections/",
+   "published_at": "2026-11-12",
+   "language": "en"
+  },
+  {
+   "key": "kenya-delegation-visits-inec",
+   "author": "m2",
+   "title": "Kenyan delegation visits INEC to learn from Nigeria's preparations, discusses voting abroad",
+   "body": "A delegation from Kenya has visited INEC in Abuja to learn from Nigeria's election preparations ahead of Kenya's own general election in August 2027.\n\nKenya's High Commissioner to Nigeria, Isaac Parashina, said the visit was aimed at learning from Nigeria's experience. The talks included ways of expanding voting opportunities for citizens living abroad, an issue debated in both countries.\n\nAn INEC national commissioner told the delegation that the commission has completed nine of its scheduled pre-election activities after readiness assessments across the six geopolitical zones, and has begun distributing non-sensitive materials.",
+   "state": "fct",
+   "source_url": "https://www.firstawareness.com.ng/2026/11/inec-kicks-off-distribution-of-election.html",
+   "published_at": "2026-11-13",
+   "language": "en"
+  },
+  {
+   "key": "tinubu-jos-north-central-rally",
+   "author": "m2",
+   "title": "Jos rally: Tinubu promises security and rebuilding; Mutfwang says Plateau is 'Tinubu or nothing'",
+   "body": "President Tinubu held the APC's North-Central campaign rally at the 60,000-capacity Zaria Road Stadium in Jos on Saturday, 14 November, and asked Plateau voters to support him and other APC candidates.\n\nHe pointed to his administration's security commitments and development projects, promised to rebuild attacked communities and help displaced people return home, said federal security surveillance would be installed soon, and called for unity across religious, ethnic and cultural lines.\n\nGovernor Caleb Mutfwang, who moved to the APC, said the state had decided its choice and would deliver unprecedented votes. Vice-President Shettima praised Plateau's contributions to the nation, and APC National Chairman Nentawe Yilwatda handed flags to governorship candidates including Aliyu Wadada (Nasarawa) and Yakubu Danladi (Kwara).\n\nNDC candidate Peter Obi also made returning displaced people a central promise at his own Jos town hall earlier in the week.",
+   "state": "plateau",
+   "source_url": "https://statehouse.gov.ng/president-tinubu-seeks-plateaus-support-for-2027-pledges-security-and-development-measures/",
+   "published_at": "2026-11-14",
+   "language": "en"
+  },
+  {
+   "key": "osun-apc-osogbo-rally",
+   "author": "m2",
+   "title": "Osun APC stages street rally in Osogbo, says relationship with Accord is intact",
+   "body": "The APC in Osun State held a large street rally in Osogbo on Saturday, 14 November, moving from the stadium through Ayetoro, Igbona, Old Garage and Olaiya to the party secretariat.\n\nThe party's last governorship candidate, Bola Oyebamiji, said the turnout showed the APC can deliver its target of two million votes for President Tinubu in Osun, and denied reports of internal rifts. He said the party's relationship with Accord, the party of Governor Ademola Adeleke, remains intact.\n\nParty chieftains credited Marine and Blue Economy Minister Gboyega Oyetola with leading the mobilisation.\n\nAdeleke was re-elected on the Accord platform in August, defeating Oyebamiji.",
+   "state": "osun",
+   "source_url": "https://thesun.ng/osun-2027-apc-stages-mass-rally-dismisses-internal-rifts/",
+   "published_at": "2026-11-14",
+   "language": "en"
+  },
+  {
+   "key": "gombe-faction-north-west-campaign-council",
+   "author": "m3",
+   "title": "ADC faction loyal to Nafiu Gombe inaugurates its own North-West campaign council",
+   "body": "A faction of the ADC led by Nafiu Bala Gombe has inaugurated a North-West campaign council after a meeting in Sokoto. Factional spokesperson Christopher Okechukwu said Nuradeen Lawal Chindo will chair it, with Bello Shehu as secretary. Bala Sani Kumo, the faction's deputy campaign director-general for the North, presided.\n\nThe council is meant to coordinate the faction's activities across the seven North-West states.\n\nThe ADC leadership under David Mark is campaigning for Atiku Abubakar, and the rival leadership claims are before the courts.\n\nThe announcement did not change INEC's recognition of the party's leadership or its presidential nomination.",
+   "state": "sokoto",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/921852-2027-politics-watch-from-sokoto-ultimatum-to-conflicting-%E2%82%A650000-relief-terms-saturdays-roundup.html",
+   "published_at": "2026-11-01",
+   "language": "en"
+  },
+  {
+   "key": "pdp-says-onor-remains-candidate",
+   "author": "m3",
+   "title": "PDP says Sandy Onor is still its presidential candidate despite backing Tinubu through Rainbow Coalition",
+   "body": "PDP chairman George Turnah said on Friday that Senator Sandy Onor remains the party's presidential candidate.\n\nThe statement came as many PDP leaders, including FCT Minister Nyesom Wike, back President Tinubu through the Rainbow Coalition, a cross-party grouping supporting the president's re-election.\n\nNo withdrawal of Onor's candidacy has been announced, and INEC lists him as the PDP's presidential candidate.\n\nOnor, a former senator from Cross River State, emerged as the consensus candidate of the Wike-backed faction in May, promising a grassroots campaign on poverty and insecurity.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/921852-2027-politics-watch-from-sokoto-ultimatum-to-conflicting-%E2%82%A650000-relief-terms-saturdays-roundup.html",
+   "published_at": "2026-11-01",
+   "language": "en"
+  },
+  {
+   "key": "jigawa-defections-nitda-dg",
+   "author": "m3",
+   "title": "Jigawa: PDP and NDC members defect to APC at campaign office opened by NITDA chief",
+   "body": "Some members of the PDP and the NDC in Jigawa State reportedly defected to the APC during the inauguration of a pro-Tinubu grassroots campaign office.\n\nThe event was led by Kashifu Inuwa Abdullahi, Director-General of the National Information Technology Development Agency (NITDA). Some defectors said development interventions associated with NITDA were among their reasons for joining.\n\nThere is no established evidence that NITDA's resources were used for the political event.\n\nThe number of defectors was not independently confirmed, and the PDP and NDC did not comment.",
+   "state": "jigawa",
+   "source_url": "https://www.premiumtimesng.com/news/headlines/922071-2027-politics-watch-sundays-roundup-atiku-challenges-tinubu-on-power-as-kwankwaso-tells-him-to-stand-down.html",
+   "published_at": "2026-11-02",
+   "language": "en"
+  },
+  {
+   "key": "mutfwang-no-rainbow-coalition-plateau",
+   "author": "m3",
+   "title": "Plateau: Mutfwang inaugurates APC campaign councils, rules out 'Rainbow Coalition' in the state",
+   "body": "Plateau Governor Caleb Mutfwang inaugurated the APC's presidential and state campaign councils at Government House, Rayfield, Jos, on Monday, 2 November.\n\nHe dismissed talk of a Rainbow Coalition in the state, saying Plateau will run one unified APC campaign, and declared that there is no vacancy in Aso Rock or in Government House. He acknowledged hunger and insecurity but said his administration is taking deliberate steps to tackle them.\n\nMutfwang also cited an agreement that each senatorial zone holds the governorship for two terms, warning that opposing his re-election could affect the northern zone's chance in 2035. State APC chairman Rufus Bature warned that members joining the Rainbow Coalition would not be tolerated.\n\nCampaign Director-General Joseph Ari said 115 support groups had already signed up.",
+   "state": "plateau",
+   "source_url": "https://www.vanguardngr.com/2026/11/2027-no-rainbow-coalition-plateau-is-going-apc-mutfwang/",
+   "published_at": "2026-11-02",
+   "language": "en"
+  },
+  {
+   "key": "niger-apc-suit-against-former-members",
+   "author": "m3",
+   "title": "Niger APC goes to court to stop former members from contesting on opposition tickets",
+   "body": "The APC in Niger State has filed a suit at the Federal High Court in Minna against the PDP governorship candidate, Mohammed Nami, the SDP candidate, Mohammed Ndarani Mohammed, and other politicians who left the party after disagreements over its primary.\n\nThe defendants include INEC, the PDP, SDP, ADC and NDC, along with Senator Peter Jiya, NDC senatorial candidate Sadiq Rabiu and ADC deputy governorship candidate Musa Mamman. Reports say 11 Senior Advocates of Nigeria, led by Jacob Usman, filed the suit.\n\nThe APC argues the politicians joined other parties without formally resigning from it, and wants INEC stopped from recognising them as candidates. If it succeeds, candidates already nominated by opposition parties could be kept off the ballot.\n\nThe case follows the Supreme Court's 24 September judgment restoring membership-register provisions of the Electoral Act 2026, which said those rules do not automatically disqualify individual candidates and left such questions to the Federal High Court.",
+   "state": "niger",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922304-2027-politics-watch-battle-for-place-on-ballot-kano-question-inec-yet-to-answer.html",
+   "published_at": "2026-11-03",
+   "language": "en"
+  },
+  {
+   "key": "nnpp-sues-inec-45-lawmakers",
+   "author": "m3",
+   "title": "NNPP sues INEC and 45 lawmakers who defected, asks court whether they can keep their seats",
+   "body": "The New Nigeria Peoples Party (NNPP) has sued INEC and 45 lawmakers elected on its platform in 2023 at the Federal High Court in Abuja. It wants the court to decide whether they can keep their seats after defecting to other parties.\n\nThe party alleges that some of the lawmakers did not follow the resignation procedure in its constitution, while others remained on its membership register even though they appear on INEC lists for other parties.\n\nThe suit follows a letter the party sent INEC on 19 October asking for an investigation. It relies on Sections 68 and 109 of the Constitution, which deal with when federal and state legislators lose their seats, and asks whether the relevant legislative authorities should declare the affected seats vacant.\n\nThe lawmakers have not yet responded in court.",
+   "state": "fct",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922590-2027-politics-watch-tuesdays-roundup-from-sokotos-security-row-to-zamfaras-rival-winners.html",
+   "published_at": "2026-11-04",
+   "language": "en"
+  },
+  {
+   "key": "police-warn-against-destroying-campaign-materials",
+   "author": "m3",
+   "title": "Police warn that anyone who destroys campaign posters or billboards will be prosecuted",
+   "body": "The Nigeria Police Force has warned politicians, thugs and others against destroying or defacing campaign posters, banners and billboards belonging to any candidate or party.\n\nThe police said political loyalty does not give anyone the right to decide whose campaign materials are displayed or removed, and that offenders will be arrested and prosecuted.\n\nInspector-General Olatunji Disu has directed Commissioners of Police in the 36 states and the FCT to take steps to prevent such incidents.\n\nOpposition parties in Edo had earlier complained that their billboards were being destroyed.",
+   "state": "",
+   "source_url": "https://www.vanguardngr.com/2026/11/police-warn-politicians-against-destroying-campaign-materials/",
+   "published_at": "2026-11-04",
+   "language": "en"
+  },
+  {
+   "key": "shettima-seeks-90-percent-ekiti",
+   "author": "m3",
+   "title": "Ekiti: Shettima asks voters for at least 90% of the vote for Tinubu on 16 January",
+   "body": "Vice-President Kashim Shettima has asked Ekiti voters to give President Tinubu at least 90 per cent of the vote in the 16 January presidential election. Tinubu received about 65 per cent of the state's valid votes in 2023.\n\nWole Oluyede, who ran for governor on the PDP platform in June, backed the campaign at the rally.\n\nAPC National Chairman Nentawe Yilwatda defended the administration's economic record, pointing to student loans and tax changes as benefits for households and businesses.\n\nThe target would mean adding about 25 percentage points to Tinubu's 2023 share in the state.",
+   "state": "ekiti",
+   "source_url": "https://www.premiumtimesng.com/news/more-news/923079-2027-politics-watch-from-atikus-court-setback-to-apcs-divided-loyalty.html",
+   "published_at": "2026-11-06",
+   "language": "en"
+  },
+  {
+   "key": "obi-kwankwaso-lagos-markets",
+   "author": "m3",
+   "title": "Obi and Kwankwaso take NDC mobilisation to Lagos; Kwankwaso visits Katangua market",
+   "body": "NDC presidential candidate Peter Obi and running mate Rabiu Kwankwaso took the party's mobilisation to Lagos for a town hall meeting and meetings with stakeholders.\n\nKwankwaso visited the busy Katangua Market in Alimosho, where he met traders and mobilisation groups; a widely shared video showed a large crowd chanting around him. Obi was accompanied by the NDC's Lagos governorship candidate, Funso Doherty, at a service of songs for a late friend at the Trade Fair market.\n\nThe Lagos visit came days after Obi's convoy was attacked in Calabar during the party's town hall there. The party said its activities would continue.\n\nA later NDC town hall in Oregun, Lagos, on 12 November was disrupted by suspected thugs.",
+   "state": "lagos",
+   "source_url": "https://www.channelstv.com/2026/11/06/obi-kwankwaso-take-ndc-mobilisation-to-lagos-visit-markets/",
+   "published_at": "2026-11-06",
+   "language": "en"
+  },
+  {
+   "key": "tinubu-uyo-obi-erosion-claim",
+   "author": "m3",
+   "title": "In Uyo, Tinubu says Obi failed on erosion in Anambra; record shows a World Bank project began",
+   "body": "At the APC rally in Uyo's Godswill Akpabio International Stadium, President Tinubu said Peter Obi failed to tackle erosion as governor of Anambra, contrasting it with his own record in Lagos. Vice-President Shettima accused Obi of using unreliable statistics, without naming a specific figure.\n\nObi's response to the Uyo remarks had not been confirmed by Friday night.\n\nThe record is more mixed than the claim suggests. As governor, Obi urged the World Bank in 2012 to speed up erosion-control work in the South-East, and the bank approved an erosion and watershed project that year, with Anambra among the first seven participating states. Whether that work went far enough is a matter of debate.",
+   "state": "akwa_ibom",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923342-2027-politics-watch-from-adcs-court-appeal-to-apgas-tinubu-endorsement.html",
+   "published_at": "2026-11-07",
+   "language": "en"
+  },
+  {
+   "key": "ekiti-opposition-politicians-back-tinubu",
+   "author": "m3",
+   "title": "Ekiti: politicians who ran for governor on opposition tickets pledge support for Tinubu",
+   "body": "Politicians who ran for governor in Ekiti State under the PDP, SDP and APM pledged support for President Tinubu's re-election at Thursday's APC rally in the state.\n\nThey made the pledges in their individual capacities, not on behalf of their parties. The reports did not name all of them or say how many took part.\n\nThis kind of personal endorsement differs from APGA's formal, party-level decision in Anambra to back Tinubu and field no presidential candidate.",
+   "state": "ekiti",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923342-2027-politics-watch-from-adcs-court-appeal-to-apgas-tinubu-endorsement.html",
+   "published_at": "2026-11-07",
+   "language": "en"
+  },
+  {
+   "key": "lagos-candidates-housing-plans",
+   "author": "m3",
+   "title": "Lagos 2027: candidates set out rival plans for affordable housing and rent",
+   "body": "Housing featured strongly in the plans Lagos governorship candidates presented at the 8 November debate, organised by a consortium of Vanguard, Channels Television, TVC News, Punch and TheCable.\n\nADC candidate Gbadebo Rhodes-Vivour proposed more than 100,000 housing units in his first four years, financed partly by taxing luxury property. APC candidate Obafemi Hamzat stressed continuing public housing delivery and mortgage finance. NDC candidate Funso Doherty argued for direct government involvement in the rental market and has elsewhere set a target of 150,000 units.\n\nThe candidates differ mainly on who pays: Rhodes-Vivour leans on new taxes and private partners, Hamzat on existing state programmes, and Doherty on a more active state role in renting.\n\nNone of the candidates gave a detailed costing for their targets.",
+   "state": "lagos",
+   "source_url": "https://www.nigeriahousingmarket.com/news/lagos-2027-governorship-candidates-housing-plans-affordable-homes",
+   "published_at": "2026-11-09",
+   "language": "en"
+  },
+  {
+   "key": "wike-n10m-pledge-councillors",
+   "author": "m3",
+   "title": "Wike promises ₦10 million to FCT councillors who deliver their wards for Tinubu",
+   "body": "FCT Minister Nyesom Wike has promised ₦10 million to councillors in the Federal Capital Territory who deliver their wards for President Bola Tinubu. He spoke at a Rainbow Coalition stakeholders' meeting held in Kwali Area Council and urged councillors to mobilise community leaders, youth groups and local associations.\n\nHis media aide, Lere Olayinka, confirmed the promise. APC National Chairman Nentawe Yilwatda defended it on Channels Television, saying he did not see it as vote-buying.\n\nNeither Wike nor the party said who would fund the payments, what would count as delivering a ward, or what the money would be used for.\n\nSection 125(1)(a) of the Electoral Act 2026 makes corrupt promises meant to induce votes an offence, while subsection (3) excludes genuine, lawful election expenses. The announcement alone does not establish that any offence was committed.",
+   "state": "fct",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924051-2027-politics-watch-from-inecs-1-6m-voter-register-clean-up-to-wikes-%E2%82%A610m-pledge.html",
+   "published_at": "2026-11-10",
+   "language": "en"
+  },
+  {
+   "key": "yobe-court-dismisses-suit-against-wali",
+   "author": "m3",
+   "title": "Yobe: court dismisses suit against Baba Malam Wali's APC governorship ticket",
+   "body": "Justice Fatima Murtala Amin, sitting in Damaturu, has dismissed a suit filed by Mustapha Maihaja challenging Baba Malam Wali's emergence as the APC governorship candidate in Yobe State.\n\nThe court held that the suit was filed outside the period the law allows. It also held that Maihaja's allegation of over-voting in the primary had not been proven.\n\nThe decision leaves Wali's nomination in place at the trial-court level. It can still be appealed.",
+   "state": "yobe",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924051-2027-politics-watch-from-inecs-1-6m-voter-register-clean-up-to-wikes-%E2%82%A610m-pledge.html",
+   "published_at": "2026-11-10",
+   "language": "en"
+  },
+  {
+   "key": "sdp-leadership-dispute-adebayo-candidacy",
+   "author": "m3",
+   "title": "SDP leadership dispute: rival statement says Adebayo was expelled; party presents him as candidate",
+   "body": "As the SDP inaugurated its presidential campaign council in Abuja, a statement on a website bearing the party's name disputed Prince Adewole Adebayo's status as its candidate.\n\nThat statement claimed Adebayo was expelled following resolutions at a National Executive Committee meeting and convention held on 20 May 2026, and that he was therefore never validly nominated. It contrasts with the event itself, where party chairman Abubakar Sadiq Gombe and others presented Adebayo as the candidate. Adebayo was returned unopposed at the SDP convention in Bauchi in May, and INEC lists him among the 18 presidential candidates.\n\nAt the event, Adebayo raised concerns about political intolerance, citing reports that opposition posters, flyers and billboards had been removed or restricted in Adamawa and other states.\n\nThe dispute adds the SDP to the list of parties with leadership quarrels before the election.",
+   "state": "fct",
+   "source_url": "https://blueprint.ng/2027-elections-ex-obidient-coordinator-tanko-dumps-ndc-for-sdp",
+   "published_at": "2026-11-12",
+   "language": "en"
+  },
+  {
+   "key": "apc-council-condemns-attacks-demands-arrests",
+   "author": "m3",
+   "title": "APC campaign council condemns attacks on rallies across party lines, asks police to make arrests",
+   "body": "The All Progressives Congress (APC) Presidential Campaign Council has condemned reported attacks on political gatherings in Edo, Cross River and Gombe states, as well as the disruption of a Nigeria Democratic Congress (NDC) town hall meeting in Lagos.\n\nIn a statement issued on Thursday and signed by its spokesperson, Dele Alake, the council said attacks on leaders and supporters of any party are unacceptable. It asked security agencies to be more responsive and alert, to prevent political violence, and to arrest and punish those responsible.\n\nIn Lagos, suspected hoodlums reportedly invaded the Classique Event Centre in Oregun and disrupted the NDC gathering. The NDC blamed the ruling party for that incident; no one has been charged.\n\nThe council urged parties, candidates and supporters to show restraint and to campaign on issues rather than incite violence.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924805-2027-politics-watch-political-violence-adcs-legal-internal-setback.html",
+   "published_at": "2026-11-13",
+   "language": "en"
+  },
+  {
+   "key": "obi-lagos-old-anthem",
+   "author": "m3",
+   "title": "Old anthem sung at Obi's Lagos town hall after thugs disrupted the venue",
+   "body": "Supporters at the NDC's Lagos town hall for Peter Obi on Thursday, 12 November, sang the former national anthem, 'Arise, O Compatriots', instead of 'Nigeria, We Hail Thee', which President Tinubu signed back into law in May 2024.\n\nThe event started after suspected thugs invaded the venue in Oregun and attacked people before Obi arrived; supporters fought them off, and reporters saw broken bottles, damaged vehicles and spent bullet shells. The NDC blamed the APC for the attack. That claim has not been proven, and no one has been charged.\n\nFCT Minister Nyesom Wike criticised Obi over the anthem choice, Channels Television reported. Obi's own comment on the anthem was not reported.\n\nA 2024 bill that would have punished refusal to recite the reinstated anthem with a ₦5 million fine or 10 years in prison was withdrawn in August 2024 after criticism from rights groups.",
+   "state": "lagos",
+   "source_url": "https://www.pulse.ng/story/peter-obi-ndc-old-national-anthem-lagos-2026111412253277514",
+   "published_at": "2026-11-14",
+   "language": "en"
+  },
+  {
+   "key": "atiku-bauchi-rally-subsidies",
+   "author": "m3",
+   "title": "Bauchi: Atiku promises to restore fuel and electricity subsidies at ADC rally",
+   "body": "ADC presidential candidate Atiku Abubakar has promised to restore fuel and electricity subsidies and tackle insecurity if elected in 2027, speaking at the party's rally in Bauchi State on Saturday, 14 November. He also said he would expand oil exploration in the Kolmani field.\n\nHe was joined by his running mate, Rotimi Amaechi, ADC chairman David Mark and the party's Bauchi governorship candidate, Senator Halliru Dauda Jika.\n\nAtiku has repeatedly promised to reverse the removal of the petrol subsidy, and in August questioned how the savings from the policy had been used. The APC argues that removing the subsidy was necessary to fix public finances.\n\nThe rally went ahead while the ADC's appeal against the judgment that voided its leadership, and the process that nominated Atiku, is pending.",
+   "state": "bauchi",
+   "source_url": "https://www.opinionnigeria.com/2027-atiku-vows-to-restore-fuel-electricity-subsidies-tackle-insecurity-if-elected/",
+   "published_at": "2026-11-14",
+   "language": "en"
+  },
+  {
+   "key": "adamawa-governorship-race-field",
+   "author": "m4",
+   "title": "Adamawa 2027: Fintiri's exit, Atiku and Ribadu's interests shape a crowded governorship race",
+   "body": "Governor Ahmadu Fintiri's second term ends in May, and his move from the PDP to the APC in February has strengthened the ruling party in a state it lost in 2019.\n\nFintiri and Atiku Abubakar allied under the PDP in 2023 but have since split. Atiku, now in the ADC, remains influential in his home state, while National Security Adviser Nuhu Ribadu's interests are tied to the APC's push.\n\nSix candidates believe they can win: Tijjani Galadima (APC), seen by analysts as the frontrunner; Abdulrahman Haske (APM), who left the APC after disputing its primary; Hamman Modibbo (ADC), whose ticket is contested in court by Umar Suleiman, who won the party's May primary; Aishatu Ahmed 'Binani' (NDC); Ishaku Abbo (Labour Party); and Maurice Vunobolki (PDP), who faces an internal challenge.\n\nPolitical scientist Mahdi Abba notes that the party Atiku backed has won the governorship in recent elections, but that voters have not always followed political godfathers. He also argues that four leading candidates sharing a similar support base could split their votes.",
+   "state": "adamawa",
+   "source_url": "https://www.premiumtimesng.com/investigationspecial-reports/915944-2027-fintiris-exit-atiku-ribadus-interests-set-stage-for-tight-adamawa-governorship-race.html",
+   "published_at": "2026-10-10",
+   "language": "en"
+  },
+  {
+   "key": "aac-requests-aso-villa-for-campaign-launch",
+   "author": "m4",
+   "title": "AAC asks Tinubu to let it inaugurate Sowore's campaign council at the Presidential Villa",
+   "body": "The African Action Congress (AAC) has written to President Tinubu asking to inaugurate the campaign council of its presidential candidate, Omoyele Sowore, at the Presidential Villa in Abuja on 11 November.\n\nIn a letter dated 21 October and signed by National Secretary Oshiokhue Ikpeminoghena, the party also asked for food, drinks and logistics for 5,000 participants, matching what it said had been provided to the APC when the ruling party inaugurated its own campaign council at the Villa.\n\nSowore said the request was about equal access: if the APC can hold party events at the Villa, which belongs to all Nigerians, other parties should be able to as well. APC National Secretary Ajibola Basiru criticised the request and questioned the AAC's electoral strength.\n\nReports did not say whether the Presidency replied to the request.",
+   "state": "fct",
+   "source_url": "https://www.icirnigeria.org/aac-writes-tinubu-seeks-presidential-villa-for-sowores-campaign-inauguration/",
+   "published_at": "2026-10-22",
+   "language": "en"
+  },
+  {
+   "key": "oyo-governorship-field-16-candidates",
+   "author": "m4",
+   "title": "Oyo 2027: 16 governorship candidates on the ballot, four seen as leading contenders",
+   "body": "INEC has cleared 16 candidates for the 2027 Oyo State governorship election.\n\nObservers see four as the main contenders: Senator Sharafadeen Alli of the APC; Bimbo Adekanmbi of the APM, who has the backing of outgoing Governor Seyi Makinde; broadcaster Oriyomi Hamzat of Accord, founder of Agidigbo FM; and Taofeek Adegboyega Adegoke of the ADC. The PDP's candidate is Hazeem Gbolarumi, and the NDC's is Yusuf Akin Adebola.\n\nAnalysts note that while Ibadan matters most, other blocs such as Ogbomoso, Oke-Ogun, Oyo town and Ibarapa can decide the race.\n\nThe governorship election holds on 6 February 2027.",
+   "state": "oyo",
+   "source_url": "https://www.thisdaylive.com/2026/10/31/2027-major-contenders-in-oyos-governorship-election/",
+   "published_at": "2026-10-31",
+   "language": "en"
+  },
+  {
+   "key": "accord-defends-nominations-secretary-suit",
+   "author": "m4",
+   "title": "Accord fights suit by its own national secretary seeking to disqualify all its candidates",
+   "body": "Accord's National Secretary, Adebukola Ajaja, has filed a suit asking the court to disqualify all the party's candidates. The dispute centres on who had authority to conduct and submit the party's nominations.\n\nAccord has filed a preliminary objection, arguing that she has no standing to bring the case and that it was filed outside the time allowed by law.\n\nSeparately, a Federal High Court judgment of 5 October ordered INEC to recognise Gbenga Olawepo-Hashim as Accord's presidential candidate. The preliminary objection does not affect that ruling.\n\nAccord is the party of Osun Governor Ademola Adeleke, who was re-elected on its platform in August.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922304-2027-politics-watch-battle-for-place-on-ballot-kano-question-inec-yet-to-answer.html",
+   "published_at": "2026-11-03",
+   "language": "en"
+  },
+  {
+   "key": "atiku-accuses-sss-sokoto-launch",
+   "author": "m4",
+   "title": "Atiku accuses SSS of recruiting protesters to disrupt Sokoto launch; SSS rejects the claim",
+   "body": "On Tuesday, 3 November, ADC presidential candidate Atiku Abubakar accused the State Security Service (SSS) of recruiting protesters to disrupt the party's campaign launch in Sokoto, set for the next day. He said the protests could give the APC-controlled state government grounds to impose a curfew.\n\nAtiku named an office behind a bank on Koko Road as an alleged assembly point, said trucks were moving protesters, and alleged that protesters were blocking traffic and harassing residents. Premium Times said it could not independently verify these claims.\n\nThe SSS rejected the allegation. Its spokesperson, Favour Dozie, said the Director-General had ordered an investigation. The service pointed to its protection of the ADC's Sokoto governorship candidate, Manir Dan'iya, during an attack on 31 October, and to its prosecution of a man accused of threatening Peter Obi, though it did not directly address the recruitment claim.",
+   "state": "sokoto",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922590-2027-politics-watch-tuesdays-roundup-from-sokotos-security-row-to-zamfaras-rival-winners.html",
+   "published_at": "2026-11-04",
+   "language": "en"
+  },
+  {
+   "key": "state-police-amendment-28-assemblies",
+   "author": "m4",
+   "title": "28 state assemblies approve state police amendment; bill heads to Tinubu for assent",
+   "body": "Twenty-eight state Houses of Assembly have approved a constitutional amendment that would allow states to set up their own police services. That is more than the 24 approvals required under Section 9 of the Constitution.\n\nThe Clerk to the National Assembly, Kamoru Ogunlana, said his office verified the resolutions and has started the administrative process of sending the bill to President Bola Tinubu for assent.\n\nUnder the proposal, governors would appoint state police commissioners on the recommendation of the relevant police service commission, subject to confirmation by the state legislature.\n\nThe amendment is not yet law. The remaining constitutional steps, including presidential assent, still have to be completed.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922590-2027-politics-watch-tuesdays-roundup-from-sokotos-security-row-to-zamfaras-rival-winners.html",
+   "published_at": "2026-11-04",
+   "language": "en"
+  },
+  {
+   "key": "ok-movement-disputes-distancing-claims",
+   "author": "m4",
+   "title": "OK Movement disputes claims that Obi and Kwankwaso have distanced themselves from it",
+   "body": "The OK Movement, a support group for the NDC's Peter Obi–Rabiu Kwankwaso ticket, has rejected claims that the two candidates have distanced themselves from it.\n\nIts UK coordinator, Adebayo Brown, accused some figures linked to the Obidient Movement and the NDC campaign of encouraging division between the support groups.\n\nRepresentatives of the campaign and the Obidient Movement dismissed the disagreement as a distraction, saying their focus remains on mobilising voters.\n\nThe row shows the challenge of coordinating the several volunteer networks that grew around Obi in 2023 and Kwankwaso's Kwankwasiyya movement now that both men share one ticket.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922590-2027-politics-watch-tuesdays-roundup-from-sokotos-security-row-to-zamfaras-rival-winners.html",
+   "published_at": "2026-11-04",
+   "language": "en"
+  },
+  {
+   "key": "calabar-convoy-attack-probe",
+   "author": "m4",
+   "title": "Calabar convoy attack: governor condemns it, state rejects APC link, one suspect held",
+   "body": "Cross River Governor Bassey Otu has condemned Wednesday's attack on Peter Obi's convoy in Calabar and directed security agencies to find those responsible.\n\nInformation Commissioner Ekpenyong Cobham rejected Obi's suggestion that the APC was involved and blamed internal disputes within the NDC. Police have not publicly identified the attackers or any party affiliation.\n\nA suspect arrested near the Watt Market roundabout remains in custody while investigators continue their work.\n\nNDC state chairman Goddie Akpama said the party chose to play the attack down after the governor apologised, to avoid raising tensions.",
+   "state": "cross_river",
+   "source_url": "https://www.premiumtimesng.com/news/more-news/923079-2027-politics-watch-from-atikus-court-setback-to-apcs-divided-loyalty.html",
+   "published_at": "2026-11-06",
+   "language": "en"
+  },
+  {
+   "key": "ibom-deep-seaport-approval-dispute",
+   "author": "m4",
+   "title": "Ibom Deep Seaport: Tinubu announces approval; NDC says it was approved years ago",
+   "body": "At the APC rally in Uyo, Governor Umo Eno asked President Tinubu to facilitate the Ibom Deep Seaport and pledged two million votes for him if the federal government did. Tinubu announced his approval of the request.\n\nThe NDC's National Publicity Secretary, Osa Director, said the port had already received federal approval under former President Buhari and asked what the new approval adds. Records of the Infrastructure Concession Regulatory Commission show that the Federal Executive Council approved the full business case on 16 December 2020, but that approval did not settle financing or construction. Officials then estimated the first phase at about $2 billion, with the state providing 40 per cent and a private partner the rest.\n\nEno describes the new decision as approval of the financing arrangements. The amount, terms, lenders and timetable have not been made public.\n\nThe NDC governorship candidate, Michael Enyong, says construction has not started, and has promised to move the port site from Ibeno to Ibaka and begin work within 90 days if elected.",
+   "state": "akwa_ibom",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923845-2027-politics-watch-atiku-fights-to-stay-on-ballot-tinubu-backers-claim-500-plus-vehicles.html",
+   "published_at": "2026-11-09",
+   "language": "en"
+  },
+  {
+   "key": "tinubu-backers-claim-500-vehicles",
+   "author": "m4",
+   "title": "Tompolo-linked group says it has handed out more than 500 vehicles for Tinubu's campaign",
+   "body": "The PBAT Door-to-Door Movement, associated with Government Ekpemupolo (Tompolo), says it has distributed more than 500 vehicles for grassroots mobilisation for President Tinubu across about 20 states. Its national coordinator, Sunday Asuku, announced a further tour of Enugu, Cross River, Bayelsa, Zamfara, Jigawa, Anambra, Kebbi and Abia from 9 to 14 November.\n\nEarlier, the group received 30 vehicles each in Osun and Imo, reportedly donated by Tompolo, and it deployed 26 each in Ondo and Gombe.\n\nThe 500-plus figure has not been independently verified, and a photo caption referred to 300 vehicles. No inventory showing costs, ownership, funding or recipients has been published.\n\nSection 93 of the Electoral Act 2026 requires parties to file audited election-expense returns within six months of an election. Whether these vehicles count as APC campaign spending depends on how they were financed and used.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923845-2027-politics-watch-atiku-fights-to-stay-on-ballot-tinubu-backers-claim-500-plus-vehicles.html",
+   "published_at": "2026-11-09",
+   "language": "en"
+  },
+  {
+   "key": "inec-polling-agent-deadline",
+   "author": "m4",
+   "title": "Parties have until 10 December to upload polling agents; ADC dispute raises access questions",
+   "body": "INEC's polling-agent portal issues access codes to each party's national chairman, who passes them to officials who then upload the details of the party's agents. The deadline is 10 December at 11:59 p.m. West Africa Time, ahead of the 16 January presidential election.\n\nPolling agents watch voting and counting at polling units on behalf of their parties, so a party without agents has no eyes on the count.\n\nThe ADC's leadership dispute could raise questions about which officials INEC will recognise for this process. There is no evidence so far that INEC has denied the ADC access or rejected any of its submissions.\n\nThe dispute could therefore affect more than Atiku Abubakar's place on the ballot.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923845-2027-politics-watch-atiku-fights-to-stay-on-ballot-tinubu-backers-claim-500-plus-vehicles.html",
+   "published_at": "2026-11-09",
+   "language": "en"
+  },
+  {
+   "key": "abba-atiku-haske-group-jigawa",
+   "author": "m4",
+   "title": "Jigawa: Abba Atiku leads his Haske group into the APC to back Tinubu",
+   "body": "Abba Atiku, a son of ADC presidential candidate Atiku Abubakar, led members of his Haske political organisation to Jigawa State ahead of President Tinubu's scheduled visit, and announced plans to fold the group's state structure into the APC to support Tinubu's re-election.\n\nHaske's Director-General, Usman Meyari, said the group was founded in 2019 to support Atiku Abubakar but has since decided to back Tinubu. He cited an informal understanding that presidential power rotates between the North and the South.\n\nGovernor Umar Namadi welcomed the delegation and pledged cooperation.\n\nThe announcement shows the group's declared alignment. It does not show how many members it has or how individual supporters will vote, and it does not represent Atiku Abubakar's position.",
+   "state": "jigawa",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924051-2027-politics-watch-from-inecs-1-6m-voter-register-clean-up-to-wikes-%E2%82%A610m-pledge.html",
+   "published_at": "2026-11-10",
+   "language": "en"
+  },
+  {
+   "key": "adebayo-says-sdp-will-defeat-anybody",
+   "author": "m4",
+   "title": "Adebayo says SDP can beat Tinubu, Atiku and Obi, promises to end terrorism within six months",
+   "body": "SDP presidential candidate Adewole Adebayo says he is confident of defeating President Tinubu, Atiku Abubakar and Peter Obi in a free and fair 2027 election.\n\nSpeaking on Channels Television's Politics Today on Monday, he said winning depends on convincing voters to back his plan and overcoming sentiment, apathy and voter fatigue.\n\nOn security, Adebayo promised that if elected, Nigerians would no longer see terrorists within six months, saying the armed forces have the capacity to achieve this with the right leadership.\n\nHe did not set out in the interview how the six-month target would be met or funded. Adebayo also ran on the SDP ticket in 2023.",
+   "state": "",
+   "source_url": "https://www.naijanews.com/2026/11/10/we-will-defeat-anybody-adebayo/",
+   "published_at": "2026-11-10",
+   "language": "en"
+  },
+  {
+   "key": "lagos-lp-candidate-faults-debate-exclusion",
+   "author": "m4",
+   "title": "Lagos: Labour Party candidate faults his exclusion from televised governorship debate",
+   "body": "The Labour Party's Lagos governorship candidate, Rotimi Odunaike, has criticised his exclusion, and that of several other candidates, from the governorship debate organised by the Nigeria Debate Consortium of TVC, Channels Television and other outlets.\n\nOnly four candidates took part in the 8 November debate: Obafemi Hamzat (APC), Funso Doherty (NDC), Gbadebo Rhodes-Vivour (ADC) and Deji Doherty (PDP).\n\nOdunaike later took part in the BusinessDay town hall on 13 November, which included six candidates.\n\nThe Labour Party's 2023 Lagos candidate, Rhodes-Vivour, came second in that election before moving to the ADC.",
+   "state": "lagos",
+   "source_url": "https://guardian.ng/?p=2952273",
+   "published_at": "2026-11-10",
+   "language": "en"
+  },
+  {
+   "key": "police-online-surveillance-fake-news",
+   "author": "m4",
+   "title": "Police say online monitoring before 2027 targets fake news and incitement, not criticism",
+   "body": "The Nigeria Police Force says it has stepped up monitoring of social media and other online channels ahead of the 2027 elections, but insists the aim is to stop fabricated reports and incitement that could trigger violence, not to silence criticism or legitimate journalism.\n\nInspector-General Olatunji Disu said fabricated reports, manipulated videos and inflammatory messages could undermine confidence in the electoral process, and that the monitoring focuses on deliberate fabrication and threats to public safety.\n\nAt the same event, Festus Fifen, chairman of a coalition of media and civil society groups, warned that fake reports and unverified rumours can be as dangerous as physical attacks because they can spark communal violence.",
+   "state": "",
+   "source_url": "https://thesun.ng/2027-police-say-online-surveillance-targets-fake-news-not-criticism/",
+   "published_at": "2026-11-12",
+   "language": "en"
+  },
+  {
+   "key": "dickson-alleges-plot-fake-security",
+   "author": "m4",
+   "title": "Dickson alleges plan to use fake security personnel to manipulate 2027 results, names no one",
+   "body": "Seriake Dickson, the NDC's National Leader and a former Bayelsa governor, has alleged that some people plan to manipulate the 2027 election results and deploy fake security personnel to intimidate voters.\n\nHe made the claim in a Facebook post on Thursday about a meeting with NDC youth and women leaders from wards in Ekeremor Local Government Area. He said he had warned party members about the alleged plans and asked them to stay vigilant.\n\nDickson did not identify the individuals or parties he says are involved, and no evidence was offered with the claim.\n\nHe urged citizens to resist malpractice and intimidation through lawful means, called on security agencies and INEC to act impartially, and told NDC members not to attack or insult political opponents.",
+   "state": "bayelsa",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924805-2027-politics-watch-political-violence-adcs-legal-internal-setback.html",
+   "published_at": "2026-11-13",
+   "language": "en"
+  },
+  {
+   "key": "lagos-businessday-town-hall-six-candidates",
+   "author": "m4",
+   "title": "Six Lagos governorship candidates face business leaders at BusinessDay town hall",
+   "body": "Six Lagos governorship candidates took questions from the organised private sector at a BusinessDay town hall on 13 November, covering the economy, security and their plans for the state.\n\nThey were Obafemi Hamzat (APC), Gbadebo Rhodes-Vivour (ADC), Adeyemi Doherty (PDP), Funso Doherty (NDC), Laja Adeoye (APM) and Rotimi Odunaike (Labour Party). The line-up was wider than at the 8 November televised debate, which featured four candidates; the Labour Party candidate had complained about being left out of that one.\n\nThe Nigerian Fact-checkers' Coalition checked claims made during the session. One it confirmed: Lagos has the highest number of registered voters in Nigeria, 7,488,633 according to INEC's October 2026 update.\n\nThe Lagos governorship election holds on 6 February 2027.",
+   "state": "lagos",
+   "source_url": "https://dubawa.org/nfc-live-fact-check-lagos-guber-candidates-debate-ahead-of-2027-election/",
+   "published_at": "2026-11-13",
+   "language": "en"
+  },
+  {
+   "key": "inec-irev-safeguard-bvas-850",
+   "author": "m4",
+   "title": "INEC: inaccurate polling-unit results will be blocked from IReV; fewer voters per BVAS",
+   "body": "INEC chairman Joash Amupitan has outlined new safeguards for the 2027 elections at a dialogue in London organised with the Kimpact Development Initiative.\n\nResults that are inaccurate at the polling unit, including figures that show over-voting, will be blocked from upload to the IReV results portal. Amupitan said INEC's review found the main problems in result management happen at collation centres, not polling units.\n\nThe maximum number of registered voters assigned to one BVAS device has dropped from 1,250 to 850, and polling units with more voters will get extra devices. INEC is also building climate-controlled storage across states and has bought more BVAS devices, after heat and storage problems caused malfunctions in 2023.\n\nThe nationwide mock accreditation on 28 November will test these systems ahead of the 16 January and 6 February polls.",
+   "state": "",
+   "source_url": "https://allafrica.com/stories/202611130235.html",
+   "published_at": "2026-11-13",
+   "language": "en"
+  },
+  {
+   "key": "court-orders-inec-publish-adebutu",
+   "author": "m4",
+   "title": "Ogun: court orders INEC to publish Adebutu as PDP governorship candidate; PDP urges compliance",
+   "body": "A court has ordered INEC to publish Ladi Adebutu's name as the PDP governorship candidate in Ogun State, reversing his exclusion from the ballot. The PDP has praised the judiciary and urged INEC to comply quickly.\n\nINEC left Adebutu and his running mate off the governorship list published on 10 October, leaving the PDP with no candidate among the 13 listed for Ogun. After reviewing petitions from parties, INEC restored some omitted candidates, such as Isa Pantami in Gombe, but not Adebutu. Questions had been raised about whether his name was on the party membership register submitted to INEC.\n\nThe Ogun PDP had blamed the omission on pressure from the ruling APC, a claim that has not been proven.\n\nINEC has not yet said whether it will appeal or update its list. Adebutu was runner-up in the 2023 Ogun governorship election.",
+   "state": "ogun",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/925024-2027-pdp-reacts-to-court-ruling-reinstating-adebutu-as-ogun-gov-candidate-urges-inec-to-comply.html",
+   "published_at": "2026-11-13",
+   "language": "en"
+  },
+  {
+   "key": "zamfara-ndc-lawal-insecurity",
+   "author": "m5",
+   "title": "Zamfara: NDC accuses Governor Lawal of failing his promise to end insecurity",
+   "body": "The NDC in Zamfara State has accused Governor Dauda Lawal of failing to keep his 2023 campaign promise to end insecurity.\n\nIn a rejoinder to an article by a government media aide, the party cited the recent killing of seven people in Kaura Namoda Local Government Area and alleged that the governor attended the APC presidential campaign flag-off in Kaduna instead of consoling victims. It also accused him of going quiet about federal security support after joining the APC.\n\nThe party defended its governorship aspirant, Senator Kabir Garba Marafa, over his statement that he would resign if he failed to tackle insecurity.\n\nThe state government has previously said security is improving and that it is working with federal agencies. Lawal and 14 other candidates signed a peace accord in Gusau in October.",
+   "state": "zamfara",
+   "source_url": "https://blueprint.ng/?p=856950",
+   "published_at": "2026-10-30",
+   "language": "en"
+  },
+  {
+   "key": "adc-ultimatum-daniya-convoy",
+   "author": "m5",
+   "title": "Sokoto: ADC gives 24-hour ultimatum over alleged attack on governorship candidate's convoy",
+   "body": "The ADC Presidential Campaign Council has demanded action within 24 hours against Sokoto Marshals personnel it accuses of attacking the convoy of its governorship candidate, Manir Muhammad Dan'iya.\n\nIn a Saturday statement signed by its Director of Media and Publicity, Kola Ologbondiyan, the council alleged that the personnel damaged vehicles, including the candidate's SUV, and detained two DSS operatives attached to him. The DSS has not confirmed that account. The party demanded the operatives' release, arrests and an investigation.\n\nDan'iya said the confrontation happened near Sokoto Airport at about 9 p.m. on Friday, 30 October, after he had accompanied former governor Aminu Tambuwal; some reports placed it on Thursday. He accused personnel of the Sokoto Marshals and the state Community Guard.\n\nThe Sokoto APC, through its chairman Haruna Adiya, rejected the allegations and said the security deployments were linked to preparations for a traditional title ceremony. Police spokesperson Ahmed Rufai said the command is investigating.",
+   "state": "sokoto",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/921852-2027-politics-watch-from-sokoto-ultimatum-to-conflicting-%E2%82%A650000-relief-terms-saturdays-roundup.html",
+   "published_at": "2026-11-01",
+   "language": "en"
+  },
+  {
+   "key": "abba-atiku-ten-buses-tinubu",
+   "author": "m5",
+   "title": "Abba Atiku launches pro-Tinubu group in Abuja, pledges 10 buses and a two-million-person march",
+   "body": "Abba Atiku Abubakar, a son of ADC presidential candidate Atiku Abubakar, unveiled the Haske Bola Tinubu Organisation at a press conference in Abuja.\n\nHe pledged 10 luxury buses for transport and campaign mobilisation, starting in the FCT, and announced a planned two-million-person march across the six geopolitical zones, beginning in Abuja. He cited student loans, infrastructure and other government programmes as his reasons for backing President Tinubu.\n\nAbba joined the APC and endorsed Tinubu in January, so this is about campaign mobilisation, not a new defection.\n\nReports did not confirm that the buses had been delivered.",
+   "state": "fct",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/921852-2027-politics-watch-from-sokoto-ultimatum-to-conflicting-%E2%82%A650000-relief-terms-saturdays-roundup.html",
+   "published_at": "2026-11-01",
+   "language": "en"
+  },
+  {
+   "key": "first-lady-renewed-hope-assistance",
+   "author": "m5",
+   "title": "First Lady announces ₦110m per senatorial district for elderly and disabled citizens",
+   "body": "On 29 October, First Lady Oluremi Tinubu announced Renewed Hope Initiative assistance for elderly citizens and persons with disabilities.\n\nThe allocation is ₦110 million per participating senatorial district, split into two ₦55 million parts. APC senatorial candidates were given coordination roles, although she said beneficiaries should not be chosen by party affiliation.\n\nThe stated payments of ₦200,000 each to 500 beneficiaries add up to ₦100 million, leaving ₦10 million in each district unexplained. A detailed budget would be needed to account for it.\n\nThe reports do not show that the aid depends on political support.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/headlines/922071-2027-politics-watch-sundays-roundup-atiku-challenges-tinubu-on-power-as-kwankwaso-tells-him-to-stand-down.html",
+   "published_at": "2026-11-02",
+   "language": "en"
+  },
+  {
+   "key": "factcheck-roundup-adelabu-kano-defection-videos",
+   "author": "m5",
+   "title": "Fact-check round-up: recycled videos of Adelabu, an Obi rally and a Kano 'defection' mislead voters",
+   "body": "DUBAWA has flagged several misleading election posts from the past week.\n\nA video shared on Facebook claimed former Power Minister Adebayo Adelabu recently urged Nigerians to reject the APC in 2027. The clip came from an older interview in which he discussed the challenges of campaigning for the party, and was presented out of context.\n\nAn X post claimed thousands of NDC members had just defected to the APC in Kano State, and another video was captioned as a live broadcast of a fresh campaign gathering in Owerri. Both were recycled or mislabelled footage.\n\nThe common pattern is old or edited video presented as new. Check the date of the original upload and whether credible outlets reported the event before you share.",
+   "state": "",
+   "source_url": "https://dubawa.org/round-up-obis-old-rally-adelabus-2022-interview-other-top-claims-fact-checked-last-week/",
+   "published_at": "2026-11-02",
+   "language": "en"
+  },
+  {
+   "key": "kebbi-denies-demolition-malami-property",
+   "author": "m5",
+   "title": "Kebbi government says demolition of property linked to Malami was a private land dispute",
+   "body": "Property linked to Abubakar Malami, the ADC governorship candidate in Kebbi State, was demolished, and his supporters allege the state government ordered it. The property is opposite a hotel on the Sani Abacha Bypass in Birnin Kebbi.\n\nThe Kebbi State Government denied the claim, saying it was a private land dispute being presented as political intimidation. A businessman, Umaru Gulumbe, has been named as another claimant to the land.\n\nThe ADC called for an independent investigation and insists the property was lawfully acquired and developed.\n\nNeither side's account so far shows who authorised the demolition; ownership records or a demolition notice would settle it.",
+   "state": "kebbi",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922304-2027-politics-watch-battle-for-place-on-ballot-kano-question-inec-yet-to-answer.html",
+   "published_at": "2026-11-03",
+   "language": "en"
+  },
+  {
+   "key": "edo-adc-ndc-demand-probe-attacks",
+   "author": "m5",
+   "title": "Edo: ADC and NDC jointly demand investigation into attacks on opposition supporters",
+   "body": "The ADC and the NDC held a joint press conference in Edo State alleging intimidation and attacks on opposition politicians and supporters.\n\nThey cited damage to an NDC office in Ikpoba-Okha, destroyed campaign billboards and a reported shooting in Igueben, and demanded investigations. Responsibility for these incidents has not been established.\n\nThe parties called for peaceful campaigning, but a former Owan West council chairman, Dan Asekhame, made remarks at the event invoking firearms against armed political opponents, which went against that message.\n\nPolice have not publicly identified suspects in the incidents.",
+   "state": "edo",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922590-2027-politics-watch-tuesdays-roundup-from-sokotos-security-row-to-zamfaras-rival-winners.html",
+   "published_at": "2026-11-04",
+   "language": "en"
+  },
+  {
+   "key": "delta-apc-campaign-oleh",
+   "author": "m5",
+   "title": "Delta APC flags off campaign in Oleh, sets two-million-vote target for Tinubu",
+   "body": "The APC in Delta State launched its 2027 campaign at Oleh Township Stadium in Isoko South on Thursday, 5 November.\n\nGovernor Sheriff Oborevwori, who led the PDP structure in the state into the APC, and his predecessor Ifeanyi Okowa urged party members to deliver more than two million votes for President Tinubu and the governor. Senator Ede Dafinone of Delta Central said the APC would win all five categories of elections in the state and described the opposition as already defeated.\n\nThe Director-General of the state campaign council, Senator James Manager, acknowledged the economic hardship Nigerians face but said federal reforms are beginning to show results. APC National Publicity Secretary Felix Morka compared the turnout to a national rally.\n\nThe NDC's governorship candidate in Delta has rejected the endorsements of Oborevwori, saying Deltans will choose their governor.",
+   "state": "delta",
+   "source_url": "https://allafrica.com/stories/202611060564.html",
+   "published_at": "2026-11-05",
+   "language": "en"
+  },
+  {
+   "key": "atiku-kebbi-rally-after-ruling",
+   "author": "m5",
+   "title": "Hours after court ruling, Atiku campaigns in Kebbi as Mark hands flag to Malami",
+   "body": "Atiku Abubakar opened his presidential campaign in Sokoto on Wednesday and addressed voters in Birnin Kebbi on Thursday, only hours after a Federal High Court judge in Abuja voided the process that produced his ticket.\n\nAt the ADC secretariat in Birnin Kebbi, party chairman David Mark presented the governorship flag to former Attorney-General Abubakar Malami. Atiku promised better security, job creation and the return of fuel subsidies, though the speech did not explain how a refinery-linked subsidy would lower pump prices.\n\nAviation Minister Festus Keyamo rejected claims that the APC was behind the ruling, arguing that Mark's camp took over the ADC without approval from its national executive or a convention. ADC spokesperson Bolaji Abdullahi accused the APC of trying to shut the party out of the election but offered no evidence linking it to the judgment.\n\nPeter Obi of the NDC said voters need certainty, that courts should resolve disputes, and that opposition participation needs more protection.",
+   "state": "kebbi",
+   "source_url": "https://www.premiumtimesng.com/news/more-news/923079-2027-politics-watch-from-atikus-court-setback-to-apcs-divided-loyalty.html",
+   "published_at": "2026-11-06",
+   "language": "en"
+  },
+  {
+   "key": "wike-defends-abuja-billboard-fees",
+   "author": "m5",
+   "title": "Wike defends high campaign billboard charges in Abuja, says parties can use social media",
+   "body": "FCT Minister Nyesom Wike has defended higher billboard charges in Abuja, saying the money helps fund roads and schools.\n\nHe argued that politics is expensive everywhere, denied that the charges target opposition parties, and suggested parties could reach voters through social media instead.\n\nThe defence came as the Nigeria Civil Society Situation Room raised concerns about very high presidential billboard fees in several states, warning they could limit parties' access to prominent sites. In Kogi, the state signage agency cut its fee from ₦150 million to ₦25 million in October after complaints from political stakeholders.\n\nCivil society groups want permit fees and site allocations to be published and applied equally to all parties.",
+   "state": "fct",
+   "source_url": "https://www.premiumtimesng.com/news/more-news/923079-2027-politics-watch-from-atikus-court-setback-to-apcs-divided-loyalty.html",
+   "published_at": "2026-11-06",
+   "language": "en"
+  },
+  {
+   "key": "ndc-candidate-bill-nysc-postings",
+   "author": "m5",
+   "title": "Edo NDC House candidate proposes bill to stop NYSC postings to insecure areas",
+   "body": "Efosa Omo-Osagie, the NDC candidate for Oredo Federal Constituency in Edo State, has proposed legislation to stop National Youth Service Corps (NYSC) members from being posted to areas threatened by terrorism or banditry. The bill would also penalise officials who ignore security advisories.\n\nThe NYSC Act currently gives the scheme's directorate authority over where corps members are deployed, so the proposal would limit that discretion.\n\nFor it to work, the bill would need to say who decides that a place is unsafe for postings and how often that list is reviewed.\n\nThe proposal comes as INEC plans to rely on corps members as ad hoc staff for the 2027 elections, and after INEC reported a plot to attack election workers.",
+   "state": "edo",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923342-2027-politics-watch-from-adcs-court-appeal-to-apgas-tinubu-endorsement.html",
+   "published_at": "2026-11-07",
+   "language": "en"
+  },
+  {
+   "key": "pdp-turaki-appeal-court",
+   "author": "m5",
+   "title": "PDP: Court of Appeal refuses to make INEC recognise Turaki-linked leadership",
+   "body": "On 4 November, the Court of Appeal upheld a decision refusing to compel INEC to recognise an interim PDP leadership linked to Kabiru Turaki.\n\nINEC's party directory lists Abdulrahman Mohammed, who leads the faction backed by FCT Minister Nyesom Wike, as the PDP's national chairman. INEC lists Sandy Onor as the party's presidential candidate.\n\nTuraki accused the APC of benefiting from court decisions against opposition factions; that allegation has not been proven. He also criticised Wike's Rainbow Coalition, whose members belong to different parties but back President Tinubu.\n\nThe ruling leaves the Wike-backed faction in control of the PDP's official records going into the elections.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923845-2027-politics-watch-atiku-fights-to-stay-on-ballot-tinubu-backers-claim-500-plus-vehicles.html",
+   "published_at": "2026-11-09",
+   "language": "en"
+  },
+  {
+   "key": "aregbesola-appeal-preserve-records",
+   "author": "m5",
+   "title": "Aregbesola files separate appeal, asks INEC to keep ADC leadership records unchanged",
+   "body": "Rauf Aregbesola, national secretary of the David Mark-led ADC leadership, has filed his own appeal against the 5 November Federal High Court judgment, and has asked INEC to preserve the party's leadership records until the appeal is decided.\n\nHis lawyer, Mohammed Sheriff (SAN), filed the notice of appeal on 6 November and an application to suspend enforcement of specified orders on 7 November. The appeal challenges the trial court's jurisdiction and its reading of the ADC constitution, arguing the court failed to distinguish between electing someone to fill a leadership vacancy and a temporary appointment the constitution allows. Sheriff also pointed to a 2 July judgment by Justice Musa Liman that found the leadership handover involving Ralph Nwosu, Mark and Aregbesola compliant.\n\nThe request to INEC cannot overturn the later judgment, and filing an appeal or a stay application does not automatically suspend a court order.\n\nSeparately, the ADC campaign alleged that its lawyers paid for certified copies on 5 and 6 November but did not receive them in time. INEC's chairman said the commission would not act on media reports and was waiting for a certified copy.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924051-2027-politics-watch-from-inecs-1-6m-voter-register-clean-up-to-wikes-%E2%82%A610m-pledge.html",
+   "published_at": "2026-11-10",
+   "language": "en"
+  },
+  {
+   "key": "ndc-deputy-publicity-secretary-resigns",
+   "author": "m5",
+   "title": "NDC deputy national publicity secretary quits, alleging exclusion; party says there is no crisis",
+   "body": "Abdulmumin Abdulsalami, the Deputy National Publicity Secretary of the Nigeria Democratic Congress (NDC), has resigned, citing what he described as injustice, exclusion and interference by influential officials.\n\nHe addressed the letter to NDC National Chairman Moses Cleopas and submitted it through his former ward chairman in Nagazi Ward, Adavi Local Government Area of Kogi State. He said his contributions increasingly clashed with the interests of some powerful members, described himself as a foundation member, and said he is returning to private life.\n\nAbdulsalami was earlier the party's pro-tem chairman in Kogi State and later served as Deputy National Director for Labour and Civil Society.\n\nThe party's National Publicity Secretary, Osa Director, dismissed suggestions of an internal crisis, saying one member's resignation does not mean the party is divided.",
+   "state": "kogi",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924805-2027-politics-watch-political-violence-adcs-legal-internal-setback.html",
+   "published_at": "2026-11-13",
+   "language": "en"
+  },
+  {
+   "key": "amupitan-chatham-house-loyalty-constitution",
+   "author": "m5",
+   "title": "Amupitan at Chatham House: INEC still recovering trust lost in 2023, denies running X account",
+   "body": "Speaking at Chatham House in London on Thursday, 12 November, INEC chairman Joash Amupitan said his loyalty is only to the Constitution, and acknowledged that controversies around the 2023 presidential election badly damaged public confidence in the commission, which has not fully recovered.\n\nHe named insecurity, logistics and result management as INEC's three priorities. He said INEC chose to upgrade its existing technology rather than introduce a new system, because of the limited time before the elections, and that it used recent off-cycle elections to find and fix weaknesses.\n\nAmupitan rejected allegations linking him to a controversial account on X, saying he never operated it; INEC called it digital impersonation and said the matter was reported to the DSS and the Inspector-General of Police.\n\nHe also said INEC has received a substantial part of its 2027 funding and that the Federal Government promised to release the balance, partly needed to pay ad hoc staff, before the end of November.",
+   "state": "",
+   "source_url": "https://www.channelstv.com/2026/11/13/2027-elections-my-loyalty-is-solely-to-the-constitution-says-inec-chairman-amupitan/",
+   "published_at": "2026-11-13",
+   "language": "en"
+  },
+  {
+   "key": "security-experts-warn-escalating-violence",
+   "author": "m5",
+   "title": "Security experts warn that attacks on party supporters are a warning sign for 2027",
+   "body": "Security experts have raised the alarm over rising attacks on party supporters ahead of the 2027 elections, warning that the incidents could escalate unless security agencies act decisively.\n\nA retired Commissioner of Police, Lawrence Alobi, said the attacks are warning signals of possible violence during the elections and urged the police, as the lead agency for election security, to start preparing now. A former Defence spokesman, Major General Chris Olukolade, described the pre-election violence as disturbing and called for swift action and training for officers on policing elections.\n\nInspector-General Olatunji Disu has vowed to arrest and prosecute politicians and influential people who sponsor electoral violence. Force spokesperson CSP Iniedu Anietie said commissioners in all commands have been told to strengthen security against political violence.\n\nThe National Peace Committee has also issued warnings about electoral violence.",
+   "state": "",
+   "source_url": "https://leadership.ng/2027-elections-attacks-on-party-supporters-raise-security-fears/",
+   "published_at": "2026-11-13",
+   "language": "en"
+  },
+  {
+   "key": "bakassi-deep-seaport-flag-off",
+   "author": "m5",
+   "title": "Tinubu flags off construction of $3.5bn Bakassi Deep Seaport in Cross River",
+   "body": "President Tinubu has flagged off construction of the $3.5 billion Bakassi Deep Seaport in Cross River State.\n\nGovernor Bassey Otu said the project faced political, environmental and legal obstacles before the current administration. The port is planned as a public-private partnership, and the Federal Executive Council approved it as one of three such projects in December 2025, after which it received a compliance certificate from the regulator.\n\nSupporters say the port would ease congestion at Lagos ports and give the East and the North a closer gateway.\n\nThe flag-off comes during the campaign season, as the APC seeks votes in the South-South. Cross River said in 2024 that it had secured funding support from Afreximbank for the project.",
+   "state": "cross_river",
+   "source_url": "https://www.premiumtimesng.com/business/business-news/925125-tinubu-flags-off-construction-of-3-5bn-bakassi-deep-seaport.html",
+   "published_at": "2026-11-14",
+   "language": "en"
+  },
+  {
+   "key": "rivers-19-governorship-candidates-cleared",
+   "author": "m6",
+   "title": "Rivers: INEC clears 19 governorship candidates, including Chinda, Lulu-Briggs and Pidomson",
+   "body": "INEC has published its final list of 19 candidates for the 2027 Rivers State governorship election.\n\nThe main contenders are Kingsley Chinda of the APC, a former House of Representatives Minority Leader who emerged after Governor Siminalayi Fubara and others withdrew from the party's race; Dumo Lulu-Briggs of the NDC; and Gabriel Pidomson Baritulem of the ADC, a former Secretary to the State Government. Other candidates include Ejekwu Soni (PDP), Boms Chima Ernest (Labour Party), Ben-Gurion J. Peter (SDP) and Idoniboye-Obu Omangima (APGA).\n\nThe list cleared doubts about whether some frontline candidates would be affected by the Supreme Court's ruling on party membership registers.\n\nThe governorship election holds on 6 February 2027.",
+   "state": "rivers",
+   "source_url": "https://www.channelstv.com/2026/10/10/inec-clears-chinda-lulu-briggs-pidomson-16-others-for-2027-rivers-governorship-race-full-list/",
+   "published_at": "2026-10-10",
+   "language": "en"
+  },
+  {
+   "key": "n50000-relief-conflicting-terms",
+   "author": "m6",
+   "title": "₦50,000 relief: minister says monthly, official FAQ says one-off; opposition calls it a gimmick",
+   "body": "Two official government sources describe a proposed ₦50,000 cash relief programme differently.\n\nHumanitarian Affairs Minister Bernard Doro said on 30 October that eligible households would receive ₦50,000 monthly. The programme's official FAQ, under the National Emergency Relief and Stabilisation Intervention (NERSI), describes the payment as one-off assistance. The government has not clarified which is correct. The FAQ says beneficiaries are chosen from verified records, including the National Social Register.\n\nADC spokesperson Bolaji Abdullahi called the payment an election gimmick and asked for accountability on earlier interventions. APM spokesperson Abubakar Yusuf called it vote-buying, while advising eligible Nigerians to accept the aid and still vote as they choose.\n\nQuestions remain about funding, how beneficiaries will be checked, and safeguards against political interference.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/921852-2027-politics-watch-from-sokoto-ultimatum-to-conflicting-%E2%82%A650000-relief-terms-saturdays-roundup.html",
+   "published_at": "2026-11-01",
+   "language": "en"
+  },
+  {
+   "key": "amupitan-south-south-readiness",
+   "author": "m6",
+   "title": "Port Harcourt: INEC warns attackers of election staff, says 57,000 new BVAS devices are coming",
+   "body": "At a South-South readiness meeting in Port Harcourt, INEC chairman Joash Amupitan warned that anyone who attacks election officials, including NYSC members, will face legal action. He said INEC is working with security agencies through the Inter-Agency Consultative Committee on Election Security, and warned his own staff against partisanship, negligence and financial misconduct.\n\nINEC is preparing its Bimodal Voter Accreditation System, including 57,000 newly procured devices, and auditing its electronic results systems. It has also finalised an agreement with maritime transporters to move staff and materials to riverine communities.\n\nAmupitan put the South-South's registered voters at 15,823,550, including 3,736,434 in Rivers State, and said the elections will hold as scheduled.",
+   "state": "rivers",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/921852-2027-politics-watch-from-sokoto-ultimatum-to-conflicting-%E2%82%A650000-relief-terms-saturdays-roundup.html",
+   "published_at": "2026-11-01",
+   "language": "en"
+  },
+  {
+   "key": "inec-admits-irregular-register-records",
+   "author": "m6",
+   "title": "INEC admits some registration officers added irregular records; calls grow for forensic audit",
+   "body": "INEC's ICT Director, Lawrence Bayode, has acknowledged that some registration officers introduced irregular records into the preliminary voters' register.\n\nThe admission led to calls for an independent forensic audit of the register and for those responsible to be named.\n\nINEC has promised corrections before it releases the final register on 15 December, but its account of the meeting did not announce an independent audit.\n\nThe commission later said it had removed about 1.6 million invalid records and referred 54 staff for disciplinary investigation.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/921852-2027-politics-watch-from-sokoto-ultimatum-to-conflicting-%E2%82%A650000-relief-terms-saturdays-roundup.html",
+   "published_at": "2026-11-01",
+   "language": "en"
+  },
+  {
+   "key": "leke-abejide-foundation-kano-programme",
+   "author": "m6",
+   "title": "Kano: Leke Abejide Foundation announces ₦600m loans and widows' programme at pro-Tinubu event",
+   "body": "The Leke Abejide Foundation has announced a ₦600 million programme in Kano State: ₦500 million in interest-free loans and ₦100 million for widows.\n\nThe announcement was made at an event linked to mobilisation for President Tinubu and APC candidates. Governor Abba Kabir Yusuf reportedly pledged another ₦100 million, and organisers discussed recruiting polling-unit coordinators from among the women taking part.\n\nThe reports do not show that the aid depends on political support, or that campaign-finance rules were broken.",
+   "state": "kano",
+   "source_url": "https://www.premiumtimesng.com/news/headlines/922071-2027-politics-watch-sundays-roundup-atiku-challenges-tinubu-on-power-as-kwankwaso-tells-him-to-stand-down.html",
+   "published_at": "2026-11-02",
+   "language": "en"
+  },
+  {
+   "key": "south-west-adc-rift-with-atiku",
+   "author": "m6",
+   "title": "South-West ADC: officials complain of being sidelined; regional leaders deny a rift with Atiku",
+   "body": "Some ADC officials in the South-West have complained that Atiku Abubakar's associates are organising campaign activities without involving the party's established structures. The concerns were raised at a 4 September meeting in Ibadan with national secretary Rauf Aregbesola, and Adewole Ijaogbomo, who chairs the ADC's local government chairmen in Lagos, alleged recognised officials were being sidelined.\n\nAtiku later asked for five nominees from each South-West state, but some officials say their complaints remain unresolved. His spokesperson, Phrank Shaibu, said none of the six South-West campaign councils had been inaugurated yet.\n\nNational Vice Chairman Akin Omole and the six South-West state chairmen then issued a joint statement backing Atiku. They denied holding a crisis meeting with him and said the Ibadan gathering dealt with organisation and mobilisation, not opposition to his candidacy.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922304-2027-politics-watch-battle-for-place-on-ballot-kano-question-inec-yet-to-answer.html",
+   "published_at": "2026-11-03",
+   "language": "en"
+  },
+  {
+   "key": "dickson-criticises-diri-move-to-apc",
+   "author": "m6",
+   "title": "Bayelsa: Dickson criticises successor Diri for moving from PDP to APC",
+   "body": "Former Bayelsa governor Seriake Dickson has criticised his successor, Governor Douye Diri, for leaving the PDP for the APC.\n\nSpeaking during activities linked to NDC presidential candidate Peter Obi's visit to the state, Dickson accused Diri of abandoning the party that brought him to office and urged voters to reject the APC in 2027.\n\nAn aide to the governor reportedly declined to respond.\n\nDickson, now the NDC's National Leader, backed Diri's rise in 2019, so the split marks a significant change in Bayelsa's political alignment ahead of the elections.",
+   "state": "bayelsa",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922304-2027-politics-watch-battle-for-place-on-ballot-kano-question-inec-yet-to-answer.html",
+   "published_at": "2026-11-03",
+   "language": "en"
+  },
+  {
+   "key": "kano-apc-challenges-kwankwaso-prove-claim",
+   "author": "m6",
+   "title": "Kano APC denies role in NDC candidate's exclusion, challenges Kwankwaso to show evidence",
+   "body": "The APC in Kano State has dismissed Senator Rabiu Kwankwaso's allegation that the party and its governorship candidate, Governor Abba Kabir Yusuf, are behind moves to keep the NDC's candidate, Aminu Abdussalam Gwarzo, off INEC's list.\n\nIn a statement by state chairman Umar Haruna-Doguwa, the party called the allegation false and an attempt at blackmail. It said the court case was filed by NDC members against their own party, not by the APC, its candidate or the state government, and that neither the party nor the governor sponsored or influenced it.\n\nThe party said the judiciary is independent and challenged Kwankwaso, the NDC's vice-presidential candidate, to produce credible evidence for his claim.\n\nGwarzo was Yusuf's deputy until he resigned in March after the governor left the NNPP for the APC.",
+   "state": "kano",
+   "source_url": "https://www.vanguardngr.com/2026/11/kano-apc-dismisses-kwankwasos-allegation-over-missing-ndc-guber-candidates-name/",
+   "published_at": "2026-11-03",
+   "language": "en"
+  },
+  {
+   "key": "igp-says-police-ready-for-2027",
+   "author": "m6",
+   "title": "IGP Disu says police are ready to secure the 2027 elections 'even if they start tomorrow'",
+   "body": "Inspector-General of Police Olatunji Disu says the Nigeria Police Force is fully prepared to secure the 2027 elections, even if they were to start immediately.\n\nHe said the force has intensified training and retraining of officers to handle election security professionally, drawing lessons from recent off-cycle elections, and is working with the Army, the Civil Defence Corps, Customs, Immigration and the DSS.\n\nA visiting partner urged the police to stay neutral and professional during the elections, warning against actions that could undermine public confidence.\n\nThe assurance came days before a wave of attacks on campaign events in several states, which the IGP has since promised to investigate.",
+   "state": "",
+   "source_url": "https://www.vanguardngr.com/2026/11/were-ready-for-2027-elections-igp-disu/",
+   "published_at": "2026-11-03",
+   "language": "en"
+  },
+  {
+   "key": "sokoto-seals-building-used-by-adc",
+   "author": "m6",
+   "title": "Sokoto government seals building used by ADC, citing security and unclear ownership",
+   "body": "The Sokoto State Government has sealed a building on Ahmadu Bello Way that the ADC and other parties had used, citing security concerns.\n\nCommissioner for Lands and Housing Nasiru Dantsoho said records name the defunct Savannah Bank as the owner, with no documented transfer, and that the government has asked the Nigeria Deposit Insurance Corporation (NDIC) to clarify ownership.\n\nAtiku's campaign spokesperson, Phrank Shaibu, accepted that the bank owned the property but challenged the government's authority to close it, saying parties had used it for about two decades, most recently the PDP. He said he visited on Tuesday morning and met no physical restriction, and that the campaign had reported threats to the police, DSS and Civil Defence.\n\nADC National Publicity Secretary Bolaji Abdullahi warned the state government not to interfere with opposition campaigns.",
+   "state": "sokoto",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922590-2027-politics-watch-tuesdays-roundup-from-sokotos-security-row-to-zamfaras-rival-winners.html",
+   "published_at": "2026-11-04",
+   "language": "en"
+  },
+  {
+   "key": "sowore-supporters-protest-police-hq",
+   "author": "m6",
+   "title": "Sowore and supporters protest at police headquarters over Ado-Ekiti incident; 11 arrested",
+   "body": "Omoyele Sowore, the African Action Congress (AAC) presidential candidate, and his supporters protested at the police headquarters in Abuja, demanding prosecution of those who attacked his team at a restaurant in Ado-Ekiti on the night of Friday, 30 October.\n\nSowore accused security personnel of involvement. The AAC rejected the police's description of the incident as an altercation, alleged government involvement, and called for an independent inquiry and the release of CCTV footage.\n\nEkiti police spokesperson Abutu Sunday said 11 suspects were arrested in Atikankan at about 10 p.m. that Friday, and that investigators are working out each suspect's role. The police statement did not name any political sponsor or establish who was responsible. The SSS said it is waiting for the police findings.\n\nADC presidential candidate Atiku Abubakar also condemned the incident and called for an investigation.",
+   "state": "ekiti",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922590-2027-politics-watch-tuesdays-roundup-from-sokotos-security-row-to-zamfaras-rival-winners.html",
+   "published_at": "2026-11-04",
+   "language": "en"
+  },
+  {
+   "key": "adc-asks-inec-to-hold-off-ruling",
+   "author": "m6",
+   "title": "ADC lawyers ask INEC to hold off on implementing judgment that voided Atiku's nomination",
+   "body": "Lawyers for the ADC have asked INEC not to implement the judgment that voided Atiku Abubakar's presidential nomination until their appeal is decided.\n\nTheir letter, dated 6 November and stamped as received by the INEC chairman's office the same day, says the party has filed a notice of appeal and an application for a stay. Counsel Shaibu Enejoh Aruwa (SAN) noted that the Federal High Court had not yet heard the stay motion.\n\nJustice Peter Lifu ruled that the David Mark-led caretaker leadership was unlawfully constituted and told INEC to disregard decisions of the party's 99th National Executive Committee meeting and later acts, including its presidential, governorship and legislative nominations. The claimant, Nafiu Bala Gombe, argues the party constitution made him the rightful successor to former chairman Ralph Nwosu.\n\nNo stay order had been confirmed as of Friday night, and the suit number in the letter differs from the one in an earlier ruling in the case.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923342-2027-politics-watch-from-adcs-court-appeal-to-apgas-tinubu-endorsement.html",
+   "published_at": "2026-11-07",
+   "language": "en"
+  },
+  {
+   "key": "adc-chairmen-forum-portal-protest-threat",
+   "author": "m6",
+   "title": "ADC state chairmen forum asks INEC to reopen nomination portal, threatens protests",
+   "body": "Kennedy Odion, secretary of the ADC NEC Chairmen Forum, has asked INEC to reopen its nominations portal so the party can submit names after any fresh primaries. The forum, which backs the faction that won the court case, threatened nationwide protests if INEC does not act.\n\nINEC, meanwhile, disowned a viral poster claiming it had reaffirmed David Mark's leadership, saying the poster misused its logo and a photo of National Commissioner Mohammed Kudu Haruna. Haruna said the commission had not received a certified copy of the judgment and had not discussed the case.\n\nAs of Saturday, 7 November, INEC's party directory still listed Mark as national chairman and Rauf Aregbesola as national secretary.\n\nThe competing demands leave INEC between an appeal by the Mark-led leadership and pressure from the faction that won at the trial court.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923342-2027-politics-watch-from-adcs-court-appeal-to-apgas-tinubu-endorsement.html",
+   "published_at": "2026-11-07",
+   "language": "en"
+  },
+  {
+   "key": "ypp-patience-key-coalition-conditions",
+   "author": "m6",
+   "title": "YPP running mate says opposition parties must agree a written programme before any joint ticket",
+   "body": "Patience Key, the Young Progressives Party's (YPP) vice-presidential candidate, says opposition parties considering a joint ticket should first agree on how they would govern.\n\nShe proposed a written programme stating what the parties would fund, who would carry it out, and when voters could expect results, to be agreed before the parties choose a common candidate.\n\nHer proposal turns the usual coalition debate around: instead of starting with who leads, it starts with a shared plan.\n\nWith 18 presidential candidates on the January ballot, talk of opposition alliances continues, but no joint ticket has been formed.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923342-2027-politics-watch-from-adcs-court-appeal-to-apgas-tinubu-endorsement.html",
+   "published_at": "2026-11-07",
+   "language": "en"
+  },
+  {
+   "key": "factcheck-ai-image-kaduna-apc-rally",
+   "author": "m6",
+   "title": "Fact-check: viral photo of 'massive' APC crowd in Kaduna was AI-generated",
+   "body": "A Facebook user shared an image said to show a huge crowd of supporters at an APC campaign rally in Kaduna State ahead of the 2027 elections, and many users shared it as evidence of the party's growing mobilisation.\n\nThe fact-checking organisation DUBAWA examined the image and found that it was generated with artificial intelligence.\n\nAI-made crowd pictures are spreading for all parties. Before sharing a rally photo, check whether reliable outlets carried it, look for odd details such as warped faces, signs or limbs, and run a reverse image search.",
+   "state": "kaduna",
+   "source_url": "https://dubawa.org/weekly-round-up-top-eight-claims-dubawa-fact-checked-last-week/",
+   "published_at": "2026-11-08",
+   "language": "en"
+  },
+  {
+   "key": "kebbi-apc-council-jigawa-target",
+   "author": "m6",
+   "title": "Kebbi inaugurates APC campaign council; Jigawa governor promises two million votes",
+   "body": "Kebbi Governor Nasir Idris inaugurated the APC's state campaign council on Sunday, days after Atiku Abubakar campaigned in Birnin Kebbi. In 2023, Atiku won Kebbi with 285,175 votes to Tinubu's 248,088.\n\nIn neighbouring Jigawa, Governor Umar Namadi said the APC could deliver two million votes for President Tinubu in 2027.\n\nFor comparison, Jigawa cast 954,805 votes in total in the 2023 presidential election, when Tinubu won 421,390 there. A two-million target would need far higher turnout than 2023, not just a bigger share.",
+   "state": "kebbi",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923845-2027-politics-watch-atiku-fights-to-stay-on-ballot-tinubu-backers-claim-500-plus-vehicles.html",
+   "published_at": "2026-11-09",
+   "language": "en"
+  },
+  {
+   "key": "kwankwaso-dutse-2023-alliance",
+   "author": "m6",
+   "title": "In Dutse, Kwankwaso revisits failed 2023 alliance with Obi",
+   "body": "Campaigning for the NDC in Dutse, Jigawa State, vice-presidential candidate Rabiu Kwankwaso revisited his failure to reach an alliance with Peter Obi before the 2023 election.\n\nIn 2023 the two contested separately, Obi for the Labour Party and Kwankwaso for the NNPP. They now share the NDC presidential ticket.\n\nAtiku Abubakar is still running separately on the ADC platform, so this pairing is only one of several opposition arrangements in the race.",
+   "state": "jigawa",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923845-2027-politics-watch-atiku-fights-to-stay-on-ballot-tinubu-backers-claim-500-plus-vehicles.html",
+   "published_at": "2026-11-09",
+   "language": "en"
+  },
+  {
+   "key": "gombe-apc-campaign-pdp-rally",
+   "author": "m6",
+   "title": "Gombe: APC to launch campaign on 14 November, calls Pantami's candidacy illegitimate",
+   "body": "The Gombe State APC says it will launch its governorship campaign on 14 November, as the PDP prepared a large rally for its candidate, former minister Isa Ali Pantami.\n\nAPC Publicity Secretary Usman Murtala said the party has set up its campaign council and committees, and will go from community to community on the record of Governor Muhammadu Inuwa Yahaya in roads, healthcare and security. He described Pantami as an illegitimate candidate and said he should await a court decision before campaigning.\n\nINEC has cleared Pantami and listed him as the PDP's governorship candidate after reviewing his initial omission.\n\nPantami won the PDP ticket in May, saying Gombe has a poverty rate of about 74.5 per cent and that he would tackle it through education and smart agriculture. The APC candidate is Jamilu Gwamna.",
+   "state": "gombe",
+   "source_url": "https://leadership.ng/gombe-2027-pdp-plans-mega-rally-for-pantami-apc-says-opposition-have-no-candidate/",
+   "published_at": "2026-11-10",
+   "language": "en"
+  },
+  {
+   "key": "uzodimma-okorocha-feud-imo-west",
+   "author": "m7",
+   "title": "Imo: pro-Tinubu group warns Uzodimma–Okorocha Senate feud could hurt APC in the South-East",
+   "body": "The Renewed Hope Foot Soldiers for Tinubu, led by Gbenga Owojori, has warned that the dispute between Governor Hope Uzodimma and former governor Rochas Okorocha over the Imo West Senate ticket could weaken APC unity and hurt President Tinubu's campaign in the South-East.\n\nThe warning followed a Federal High Court ruling directing the APC to submit Okorocha's name as its candidate for Imo West. The group argued that Uzodimma should also have a fair chance to pursue his Senate ambition.\n\nUzodimma's camp has announced plans to challenge the judgment. It was not confirmed that an appeal had been filed or that the ruling had been stayed.",
+   "state": "imo",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/921852-2027-politics-watch-from-sokoto-ultimatum-to-conflicting-%E2%82%A650000-relief-terms-saturdays-roundup.html",
+   "published_at": "2026-11-01",
+   "language": "en"
+  },
+  {
+   "key": "bayelsa-pdp-apc-clash-diri",
+   "author": "m7",
+   "title": "Bayelsa: PDP and APC chairmen clash over Governor Diri's role in Tinubu campaign",
+   "body": "Bayelsa PDP chairman George Turnah has questioned Governor Douye Diri's participation in President Tinubu's campaign activities, after the governor's move from the PDP to the APC.\n\nThe state APC chairman, Warman Weri Ogoriba, rejected the criticism, saying the governor has shown his support through public engagements.\n\nThe exchange reflects how the governor's defection has reshaped Bayelsa politics, with former governor Seriake Dickson now leading the NDC and the PDP left without the state government behind it.",
+   "state": "bayelsa",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/921852-2027-politics-watch-from-sokoto-ultimatum-to-conflicting-%E2%82%A650000-relief-terms-saturdays-roundup.html",
+   "published_at": "2026-11-01",
+   "language": "en"
+  },
+  {
+   "key": "atiku-challenges-apc-electricity-record",
+   "author": "m7",
+   "title": "Atiku and APC clash over Tinubu's electricity record; Atiku proposes ending tariff bands",
+   "body": "ADC presidential candidate Atiku Abubakar has challenged the APC's defence of President Tinubu's electricity record and proposed replacing the tariff-band system with pricing tied to the electricity customers actually receive.\n\nAPC spokesperson Dele Alake said Tinubu's pledge on power should be read together with his undertaking to explain any shortfall before seeking a second term. The APC pointed to the Electricity Act 2023, metering, transmission investment, state regulatory reforms and a ₦4 trillion bond to settle verified legacy power-sector debts, and said over 1.5 million customers have been metered.\n\nAtiku's spokesperson, Phrank Shaibu, said homes and businesses remain in darkness despite the paperwork. Atiku said Band A customers often paid about ₦209.50 per kWh before VAT despite unreliable supply, and questioned the reported plan to end subsidies from 2027.\n\nHis proposal came without a tariff formula, subsidy plan or cost estimate.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/headlines/922071-2027-politics-watch-sundays-roundup-atiku-challenges-tinubu-on-power-as-kwankwaso-tells-him-to-stand-down.html",
+   "published_at": "2026-11-02",
+   "language": "en"
+  },
+  {
+   "key": "rivers-citizens-charter-apc-ndc-absent",
+   "author": "m7",
+   "title": "Rivers: APC and NDC candidates explain why they missed citizens' charter signing",
+   "body": "Five governorship candidates in Rivers State signed a 13-point Citizens' Charter of Demands organised by the Rivers Peace Initiative, but the APC candidate, Kingsley Chinda, and the NDC candidate, Dumo Lulu-Briggs, did not attend. Both are seen as frontline contenders.\n\nAPC spokesperson Chibike Ikenga said Chinda was not invited and questioned the organisers' process. An ally of Chinda said she did not know whether he received an invitation, and described the charter as not binding on the people of the state.\n\nThe NDC campaign's spokesperson said Lulu-Briggs had a party rally in Yenagoa, Bayelsa, the same day, and declined to send his deputy instead.\n\nThe convener, Obinna Ebogidi, said invitations went to all candidates, and that both can still sign separately. Neither campaign said it opposes the charter.",
+   "state": "rivers",
+   "source_url": "https://leadership.ng/rivers-2027-apc-ndc-governorship-candidates-explain-why-they-missed-citizens-charter-event/",
+   "published_at": "2026-11-03",
+   "language": "en"
+  },
+  {
+   "key": "kano-inec-cites-court-order-ndc-ticket",
+   "author": "m7",
+   "title": "Kano: INEC says court order stops it publishing NDC governorship ticket",
+   "body": "INEC has cited a Federal High Court order to explain why it cannot publish the names of the NDC's Kano governorship candidate, Aminu Abdussalam Gwarzo, and his running mate, Mustapha Kwankwaso.\n\nThe pair were missing from the governorship list INEC published on 10 October. The NDC said officials initially blamed a computer problem. A suit (FHC/KN/CS/440/2026) was later filed by three party members against INEC and the NDC, and Justice Samuel Amobeda issued an interim order restraining publication pending further hearing. INEC has acknowledged that Gwarzo met its nomination requirements, and its updated list marks both NDC slots as 'Court Order'.\n\nGwarzo questions why his name was missing before the order existed. The NDC has gone to the Federal High Court in Abuja to compel INEC to list its ticket and plans to challenge the Kano order.\n\nRabiu Kwankwaso accused the APC and allies of Governor Abba Yusuf of trying to exclude the ticket. Kano APC chairman Umar Doguwa denied this, calling it an internal NDC dispute.",
+   "state": "kano",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/922590-2027-politics-watch-tuesdays-roundup-from-sokotos-security-row-to-zamfaras-rival-winners.html",
+   "published_at": "2026-11-04",
+   "language": "en"
+  },
+  {
+   "key": "wike-tells-lulu-briggs-kinsmen",
+   "author": "m7",
+   "title": "Rivers: Wike tells Lulu-Briggs' kinsmen their son cannot win under the NDC",
+   "body": "FCT Minister Nyesom Wike has told the people of Abonnema, home community of the NDC governorship candidate in Rivers State, Dumo Lulu-Briggs, that their son cannot win the 2027 election on the NDC platform.\n\nSpeaking at a town hall meeting in Abonnema, Akuku-Toru Local Government Area, on Thursday, Wike said he understood their wish to see their son become governor but urged them to be realistic. He asked them to back the APC candidate, Kingsley Chinda, noting that Chinda's running mate is also from their community.\n\nThe NDC has not responded to the remarks. Lulu-Briggs is among 19 governorship candidates INEC cleared in Rivers.",
+   "state": "rivers",
+   "source_url": "https://www.naijanews.com/2026/11/06/rivers-son-win-wike-lulu-briggs-kinsmen/",
+   "published_at": "2026-11-06",
+   "language": "en"
+  },
+  {
+   "key": "inec-plot-to-kidnap-ad-hoc-staff",
+   "author": "m7",
+   "title": "INEC raises alarm over plot to kidnap election workers; suspects charged",
+   "body": "INEC chairman Joash Amupitan says intelligence operations uncovered a plot to threaten, intimidate and kidnap ad hoc election staff, including NYSC members, ahead of the 2027 elections.\n\nSpeaking at the North-Central zonal readiness assessment in Lokoja, he said suspected masterminds were arrested and taken to court through the DSS, and warned that anyone who threatens or harms election personnel will face the full weight of the law. He also warned INEC staff against partisan conduct and negligence.\n\nAmupitan said credible elections cannot be achieved through last-minute arrangements, and that INEC is working with security agencies through the Inter-Agency Consultative Committee on Election Security.\n\nINEC expects to manage over 103 million registered voters across 176,846 polling units. The final register will be published on 15 December after corrections.",
+   "state": "kogi",
+   "source_url": "https://tribuneonlineng.com/2027-elections-inec-raises-alarm-over-plot-to-kidnap-electoral-workers/",
+   "published_at": "2026-11-06",
+   "language": "en"
+  },
+  {
+   "key": "atiku-vows-to-stay-apc-denies-role",
+   "author": "m7",
+   "title": "Atiku says he is staying in the race; APC denies any role in the ADC court case",
+   "body": "In a statement dated 6 November, Atiku Abubakar said he remains in the 2027 presidential race and that his campaign will keep its focus on food prices, fuel costs and insecurity.\n\nHe accused the Tinubu administration of using the courts to limit electoral competition, but offered no evidence of influence. ADC spokesperson Bolaji Abdullahi said the party will keep its campaign organisation in place.\n\nAPC National Publicity Secretary Felix Morka denied that his party had any role in the case. He said the suit grew out of an internal ADC dispute over how the Mark-led group took control, and urged the ADC to appeal and settle its leadership crisis.\n\nINEC's published candidate list still names Atiku and his running mate, Rotimi Amaechi, while the appeal is pending.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923342-2027-politics-watch-from-adcs-court-appeal-to-apgas-tinubu-endorsement.html",
+   "published_at": "2026-11-07",
+   "language": "en"
+  },
+  {
+   "key": "factcheck-galadima-claims",
+   "author": "m7",
+   "title": "Fact-check: no evidence for claim that Tinubu met INEC chairman in France",
+   "body": "NNPP chieftain Buba Galadima alleged on Channels Television's Politics Today that President Tinubu held a private meeting in France with the INEC chairman and other prominent Nigerians, and suggested it could have implications for the 2027 elections.\n\nDUBAWA found no evidence to support the allegation.\n\nGaladima also claimed that Nigerians aged 18 to 35 make up 65 per cent of registered voters, describing them as a major voting bloc. Young people are a large share of the register, but exact proportions depend on INEC's published breakdown, which voters can check.\n\nINEC has repeatedly said it has no candidate and no party in the election.",
+   "state": "",
+   "source_url": "https://dubawa.org/weekly-round-up-top-eight-claims-dubawa-fact-checked-last-week/",
+   "published_at": "2026-11-08",
+   "language": "en"
+  },
+  {
+   "key": "rail-inaugurations-proposed-3-december",
+   "author": "m7",
+   "title": "APC campaign proposes 3 December to inaugurate Kaduna–Kano and Kano–Maradi rail sections",
+   "body": "The APC Presidential Campaign Council has proposed 3 December as the date to inaugurate two rail sections: the 190 km Jaji–Kano section of the Kaduna–Kano railway, and the 250 km Dawanu–Kano–Kazaure–Daura–Katsina section of the Kano–Maradi line.\n\nThe council put completion at about 90 per cent for Kaduna–Kano and 70 per cent for Kano–Maradi. The transport ministry had earlier named December as its commissioning target.\n\nAn inauguration does not confirm when regular passenger services will begin. The proposed date is about six weeks before the 16 January presidential election.",
+   "state": "kano",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/923845-2027-politics-watch-atiku-fights-to-stay-on-ballot-tinubu-backers-claim-500-plus-vehicles.html",
+   "published_at": "2026-11-09",
+   "language": "en"
+  },
+  {
+   "key": "reps-probe-attacks-on-rallies",
+   "author": "m7",
+   "title": "House of Reps sets up committee to probe attacks on political rallies, report due in three weeks",
+   "body": "The House of Representatives on Thursday, 12 November, adopted without debate a motion on rising violence during political campaigns, sponsored by Minority Leader Frederick Agbedi (PDP, Bayelsa) and 16 other lawmakers.\n\nThe House condemned violence, intimidation, assault and destruction of property linked to political rallies, whatever the party, and urged parties and candidates to avoid inflammatory language and cooperate with security agencies.\n\nThe motion cited disrupted meetings in Enugu on 12 September, where one person was allegedly killed; an attack on APC supporters travelling to a Katsina rally on 28 October, after which 14 suspects were arrested; violence at an APC rally in Lafia, Nasarawa, on 4 November; and an attack on a procession in Asaba on 7 November that left one dead and five injured. Violence in Calabar was also raised.\n\nA committee drawn from the Police Affairs and National Security committees, headed by a principal officer, will investigate the causes and report within three weeks. Agbedi warned against blaming anyone before impartial inquiries are complete.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/924680-2027-reps-to-probe-attacks-on-political-rallies-supporters.html",
+   "published_at": "2026-11-12",
+   "language": "en"
+  },
+  {
+   "key": "tinubu-orders-crackdown-thuggery",
+   "author": "m7",
+   "title": "Tinubu orders security agencies to crack down on political thuggery",
+   "body": "President Bola Tinubu has directed security agencies to act against political violence ahead of the 2027 elections, in a State House statement issued on Friday, 13 November.\n\nHe said every party and candidate must be able to campaign anywhere in Nigeria without intimidation or threats, that his government will not tolerate conduct that threatens public order during the campaign, and he condemned all forms of campaign violence. He urged parties to campaign on policies and ideas and said rivals should not see each other as enemies.\n\nThe statement followed reports of attacks on an APC convoy in Funtua, Katsina, on 28 October; violence at an NDC procession in Asaba on 7 November that police said left one dead and five injured; and the disruption of an NDC town hall in Lagos on 12 November, alongside incidents in Ekiti, Cross River and Sokoto.\n\nThe police had warned a week earlier that people who attack opponents or destroy campaign materials would be arrested and prosecuted.",
+   "state": "",
+   "source_url": "https://www.premiumtimesng.com/news/top-news/925036-2027-tinubu-orders-security-agencies-to-crack-down-on-political-thuggery.html",
+   "published_at": "2026-11-13",
+   "language": "en"
+  }
+ ]
+}

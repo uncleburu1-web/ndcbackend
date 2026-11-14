@@ -264,6 +264,9 @@ PVC is its own unit: membership only asks `pvc.services.is_verified(user)`.
 - **News import:** `python manage.py import_news --as <admin email> [--announcements] [--file …] [--dry-run] [--list]` publishes
   researched election news (50 items) or NDCConnect's own announcements with graphics as official articles, without
   notifying anyone (see `data/news/README.md`). Safe to run again: anything already there is left as it is.
+- **Member news import:** `python manage.py import_member_news --authors m1=<email>,… [--pending] [--show-names] [--dry-run] [--list]`
+  posts the community news in `data/news/2026-11-member-news.json` as the members it names by handle (normal submit checks), approved by a
+  reviewer who isn't the author, without notifications; idempotent by author + title. See `data/news/README.md`.
 - **Demo donations (local only):** `python manage.py seed_demo_donations --count 1500 --total 557000000` seeds simulated donations
   to preview the Finance pages: synthetic names, `example.com/.org/.net` emails, `+23480000…` demo phone numbers, fictional
   addresses, varied states, named and anonymous donors, the NDC fund and published candidates, dates over `--days` or
